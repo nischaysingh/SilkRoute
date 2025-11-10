@@ -16,11 +16,12 @@ import {
   ArrowRight, Sparkles, Plus, Trash2, Edit, Eye, GitBranch, Target,
   Zap, Lock, Unlock, TrendingUp, BarChart3, Code, Settings, Cpu,
   FileText, Link, MessageSquare, Layers, Network, Filter, ChevronRight,
-  Lightbulb, Activity, CheckCircle // NEW ICONS
+  Lightbulb, Activity, CheckCircle, Brain, Users // NEW ICONS
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { LineChart, Line, ResponsiveContainer } from 'recharts'; // NEW: Recharts for KPI trend visualization
 
 export default function ToolboxTab() {
   const [activeView, setActiveView] = useState("overview");
@@ -135,6 +136,332 @@ export default function ToolboxTab() {
     { time: "10:41:58", type: "simulation", mission: "payment_retry_handler", message: "Simulation complete (94% confidence)", status: "success" },
     { time: "10:41:45", type: "alert", mission: "inventory_optimizer", message: "Awaiting validation", status: "warning" }
   ]);
+
+  // NEW: Phase 3 - Advanced Intelligence State
+  
+  // OpsGraph State
+  const [opsGraphData] = useState({
+    nodes: [
+      { id: "invoice_rec", type: "mission", label: "Invoice Reconciler", runs: 2145, successRate: 97 },
+      { id: "crm_sync", type: "mission", label: "CRM Sync", runs: 847, successRate: 94 },
+      { id: "payment_retry", type: "mission", label: "Payment Retry", runs: 423, successRate: 89 },
+      { id: "quickbooks_api", type: "datasource", label: "QuickBooks API", calls: 3842 },
+      { id: "stripe_api", type: "datasource", label: "Stripe API", calls: 2156 },
+      { id: "approval_policy", type: "policy", label: ">$5K Approval", hits: 142 }
+    ],
+    edges: [
+      { from: "invoice_rec", to: "quickbooks_api", type: "calls", weight: 2145 },
+      { from: "invoice_rec", to: "approval_policy", type: "validates", weight: 142 },
+      { from: "crm_sync", to: "stripe_api", type: "calls", weight: 847 },
+      { from: "payment_retry", to: "stripe_api", type: "calls", weight: 423 }
+    ],
+    patterns: [
+      {
+        id: 1,
+        title: "Shared API Pattern Detected",
+        description: "Invoice Reconciler and Payment Retry both call Stripe API with similar params",
+        confidence: 94,
+        impact: "Consolidate into shared subflow → -$0.008/run",
+        type: "optimization",
+        affected: ["invoice_rec", "payment_retry"]
+      },
+      {
+        id: 2,
+        title: "Latency Correlation Found",
+        description: "CRM Sync latency spikes correlate with Invoice Reconciler step 4 delays",
+        confidence: 87,
+        impact: "Sequential dependency detected → parallelize to save 340ms avg",
+        type: "performance",
+        affected: ["crm_sync", "invoice_rec"]
+      },
+      {
+        id: 3,
+        title: "Auto-Approve Opportunity",
+        description: "98% of tickets <$200 always approved → convert to auto-approve rule",
+        confidence: 98,
+        impact: "Reduce human review load by 40%",
+        type: "automation",
+        affected: ["approval_policy"]
+      }
+    ]
+  });
+
+  // Config Leaderboard State
+  const [configLeaderboard] = useState([
+    {
+      id: 1,
+      mission: "invoice_reconciler_v2",
+      version: "v2.4",
+      type: "challenger",
+      metrics: { success: 97.8, latency: 720, cost: 0.019 },
+      champion: { success: 94.2, latency: 840, cost: 0.024 },
+      delta: { success: +3.6, latency: -120, cost: -0.005 },
+      runsCompleted: 142,
+      confidence: 94,
+      status: "ready_to_promote"
+    },
+    {
+      id: 2,
+      mission: "crm_sync_agent",
+      version: "v3.1",
+      type: "challenger",
+      metrics: { success: 92.1, latency: 680, cost: 0.021 },
+      champion: { success: 94.0, latency: 720, cost: 0.019 },
+      delta: { success: -1.9, latency: -40, cost: +0.002 },
+      runsCompleted: 89,
+      confidence: 78,
+      status: "testing"
+    },
+    {
+      id: 3,
+      mission: "payment_retry_handler",
+      version: "v1.8",
+      type: "champion",
+      metrics: { success: 89.4, latency: 920, cost: 0.027 },
+      champion: { success: 89.4, latency: 920, cost: 0.027 },
+      delta: { success: 0, latency: 0, cost: 0 },
+      runsCompleted: 2847,
+      confidence: 99,
+      status: "stable"
+    }
+  ]);
+
+  // Playbook Synthesis State
+  const [synthesizedPlaybooks] = useState([
+    {
+      id: 1,
+      name: "Refund Tiering Strategy",
+      confidence: 94,
+      learnedFrom: "2,145 runs across 3 missions",
+      segments: [
+        { condition: "amount < $50", action: "auto-approve", success: 99.2 },
+        { condition: "$50 <= amount < $500", action: "manager-review", success: 96.8 },
+        { condition: "amount >= $500", action: "finance-review + compliance", success: 94.1 }
+      ],
+      triggers: ["refund_request", "chargeback_claim"],
+      dataJoins: ["customer_tier", "purchase_history", "fraud_score"],
+      policies: ["PII masking", "Audit log required", "SLA: 24h"],
+      kpis: { avgProcessingTime: "18 min", approvalRate: 97.2, costPerCase: 0.042 },
+      provenance: [
+        "Derived from Invoice Reconciler (842 runs)",
+        "Validated against Payment Retry (1,103 runs)",
+        "Tested in CRM Sync (200 shadow runs)"
+      ]
+    },
+    {
+      id: 2,
+      name: "Invoice Chase Cadence",
+      confidence: 89,
+      learnedFrom: "1,847 runs over 6 months",
+      segments: [
+        { condition: "0-15 days overdue", action: "automated_reminder", success: 78.3 },
+        { condition: "16-30 days", action: "phone_follow_up", success: 84.1 },
+        { condition: ">30 days", action: "collections_escalation", success: 62.4 }
+      ],
+      triggers: ["invoice_overdue"],
+      dataJoins: ["payment_history", "customer_relationship", "account_health"],
+      policies: ["Cannot contact before 7 days", "Max 3 attempts per cycle"],
+      kpis: { collectionRate: 81.2, avgDaysToPayment: 22, costPerChase: 0.18 },
+      provenance: [
+        "Extracted from Finance Ops workflows",
+        "Validated against AR Collection patterns"
+      ]
+    }
+  ]);
+
+  // What-If Scenarios State
+  const [whatIfScenarios] = useState([
+    {
+      id: 1,
+      title: "Shift Batch Processing to Off-Peak",
+      type: "schedule",
+      current: "Runs at 14:00 daily",
+      proposed: "Run at 02:00 daily",
+      impact: {
+        cost: { current: "$4.20/day", predicted: "$3.44/day", delta: "-18%" },
+        latency: { current: "840ms avg", predicted: "780ms avg", delta: "-7%" },
+        confidence: 92
+      },
+      reasoning: "Off-peak pricing + lower API contention",
+      ciLower: "-22%",
+      ciUpper: "-14%",
+      dataSources: "Last 90 days traffic patterns",
+      risks: ["Timezone dependencies", "Reporting delays"],
+      status: "ready"
+    },
+    {
+      id: 2,
+      title: "Route Low-Risk Intents to Autopilot",
+      type: "routing",
+      current: "All refunds <$50 → Pilot (human review)",
+      proposed: "Refunds <$50 → Autopilot (auto-approve)",
+      impact: {
+        humanLoad: { current: "240 reviews/day", predicted: "96 reviews/day", delta: "-60%" },
+        processingTime: { current: "4.2 hours avg", predicted: "8 minutes avg", delta: "-97%" },
+        confidence: 96
+      },
+      reasoning: "98.7% of <$50 refunds historically approved without changes",
+      ciLower: "-55%",
+      ciUpper: "-65%",
+      dataSources: "2,847 historical approvals",
+      risks: ["Policy change lag", "Edge case detection"],
+      status: "ready"
+    },
+    {
+      id: 3,
+      title: "Increase Batching Window",
+      type: "batching",
+      current: "Batch size: 50 items",
+      proposed: "Batch size: 200 items",
+      impact: {
+        cost: { current: "$0.024/item", predicted: "$0.017/item", delta: "-29%" },
+        latency: { current: "680ms p95", predicted: "920ms p95", delta: "+35%" },
+        confidence: 84
+      },
+      reasoning: "API bulk endpoints available; trade latency for cost",
+      ciLower: "-24%",
+      ciUpper: "-34%",
+      dataSources: "Simulation on last 30 days",
+      risks: ["Timeout on large batches", "Memory pressure"],
+      status: "needs_review"
+    }
+  ]);
+
+  // Safety Envelope State
+  const [safetyEnvelopes] = useState([
+    {
+      mission: "invoice_reconciler_v2",
+      metrics: [
+        { name: "cost_per_run", normal: [0.019, 0.026], current: 0.024, status: "green" },
+        { name: "latency_p95", normal: [720, 920], current: 840, status: "green" },
+        { name: "error_rate", normal: [0.01, 0.05], current: 0.028, status: "green" },
+        { name: "policy_hits", normal: [10, 25], current: 18, status: "green" }
+      ],
+      violations: [],
+      lastTightened: "3 days ago",
+      canaryActive: false
+    },
+    {
+      mission: "crm_sync_agent",
+      metrics: [
+        { name: "cost_per_run", normal: [0.015, 0.023], current: 0.031, status: "amber" },
+        { name: "latency_p95", normal: [650, 780], current: 720, status: "green" },
+        { name: "error_rate", normal: [0.02, 0.06], current: 0.084, status: "red" },
+        { name: "policy_hits", normal: [5, 15], current: 12, status: "green" }
+      ],
+      violations: [
+        { metric: "cost_per_run", value: 0.031, threshold: 0.023, time: "2 hours ago" },
+        { metric: "error_rate", value: 0.084, threshold: 0.06, time: "45 min ago" }
+      ],
+      lastTightened: "Just now",
+      canaryActive: false,
+      actionTaken: "Auto-tightened human review threshold from $5K to $3K"
+    }
+  ]);
+
+  // Skill Transfer State
+  const [skillTransferTemplates] = useState([
+    {
+      id: 1,
+      sourceMission: "Ticket Triage Agent",
+      sourceDomain: "Customer Support",
+      targetDomain: "Lead Qualification",
+      fieldMapping: [
+        { source: "ticket_priority", target: "lead_score", confidence: 94, autoResolved: true },
+        { source: "customer_sentiment", target: "lead_interest", confidence: 87, autoResolved: true },
+        { source: "ticket_category", target: "lead_segment", confidence: 72, autoResolved: false, needsReview: true },
+        { source: "resolution_time", target: "response_sla", confidence: 91, autoResolved: true }
+      ],
+      piiFields: [
+        { field: "customer_email", action: "masked", policy: "GDPR compliant" },
+        { field: "phone_number", action: "excluded", policy: "Not transferred" }
+      ],
+      mappingSuccess: 85,
+      estimatedAccuracy: "89% (based on similar domain transfer)",
+      riskNotes: [
+        "Lead qualification criteria differ from support triage",
+        "May need domain-specific training data"
+      ]
+    }
+  ]);
+
+  // Feedback Heatmap State
+  const [feedbackHeatmap] = useState({
+    data: [
+      { team: "Finance", intent: "refund_<$50", approved: 187, rejected: 3, confidence: 98 },
+      { team: "Finance", intent: "refund_$50-$500", approved: 142, rejected: 18, confidence: 89 },
+      { team: "Finance", intent: "refund_>$500", approved: 34, rejected: 24, confidence: 59 },
+      { team: "Operations", intent: "inventory_adjust", approved: 94, rejected: 6, confidence: 94 },
+      { team: "Operations", intent: "vendor_payment", approved: 67, rejected: 12, confidence: 85 },
+      { team: "Customer Success", intent: "account_upgrade", approved: 156, rejected: 4, confidence: 97 }
+    ],
+    patterns: [
+      {
+        team: "Finance",
+        pattern: "Always rejects same-day refunds >$5K",
+        confidence: 96,
+        suggestedRule: "Auto-route >$5K same-day refunds to CFO approval"
+      },
+      {
+        team: "Operations",
+        pattern: "Approvals slower on Fridays (avg +3.2 hours)",
+        confidence: 84,
+        suggestedRule: "Increase urgency threshold on Fridays"
+      }
+    ]
+  });
+
+  // Fleet Optimizer State
+  const [fleetOpportunities] = useState([
+    {
+      id: 1,
+      type: "merge",
+      title: "Consolidate Duplicate API Calls",
+      description: "Invoice Reconciler and Payment Retry both call Stripe API with 87% overlapping params",
+      affected: ["invoice_reconciler_v2", "payment_retry_handler"],
+      impact: {
+        apiCalls: { current: 2568, predicted: 1847, delta: "-28%" },
+        cost: { current: "$0.051/day", predicted: "$0.037/day", delta: "-27%" }
+      },
+      confidence: 92,
+      action: "Create shared cache layer"
+    },
+    {
+      id: 2,
+      type: "reschedule",
+      title: "Coordinate Rate-Limited Endpoints",
+      description: "3 missions hitting same QuickBooks endpoint causing 429 errors",
+      affected: ["invoice_reconciler_v2", "crm_sync_agent", "ar_collection_push"],
+      impact: {
+        errors: { current: "12%", predicted: "2%", delta: "-83%" },
+        throughput: { current: "2,400/hr", predicted: "3,100/hr", delta: "+29%" }
+      },
+      confidence: 89,
+      action: "Implement request queue with backpressure"
+    },
+    {
+      id: 3,
+      type: "cache",
+      title: "Share Customer Data Cache",
+      description: "4 missions independently fetching customer profiles",
+      affected: ["invoice_rec", "crm_sync", "payment_retry", "refund_handler"],
+      impact: {
+        apiCalls: { current: 4200, predicted: 980, delta: "-77%" },
+        latency: { current: "840ms", predicted: "340ms", delta: "-60%" }
+      },
+      confidence: 94,
+      action: "Deploy shared Redis cache with 15min TTL"
+    }
+  ]);
+
+  // KPI Dashboard State
+  const [phase3KPIs] = useState({
+    opsReuseRatio: { current: 23, target: 30, trend: [18, 20, 21, 23], unit: "%" },
+    autoTuneWinRate: { current: 32, target: 35, trend: [28, 29, 31, 32], unit: "%" },
+    spendEfficiency: { current: -12, target: -15, trend: [-8, -10, -11, -12], unit: "%" },
+    humanApprovalLoad: { current: -35, target: -40, trend: [-20, -28, -32, -35], unit: "%" },
+    meanTimeToOptimization: { current: 18, target: 24, trend: [28, 24, 21, 18], unit: "hours" }
+  });
 
   const lifecycleStages = [
     { 
@@ -398,12 +725,54 @@ export default function ToolboxTab() {
     return lifecycleStages.find(s => s.stage === stage);
   };
 
+  const handlePromoteConfig = (config) => {
+    toast.success(`Promoting ${config.version} for ${config.mission}`, {
+      description: `Expected savings: $${Math.abs(config.delta.cost).toFixed(3)}/run`
+    });
+  };
+
+  const handleApplyWhatIf = (scenario) => {
+    toast.success(`Applying: ${scenario.title}`, {
+      description: `Expected impact: ${scenario.impact.cost?.delta || scenario.impact.humanLoad?.delta}`
+    });
+  };
+
+  const handleAdoptPlaybook = (playbook) => {
+    toast.success(`Adopting playbook: ${playbook.name}`, {
+      description: "Opening in Mission Builder..."
+    });
+    setActiveView("mission-builder");
+  };
+
+  const handleApplyFleetOptimization = (opportunity) => {
+    toast.success(`Applying: ${opportunity.title}`, {
+      description: `Expected impact: ${opportunity.impact.cost?.delta || opportunity.impact.apiCalls?.delta}`
+    });
+  };
+
+  const handleEnableCanary = (mission) => {
+    toast.info(`Enabling Canary Mode for ${mission}`, {
+      description: "10% traffic, 2 hour duration, auto-rollback on errors"
+    });
+  };
+
+  const handleCloneSkills = (template) => {
+    toast.success(`Cloning skills to ${template.targetDomain}`, {
+      description: "Generating MissionSpec draft..."
+    });
+  };
+
   return (
     <div className="space-y-6">
       <Tabs value={activeView} onValueChange={setActiveView} className="w-full">
         <TabsList className="bg-white/80 backdrop-blur-sm border border-slate-200">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="flight-deck"><Settings className="w-4 h-4 mr-2" />Flight Deck</TabsTrigger>
+          <TabsTrigger value="ops-graph"><Network className="w-4 h-4 mr-2" />OpsGraph</TabsTrigger>
+          <TabsTrigger value="auto-tune"><TrendingUp className="w-4 h-4 mr-2" />Auto-Tune</TabsTrigger>
+          <TabsTrigger value="playbooks"><FileText className="w-4 h-4 mr-2" />Playbooks</TabsTrigger>
+          <TabsTrigger value="what-if"><FlaskConical className="w-4 h-4 mr-2" />What-If</TabsTrigger>
+          <TabsTrigger value="intelligence"><Brain className="w-4 h-4 mr-2" />Intelligence</TabsTrigger>
           <TabsTrigger value="mission-builder"><Plane className="w-4 h-4 mr-2" />Mission Builder</TabsTrigger>
           <TabsTrigger value="action-library"><Boxes className="w-4 h-4 mr-2" />Actions</TabsTrigger>
           <TabsTrigger value="spec-writer"><FileCode className="w-4 h-4 mr-2" />SpecWriter</TabsTrigger>
@@ -800,6 +1169,850 @@ export default function ToolboxTab() {
               </CardContent>
             </Card>
           </div>
+        </TabsContent>
+
+        {/* NEW: OPS GRAPH TAB */}
+        <TabsContent value="ops-graph" className="space-y-6 mt-6">
+          <Card className="bg-gradient-to-br from-purple-900/20 to-blue-900/20 border-purple-500/30">
+            <CardContent className="p-8">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-4">
+                  <div className="p-4 bg-gradient-to-br from-purple-600 to-pink-600 rounded-2xl">
+                    <Network className="w-8 h-8 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-3xl font-bold text-white mb-1">Cross-Mission Brain (OpsGraph)</h2>
+                    <p className="text-gray-400">Live knowledge graph • Pattern mining • Root-cause linking</p>
+                  </div>
+                </div>
+                <Badge className="bg-emerald-600/20 text-emerald-400 border-emerald-600/30 px-4 py-2">
+                  <Activity className="w-4 h-4 mr-2" />
+                  {opsGraphData.patterns.length} Patterns Detected
+                </Badge>
+              </div>
+
+              {/* Pattern Suggestions */}
+              <div className="grid grid-cols-3 gap-4">
+                {opsGraphData.patterns.map((pattern) => (
+                  <Card key={pattern.id} className="bg-white/5 backdrop-blur-sm border-white/10">
+                    <CardContent className="p-6">
+                      <div className="flex items-start justify-between mb-4">
+                        <Badge className={cn(
+                          "text-xs",
+                          pattern.type === "optimization" && "bg-emerald-100 text-emerald-700",
+                          pattern.type === "performance" && "bg-blue-100 text-blue-700",
+                          pattern.type === "automation" && "bg-purple-100 text-purple-700"
+                        )}>
+                          {pattern.type}
+                        </Badge>
+                        <Badge className="bg-white/10 text-white text-xs">
+                          {pattern.confidence}% confidence
+                        </Badge>
+                      </div>
+                      
+                      <h4 className="text-lg font-bold text-white mb-2">{pattern.title}</h4>
+                      <p className="text-sm text-gray-300 mb-4">{pattern.description}</p>
+                      
+                      <div className="p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-lg mb-4">
+                        <div className="text-xs text-emerald-400 font-semibold mb-1">Expected Impact:</div>
+                        <div className="text-sm text-white">{pattern.impact}</div>
+                      </div>
+
+                      <div className="flex flex-wrap gap-1 mb-4">
+                        <div className="text-xs text-gray-400 mr-2">Affects:</div>
+                        {pattern.affected.map((node, idx) => (
+                          <Badge key={idx} className="text-xs bg-white/10 text-white">
+                            {opsGraphData.nodes.find(n => n.id === node)?.label}
+                          </Badge>
+                        ))}
+                      </div>
+
+                      <div className="flex gap-2">
+                        <Button size="sm" className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-xs h-8">
+                          <Check className="w-3 h-3 mr-1" />
+                          Apply
+                        </Button>
+                        <Button size="sm" variant="outline" className="flex-1 bg-white/5 border-white/10 text-white hover:bg-white/10 text-xs h-8">
+                          Explain
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Graph Visualization */}
+          <Card className="bg-white/5 backdrop-blur-xl border-white/10">
+            <CardHeader>
+              <CardTitle className="text-white text-lg flex items-center gap-2">
+                <Network className="w-5 h-5 text-purple-400" />
+                Mission Dependency Graph
+              </CardTitle>
+              <p className="text-sm text-gray-400 mt-1">Zoomable view of missions, data sources, and policies</p>
+            </CardHeader>
+            <CardContent>
+              <div className="bg-slate-900/50 rounded-lg p-8 border border-white/10 min-h-[400px] flex items-center justify-center">
+                <div className="text-center">
+                  <Network className="w-16 h-16 mx-auto mb-4 text-purple-400 opacity-50" />
+                  <p className="text-white text-sm mb-2">Interactive Graph Visualization</p>
+                  <p className="text-gray-400 text-xs">Nodes: {opsGraphData.nodes.length} • Edges: {opsGraphData.edges.length}</p>
+                </div>
+              </div>
+
+              {/* Node Legend */}
+              <div className="flex gap-4 mt-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-purple-500"></div>
+                  <span className="text-xs text-gray-400">Missions</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+                  <span className="text-xs text-gray-400">Data Sources</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                  <span className="text-xs text-gray-400">Policies</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* NEW: AUTO-TUNE TAB */}
+        <TabsContent value="auto-tune" className="space-y-6 mt-6">
+          <Card className="bg-gradient-to-br from-emerald-900/20 to-teal-900/20 border-emerald-500/30">
+            <CardContent className="p-8">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-4">
+                  <div className="p-4 bg-gradient-to-br from-emerald-600 to-teal-600 rounded-2xl">
+                    <TrendingUp className="w-8 h-8 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-3xl font-bold text-white mb-1">Config Leaderboard</h2>
+                    <p className="text-gray-400">Champion/Challenger testing • Auto-promotion • Continuous optimization</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Leaderboard */}
+              <div className="space-y-4">
+                {configLeaderboard.map((config) => (
+                  <Card key={config.id} className={cn(
+                    "border-2",
+                    config.status === "ready_to_promote" ? "border-emerald-300 bg-emerald-50/5" :
+                    config.status === "testing" ? "border-blue-300 bg-blue-50/5" :
+                    "border-slate-300 bg-white/5"
+                  )}>
+                    <CardContent className="p-6">
+                      <div className="flex items-start justify-between mb-4">
+                        <div>
+                          <h4 className="text-lg font-bold text-white mb-1">{config.mission}</h4>
+                          <div className="flex items-center gap-2">
+                            <Badge className={cn(
+                              "text-xs",
+                              config.type === "challenger" ? "bg-blue-100 text-blue-700" : "bg-purple-100 text-purple-700"
+                            )}>
+                              {config.version} ({config.type})
+                            </Badge>
+                            <Badge className={cn(
+                              "text-xs",
+                              config.status === "ready_to_promote" ? "bg-emerald-100 text-emerald-700" :
+                              config.status === "testing" ? "bg-amber-100 text-amber-700" :
+                              "bg-slate-100 text-slate-700"
+                            )}>
+                              {config.status.replace(/_/g, " ")}
+                            </Badge>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-sm text-gray-400">Confidence</div>
+                          <div className="text-2xl font-bold text-white">{config.confidence}%</div>
+                        </div>
+                      </div>
+
+                      {/* Metrics Comparison */}
+                      <div className="grid grid-cols-3 gap-4 mb-4">
+                        <div>
+                          <div className="text-xs text-gray-400 mb-1">Success Rate</div>
+                          <div className="flex items-baseline gap-2">
+                            <span className="text-lg font-bold text-white">{config.metrics.success}%</span>
+                            <Badge className={cn(
+                              "text-xs",
+                              config.delta.success > 0 ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700"
+                            )}>
+                              {config.delta.success > 0 ? "+" : ""}{config.delta.success}%
+                            </Badge>
+                          </div>
+                        </div>
+                        <div>
+                          <div className="text-xs text-gray-400 mb-1">Latency (p95)</div>
+                          <div className="flex items-baseline gap-2">
+                            <span className="text-lg font-bold text-white">{config.metrics.latency}ms</span>
+                            <Badge className={cn(
+                              "text-xs",
+                              config.delta.latency < 0 ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700"
+                            )}>
+                              {config.delta.latency}ms
+                            </Badge>
+                          </div>
+                        </div>
+                        <div>
+                          <div className="text-xs text-gray-400 mb-1">Cost/Run</div>
+                          <div className="flex items-baseline gap-2">
+                            <span className="text-lg font-bold text-white">${config.metrics.cost}</span>
+                            <Badge className={cn(
+                              "text-xs",
+                              config.delta.cost < 0 ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700"
+                            )}>
+                              ${config.delta.cost.toFixed(3)}
+                            </Badge>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between text-xs text-gray-400 mb-4">
+                        <span>Runs completed: {config.runsCompleted}</span>
+                      </div>
+
+                      {config.status === "ready_to_promote" && (
+                        <div className="flex gap-2">
+                          <Button 
+                            onClick={() => handlePromoteConfig(config)}
+                            className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-xs h-8"
+                          >
+                            <TrendingUp className="w-3 h-3 mr-1" />
+                            Promote to Champion
+                          </Button>
+                          <Button variant="outline" className="bg-white/5 border-white/10 text-white hover:bg-white/10 text-xs h-8">
+                            View Impact Card
+                          </Button>
+                          <Button variant="outline" className="bg-white/5 border-white/10 text-white hover:bg-white/10 text-xs h-8">
+                            <Eye className="w-3 h-3 mr-1" />
+                            Diff
+                          </Button>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* NEW: PLAYBOOKS TAB */}
+        <TabsContent value="playbooks" className="space-y-6 mt-6">
+          <Card className="bg-gradient-to-br from-indigo-900/20 to-purple-900/20 border-indigo-500/30">
+            <CardContent className="p-8">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-4">
+                  <div className="p-4 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-2xl">
+                    <FileText className="w-8 h-8 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-3xl font-bold text-white mb-1">Synthesized Playbooks</h2>
+                    <p className="text-gray-400">Learned from behavior • Company-specific strategies • Ready to deploy</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-6">
+                {synthesizedPlaybooks.map((playbook) => (
+                  <Card key={playbook.id} className="bg-white/5 backdrop-blur-sm border-white/10">
+                    <CardContent className="p-6">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex-1">
+                          <h3 className="text-xl font-bold text-white mb-2">{playbook.name}</h3>
+                          <div className="flex items-center gap-2 mb-3">
+                            <Badge className="bg-purple-100 text-purple-700 text-xs">
+                              {playbook.confidence}% confidence
+                            </Badge>
+                            <span className="text-xs text-gray-400">Learned from {playbook.learnedFrom}</span>
+                          </div>
+                        </div>
+                        <Button 
+                          onClick={() => handleAdoptPlaybook(playbook)}
+                          className="bg-indigo-600 hover:bg-indigo-700 text-xs h-8"
+                        >
+                          <Plus className="w-3 h-3 mr-1" />
+                          Adopt as Subflow
+                        </Button>
+                      </div>
+
+                      {/* Segments */}
+                      <div className="mb-4">
+                        <h4 className="text-sm font-bold text-white mb-3">Decision Segments</h4>
+                        <div className="space-y-2">
+                          {playbook.segments.map((segment, idx) => (
+                            <div key={idx} className="flex items-center justify-between p-3 bg-white/5 border border-white/10 rounded-lg">
+                              <div className="flex-1">
+                                <div className="text-sm text-white font-mono">{segment.condition}</div>
+                                <div className="text-xs text-gray-400 mt-1">→ {segment.action}</div>
+                              </div>
+                              <Badge className="bg-emerald-100 text-emerald-700 text-xs">
+                                {segment.success}% success
+                              </Badge>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Metadata Grid */}
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <h5 className="text-xs font-bold text-gray-400 mb-2">Triggers</h5>
+                          <div className="flex flex-wrap gap-1">
+                            {playbook.triggers.map((trigger, idx) => (
+                              <Badge key={idx} className="bg-blue-100 text-blue-700 text-xs">
+                                {trigger}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                        <div>
+                          <h5 className="text-xs font-bold text-gray-400 mb-2">Data Joins</h5>
+                          <div className="flex flex-wrap gap-1">
+                            {playbook.dataJoins.map((join, idx) => (
+                              <Badge key={idx} className="bg-amber-100 text-amber-700 text-xs">
+                                {join}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                        <div>
+                          <h5 className="text-xs font-bold text-gray-400 mb-2">Policies</h5>
+                          <div className="flex flex-wrap gap-1">
+                            {playbook.policies.map((policy, idx) => (
+                              <Badge key={idx} className="bg-red-100 text-red-700 text-xs">
+                                {policy}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                        <div>
+                          <h5 className="text-xs font-bold text-gray-400 mb-2">KPIs</h5>
+                          <div className="space-y-1 text-xs">
+                            <div className="flex justify-between text-white">
+                              <span>Avg Processing:</span>
+                              <span className="font-semibold">{playbook.kpis.avgProcessingTime}</span>
+                            </div>
+                            <div className="flex justify-between text-white">
+                              <span>Approval Rate:</span>
+                              <span className="font-semibold">{playbook.kpis.approvalRate}%</span>
+                            </div>
+                            <div className="flex justify-between text-white">
+                              <span>Cost/Case:</span>
+                              <span className="font-semibold">${playbook.kpis.costPerCase}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Provenance */}
+                      <div className="mt-4 pt-4 border-t border-white/10">
+                        <h5 className="text-xs font-bold text-gray-400 mb-2">Provenance</h5>
+                        <div className="space-y-1">
+                          {playbook.provenance.map((source, idx) => (
+                            <div key={idx} className="text-xs text-gray-300">• {source}</div>
+                          ))}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* NEW: WHAT-IF STUDIO TAB */}
+        <TabsContent value="what-if" className="space-y-6 mt-6">
+          <Card className="bg-gradient-to-br from-cyan-900/20 to-blue-900/20 border-cyan-500/30">
+            <CardContent className="p-8">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-4">
+                  <div className="p-4 bg-gradient-to-br from-cyan-600 to-blue-600 rounded-2xl">
+                    <FlaskConical className="w-8 h-8 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-3xl font-bold text-white mb-1">What-If Studio</h2>
+                    <p className="text-gray-400">Always-on simulations • Counterfactual analysis • Shadow testing</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                {whatIfScenarios.map((scenario) => (
+                  <Card key={scenario.id} className="bg-white/5 backdrop-blur-sm border-white/10">
+                    <CardContent className="p-6">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Badge className={cn(
+                              "text-xs",
+                              scenario.type === "schedule" && "bg-purple-100 text-purple-700",
+                              scenario.type === "routing" && "bg-blue-100 text-blue-700",
+                              scenario.type === "batching" && "bg-emerald-100 text-emerald-700"
+                            )}>
+                              {scenario.type}
+                            </Badge>
+                            <Badge className={cn(
+                              "text-xs",
+                              scenario.status === "ready" ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"
+                            )}>
+                              {scenario.status.replace(/_/g, " ")}
+                            </Badge>
+                          </div>
+                          <h3 className="text-lg font-bold text-white mb-2">{scenario.title}</h3>
+                          <div className="space-y-1 text-sm mb-3">
+                            <div className="flex items-center gap-2 text-gray-400">
+                              <span>Current:</span>
+                              <span className="text-white">{scenario.current}</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-gray-400">
+                              <span>Proposed:</span>
+                              <span className="text-emerald-400 font-semibold">{scenario.proposed}</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-sm text-gray-400">Confidence</div>
+                          <div className="text-2xl font-bold text-white">{scenario.impact.confidence}%</div>
+                        </div>
+                      </div>
+
+                      {/* Impact Metrics */}
+                      <div className="grid grid-cols-2 gap-4 mb-4 p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-lg">
+                        {Object.entries(scenario.impact).filter(([key]) => key !== "confidence").map(([key, value]) => (
+                          <div key={key}>
+                            <div className="text-xs text-emerald-400 mb-1">{key.replace(/([A-Z])/g, " $1").trim()}</div>
+                            <div className="space-y-1 text-xs">
+                              <div className="flex justify-between text-gray-400">
+                                <span>Current:</span>
+                                <span className="text-white">{value.current}</span>
+                              </div>
+                              <div className="flex justify-between text-gray-400">
+                                <span>Predicted:</span>
+                                <span className="text-white">{value.predicted}</span>
+                              </div>
+                              <div className="flex justify-between font-bold">
+                                <span className="text-emerald-400">Delta:</span>
+                                <span className="text-emerald-400">{value.delta}</span>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Reasoning */}
+                      <div className="mb-4 p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+                        <div className="text-xs text-blue-400 font-semibold mb-1">Reasoning:</div>
+                        <div className="text-sm text-white">{scenario.reasoning}</div>
+                      </div>
+
+                      {/* Confidence Band */}
+                      <div className="mb-4">
+                        <div className="flex items-center justify-between text-xs text-gray-400 mb-1">
+                          <span>95% Confidence Interval</span>
+                          <span>{scenario.ciLower} to {scenario.ciUpper}</span>
+                        </div>
+                        <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                          <div 
+                            className="h-full bg-gradient-to-r from-blue-500 to-emerald-500"
+                            style={{ width: `${scenario.impact.confidence}%` }}
+                          ></div>
+                        </div>
+                      </div>
+
+                      {/* Risks */}
+                      {scenario.risks.length > 0 && (
+                        <div className="mb-4">
+                          <div className="text-xs text-gray-400 mb-2">Identified Risks:</div>
+                          <div className="space-y-1">
+                            {scenario.risks.map((risk, idx) => (
+                              <div key={idx} className="flex items-center gap-2 text-xs text-amber-400">
+                                <AlertTriangle className="w-3 h-3" />
+                                {risk}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="flex gap-2">
+                        <Button 
+                          onClick={() => handleApplyWhatIf(scenario)}
+                          disabled={scenario.status !== "ready"}
+                          className="flex-1 bg-cyan-600 hover:bg-cyan-700 text-xs h-8"
+                        >
+                          <Play className="w-3 h-3 mr-1" />
+                          Apply
+                        </Button>
+                        <Button variant="outline" className="flex-1 bg-white/5 border-white/10 text-white hover:bg-white/10 text-xs h-8">
+                          <FlaskConical className="w-3 h-3 mr-1" />
+                          Dry Run
+                        </Button>
+                        <Button variant="outline" className="bg-white/5 border-white/10 text-white hover:bg-white/10 text-xs h-8">
+                          Explain
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* NEW: INTELLIGENCE TAB (combining remaining Phase 3 features) */}
+        <TabsContent value="intelligence" className="space-y-6 mt-6">
+          {/* KPI Dashboard */}
+          <Card className="bg-gradient-to-br from-slate-900 to-gray-900 border-white/10">
+            <CardContent className="p-8">
+              <h2 className="text-2xl font-bold text-white mb-6">Phase 3 Intelligence KPIs</h2>
+              <div className="grid grid-cols-5 gap-4">
+                {Object.entries(phase3KPIs).map(([key, kpi]) => (
+                  <Card key={key} className="bg-white/5 backdrop-blur-sm border-white/10">
+                    <CardContent className="p-4">
+                      <div className="text-xs text-gray-400 mb-2">{key.replace(/([A-Z])/g, " $1").trim()}</div>
+                      <div className="flex items-baseline gap-2 mb-2">
+                        <span className="text-2xl font-bold text-white">{kpi.current}{kpi.unit}</span>
+                        <Badge className={cn(
+                          "text-xs",
+                          kpi.current >= kpi.target ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"
+                        )}>
+                          Target: {kpi.target}{kpi.unit}
+                        </Badge>
+                      </div>
+                      <ResponsiveContainer width="100%" height={40}>
+                        <LineChart data={kpi.trend.map((v, i) => ({ value: v, idx: i }))}>
+                          <Line type="monotone" dataKey="value" stroke="#3b82f6" strokeWidth={2} dot={false} />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          <div className="grid grid-cols-2 gap-6">
+            {/* Safety Envelope */}
+            <Card className="bg-white/5 backdrop-blur-xl border-white/10">
+              <CardHeader>
+                <CardTitle className="text-white text-lg flex items-center gap-2">
+                  <Shield className="w-5 h-5 text-red-400" />
+                  Safety Envelope Learner
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {safetyEnvelopes.map((envelope, idx) => (
+                    <Card key={idx} className={cn(
+                      "border-2",
+                      envelope.violations.length > 0 ? "border-red-300 bg-red-50/5" : "border-emerald-300 bg-emerald-50/5"
+                    )}>
+                      <CardContent className="p-4">
+                        <div className="flex items-center justify-between mb-3">
+                          <h4 className="text-sm font-bold text-white">{envelope.mission}</h4>
+                          {envelope.canaryActive && (
+                            <Badge className="bg-amber-100 text-amber-700 text-xs">Canary Active</Badge>
+                          )}
+                        </div>
+
+                        <div className="space-y-2 mb-3">
+                          {envelope.metrics.map((metric, midx) => (
+                            <div key={midx} className="flex items-center justify-between text-xs">
+                              <span className="text-gray-400">{metric.name.replace(/_/g, " ")}</span>
+                              <div className="flex items-center gap-2">
+                                <span className="text-white">{metric.current}</span>
+                                <div className={cn(
+                                  "w-2 h-2 rounded-full",
+                                  metric.status === "green" && "bg-emerald-500",
+                                  metric.status === "amber" && "bg-amber-500",
+                                  metric.status === "red" && "bg-red-500"
+                                )} />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+
+                        {envelope.violations.length > 0 && (
+                          <div className="p-2 bg-red-500/10 border border-red-500/30 rounded mb-3">
+                            <div className="text-xs text-red-400 font-semibold mb-1">Violations:</div>
+                            {envelope.violations.map((violation, vidx) => (
+                              <div key={vidx} className="text-xs text-white">
+                                {violation.metric}: {violation.value} (threshold: {violation.threshold}) • {violation.time}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                        {envelope.actionTaken && (
+                          <div className="p-2 bg-blue-500/10 border border-blue-500/30 rounded mb-3">
+                            <div className="text-xs text-blue-400 font-semibold mb-1">Action Taken:</div>
+                            <div className="text-xs text-white">{envelope.actionTaken}</div>
+                          </div>
+                        )}
+
+                        <div className="flex gap-2">
+                          <Button 
+                            size="sm" 
+                            onClick={() => handleEnableCanary(envelope.mission)}
+                            className="flex-1 bg-amber-600 hover:bg-amber-700 text-xs h-7"
+                          >
+                            Enable Canary
+                          </Button>
+                          <Button size="sm" variant="outline" className="bg-white/5 border-white/10 text-white hover:bg-white/10 text-xs h-7">
+                            View Envelope
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Feedback Heatmap */}
+            <Card className="bg-white/5 backdrop-blur-xl border-white/10">
+              <CardHeader>
+                <CardTitle className="text-white text-lg flex items-center gap-2">
+                  <Users className="w-5 h-5 text-purple-400" />
+                  Human-in-the-Loop Memory
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4 mb-4">
+                  {feedbackHeatmap.data.map((row, idx) => (
+                    <div key={idx} className="flex items-center justify-between p-2 bg-white/5 rounded">
+                      <div className="flex-1">
+                        <div className="text-sm text-white font-semibold">{row.team}</div>
+                        <div className="text-xs text-gray-400">{row.intent}</div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div className="text-xs">
+                          <span className="text-emerald-400">{row.approved}</span>
+                          <span className="text-gray-500">/</span>
+                          <span className="text-red-400">{row.rejected}</span>
+                        </div>
+                        <Badge className={cn(
+                          "text-xs",
+                          row.confidence >= 95 ? "bg-emerald-100 text-emerald-700" :
+                          row.confidence >= 80 ? "bg-blue-100 text-blue-700" :
+                          "bg-amber-100 text-amber-700"
+                        )}>
+                          {row.confidence}%
+                        </Badge>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="border-t border-white/10 pt-4">
+                  <h5 className="text-sm font-bold text-white mb-3">Learned Patterns</h5>
+                  <div className="space-y-2">
+                    {feedbackHeatmap.patterns.map((pattern, idx) => (
+                      <Card key={idx} className="bg-blue-500/10 border-blue-500/30">
+                        <CardContent className="p-3">
+                          <div className="flex items-start justify-between mb-2">
+                            <div className="flex-1">
+                              <div className="text-xs text-white font-semibold mb-1">{pattern.team}</div>
+                              <div className="text-xs text-gray-300">{pattern.pattern}</div>
+                            </div>
+                            <Badge className="bg-blue-100 text-blue-700 text-xs">
+                              {pattern.confidence}%
+                            </Badge>
+                          </div>
+                          <div className="p-2 bg-white/5 rounded text-xs text-emerald-400">
+                            💡 {pattern.suggestedRule}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Skill Transfer */}
+          <Card className="bg-white/5 backdrop-blur-xl border-white/10">
+            <CardHeader>
+              <CardTitle className="text-white text-lg flex items-center gap-2">
+                <GitBranch className="w-5 h-5 text-cyan-400" />
+                Skill Transfer (Few-Shot Cloning)
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {skillTransferTemplates.map((template) => (
+                  <Card key={template.id} className="bg-white/5 border-white/10">
+                    <CardContent className="p-6">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Badge className="bg-cyan-100 text-cyan-700 text-xs">{template.sourceDomain}</Badge>
+                            <ArrowRight className="w-4 h-4 text-gray-400" />
+                            <Badge className="bg-purple-100 text-purple-700 text-xs">{template.targetDomain}</Badge>
+                          </div>
+                          <h4 className="text-lg font-bold text-white mb-1">Clone from: {template.sourceMission}</h4>
+                          <div className="text-sm text-gray-400">
+                            {template.mappingSuccess}% fields auto-resolved • Est. accuracy: {template.estimatedAccuracy}
+                          </div>
+                        </div>
+                        <Button 
+                          onClick={() => handleCloneSkills(template)}
+                          className="bg-cyan-600 hover:bg-cyan-700 text-xs h-8"
+                        >
+                          <Copy className="w-3 h-3 mr-1" />
+                          Clone Skills
+                        </Button>
+                      </div>
+
+                      {/* Field Mapping */}
+                      <div className="mb-4">
+                        <h5 className="text-xs font-bold text-gray-400 mb-2">Field Mapping</h5>
+                        <div className="space-y-2">
+                          {template.fieldMapping.map((mapping, idx) => (
+                            <div key={idx} className={cn(
+                              "flex items-center justify-between p-2 rounded",
+                              mapping.needsReview ? "bg-amber-500/10 border border-amber-500/30" : "bg-white/5"
+                            )}>
+                              <div className="flex items-center gap-2 text-xs">
+                                <span className="text-white font-mono">{mapping.source}</span>
+                                <ArrowRight className="w-3 h-3 text-gray-500" />
+                                <span className="text-white font-mono">{mapping.target}</span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <Badge className={cn(
+                                  "text-xs",
+                                  mapping.autoResolved ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"
+                                )}>
+                                  {mapping.confidence}%
+                                </Badge>
+                                {mapping.needsReview && (
+                                  <Badge className="bg-amber-100 text-amber-700 text-xs">Review</Badge>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* PII Handling */}
+                      <div className="mb-4">
+                        <h5 className="text-xs font-bold text-gray-400 mb-2">PII Field Handling</h5>
+                        <div className="space-y-1">
+                          {template.piiFields.map((pii, idx) => (
+                            <div key={idx} className="flex items-center justify-between p-2 bg-red-500/10 border border-red-500/30 rounded text-xs">
+                              <div className="flex items-center gap-2">
+                                <Lock className="w-3 h-3 text-red-400" />
+                                <span className="text-white">{pii.field}</span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <Badge className="bg-red-100 text-red-700 text-xs">{pii.action}</Badge>
+                                <span className="text-gray-400">{pii.policy}</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Risk Notes */}
+                      {template.riskNotes.length > 0 && (
+                        <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded">
+                          <div className="text-xs text-amber-400 font-semibold mb-2">Risk Notes:</div>
+                          {template.riskNotes.map((note, idx) => (
+                            <div key={idx} className="text-xs text-white mb-1">• {note}</div>
+                          ))}
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Fleet Optimizer */}
+          <Card className="bg-white/5 backdrop-blur-xl border-white/10">
+            <CardHeader>
+              <CardTitle className="text-white text-lg flex items-center gap-2">
+                <Network className="w-5 h-5 text-emerald-400" />
+                Meta-Ops Optimizer (Fleet-Level)
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {fleetOpportunities.map((opportunity) => (
+                  <Card key={opportunity.id} className="bg-white/5 border-white/10">
+                    <CardContent className="p-6">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Badge className={cn(
+                              "text-xs",
+                              opportunity.type === "merge" && "bg-purple-100 text-purple-700",
+                              opportunity.type === "reschedule" && "bg-blue-100 text-blue-700",
+                              opportunity.type === "cache" && "bg-emerald-100 text-emerald-700"
+                            )}>
+                              {opportunity.type}
+                            </Badge>
+                            <Badge className="bg-white/10 text-white text-xs">
+                              {opportunity.confidence}% confidence
+                            </Badge>
+                          </div>
+                          <h4 className="text-lg font-bold text-white mb-2">{opportunity.title}</h4>
+                          <p className="text-sm text-gray-300 mb-3">{opportunity.description}</p>
+                        </div>
+                        <Button 
+                          onClick={() => handleApplyFleetOptimization(opportunity)}
+                          className="bg-emerald-600 hover:bg-emerald-700 text-xs h-8"
+                        >
+                          <Play className="w-3 h-3 mr-1" />
+                          Apply
+                        </Button>
+                      </div>
+
+                      {/* Impact Metrics */}
+                      <div className="grid grid-cols-2 gap-4 p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-lg mb-4">
+                        {Object.entries(opportunity.impact).map(([key, value]) => (
+                          <div key={key}>
+                            <div className="text-xs text-emerald-400 mb-1">{key.replace(/([A-Z])/g, " $1").trim()}</div>
+                            <div className="flex items-baseline gap-2">
+                              <span className="text-sm text-white">{value.current}</span>
+                              <ArrowRight className="w-3 h-3 text-gray-500" />
+                              <span className="text-sm font-bold text-emerald-400">{value.predicted}</span>
+                              <Badge className="bg-emerald-100 text-emerald-700 text-xs">{value.delta}</Badge>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Affected Missions */}
+                      <div>
+                        <div className="text-xs text-gray-400 mb-2">Affected Missions:</div>
+                        <div className="flex flex-wrap gap-2">
+                          {opportunity.affected.map((mission, idx) => (
+                            <Badge key={idx} className="bg-blue-100 text-blue-700 text-xs">
+                              {mission}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="mt-4 p-2 bg-blue-500/10 border border-blue-500/30 rounded text-xs text-blue-400">
+                        💡 Recommended Action: {opportunity.action}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         {/* MISSION BUILDER TAB */}
