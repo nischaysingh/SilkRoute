@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -16,7 +16,7 @@ import {
   ArrowRight, Sparkles, Plus, Trash2, Edit, Eye, GitBranch, Target,
   Zap, Lock, Unlock, TrendingUp, BarChart3, Code, Settings, Cpu,
   FileText, Link, MessageSquare, Layers, Network, Filter, ChevronRight,
-  Lightbulb
+  Lightbulb, Activity, CheckCircle // NEW ICONS
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
@@ -71,6 +71,122 @@ export default function ToolboxTab() {
     projectedSpend: 87.5,
     alerts: []
   });
+
+  // NEW: Integration Fabric / Flight Deck state
+  const [activeMissions, setActiveMissions] = useState([
+    {
+      id: 1,
+      name: "invoice_reconciler_v2",
+      stage: "active",
+      owner: "finance@acme.com",
+      health: 98,
+      executions: 142,
+      lastTransition: "2m ago",
+      nextStage: "monitored",
+      triggeredTools: ["Pilot", "Autopilot"]
+    },
+    {
+      id: 2,
+      name: "crm_sync_agent",
+      stage: "simulated",
+      owner: "ops@acme.com",
+      health: 94,
+      executions: 0,
+      lastTransition: "5m ago",
+      nextStage: "cleared_for_flight",
+      triggeredTools: ["Simulator", "Guardrails"]
+    },
+    {
+      id: 3,
+      name: "payment_retry_handler",
+      stage: "validated",
+      owner: "finance@acme.com",
+      health: 100,
+      executions: 0,
+      lastTransition: "8m ago",
+      nextStage: "simulated",
+      triggeredTools: ["Simulator", "Guardrails"]
+    },
+    {
+      id: 4,
+      name: "inventory_optimizer",
+      stage: "draft",
+      owner: "ops@acme.com",
+      health: 0,
+      executions: 0,
+      lastTransition: "12m ago",
+      nextStage: "validated",
+      triggeredTools: ["SpecWriter"]
+    }
+  ]);
+
+  const [systemHealth, setSystemHealth] = useState({
+    aiBus: 98,
+    blackBox: 96,
+    policyHub: 97,
+    costGuardian: 99,
+    simulator: 94
+  });
+
+  const [telemetryStream, setTelemetryStream] = useState([
+    { time: "10:42:15", type: "execution", mission: "invoice_reconciler_v2", message: "Executed successfully", status: "success" },
+    { time: "10:42:10", type: "policy", mission: "crm_sync_agent", message: "Policy check passed", status: "success" },
+    { time: "10:42:05", type: "cost", mission: "invoice_reconciler_v2", message: "Cost within budget ($0.024)", status: "success" },
+    { time: "10:41:58", type: "simulation", mission: "payment_retry_handler", message: "Simulation complete (94% confidence)", status: "success" },
+    { time: "10:41:45", type: "alert", mission: "inventory_optimizer", message: "Awaiting validation", status: "warning" }
+  ]);
+
+  const lifecycleStages = [
+    { 
+      stage: "draft", 
+      label: "Draft", 
+      tool: "SpecWriter",
+      description: "AI generates mission spec from intent",
+      color: "slate"
+    },
+    { 
+      stage: "validated", 
+      label: "Validated", 
+      tool: "Simulator + Guardrails",
+      description: "Policy check + dry-run simulation",
+      color: "blue"
+    },
+    { 
+      stage: "simulated", 
+      label: "Simulated", 
+      tool: "Wind Tunnel",
+      description: "Historical data test flight",
+      color: "cyan"
+    },
+    { 
+      stage: "cleared_for_flight", 
+      label: "Cleared for Flight", 
+      tool: "ATC + Cost Guardian",
+      description: "Final clearance + budget check",
+      color: "emerald"
+    },
+    { 
+      stage: "active", 
+      label: "Active", 
+      tool: "Pilot + Autopilot",
+      description: "Mission running in production",
+      color: "purple"
+    },
+    { 
+      stage: "monitored", 
+      label: "Monitored", 
+      tool: "ATC + Telemetry",
+      description: "Real-time performance tracking",
+      color: "amber"
+    },
+    { 
+      stage: "audit", 
+      label: "Audit", 
+      tool: "Evaluator + Flight Deck",
+      description: "Post-flight performance review",
+      color: "indigo"
+    }
+  ];
 
   const tools = [
     {
@@ -251,11 +367,43 @@ export default function ToolboxTab() {
     return colors[color] || colors.blue;
   };
 
+  const handleMissionStageAdvance = (missionId) => {
+    setActiveMissions(prev => prev.map(m => {
+      if (m.id === missionId) {
+        const currentIdx = lifecycleStages.findIndex(s => s.stage === m.stage);
+        const nextStage = lifecycleStages[currentIdx + 1];
+        if (nextStage) {
+          toast.success(`Mission advanced to ${nextStage.label}`, {
+            description: `Triggered: ${nextStage.tool}`
+          });
+          return {
+            ...m,
+            stage: nextStage.stage,
+            lastTransition: "Just now",
+            nextStage: lifecycleStages[currentIdx + 2]?.stage || null,
+            triggeredTools: nextStage.tool.split(" + ")
+          };
+        }
+      }
+      return m;
+    }));
+  };
+
+  const getStageColor = (stage) => {
+    const stageData = lifecycleStages.find(s => s.stage === stage);
+    return stageData?.color || "slate";
+  };
+
+  const getStageInfo = (stage) => {
+    return lifecycleStages.find(s => s.stage === stage);
+  };
+
   return (
     <div className="space-y-6">
       <Tabs value={activeView} onValueChange={setActiveView} className="w-full">
         <TabsList className="bg-white/80 backdrop-blur-sm border border-slate-200">
           <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="flight-deck"><Settings className="w-4 h-4 mr-2" />Flight Deck</TabsTrigger>
           <TabsTrigger value="mission-builder"><Plane className="w-4 h-4 mr-2" />Mission Builder</TabsTrigger>
           <TabsTrigger value="action-library"><Boxes className="w-4 h-4 mr-2" />Actions</TabsTrigger>
           <TabsTrigger value="spec-writer"><FileCode className="w-4 h-4 mr-2" />SpecWriter</TabsTrigger>
@@ -364,6 +512,293 @@ export default function ToolboxTab() {
                 </Card>
               </motion.div>
             ))}
+          </div>
+        </TabsContent>
+
+        {/* NEW: FLIGHT DECK / INTEGRATION FABRIC TAB */}
+        <TabsContent value="flight-deck" className="space-y-6 mt-6">
+          <Card className="bg-gradient-to-br from-slate-900 to-gray-900 border-white/10 text-white shadow-2xl">
+            <CardContent className="p-8">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-4">
+                  <div className="p-4 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl">
+                    <Network className="w-8 h-8" />
+                  </div>
+                  <div>
+                    <h2 className="text-3xl font-bold mb-1">Integration Fabric</h2>
+                    <p className="text-gray-400">Mission Lifecycle Engine • Runtime Orchestration • AI Bus</p>
+                  </div>
+                </div>
+                <Badge className="bg-emerald-600/20 text-emerald-400 border-emerald-600/30 px-4 py-2">
+                  <Activity className="w-4 h-4 mr-2" />
+                  All Systems Operational
+                </Badge>
+              </div>
+
+              {/* System Health Dashboard */}
+              <div className="grid grid-cols-5 gap-3">
+                {[
+                  { name: "AI Bus", value: systemHealth.aiBus, icon: Zap },
+                  { name: "Black Box", value: systemHealth.blackBox, icon: Database },
+                  { name: "Policy Hub", value: systemHealth.policyHub, icon: Shield },
+                  { name: "Cost Guardian", value: systemHealth.costGuardian, icon: DollarSign },
+                  { name: "Simulator", value: systemHealth.simulator, icon: Wind }
+                ].map((system, idx) => (
+                  <div key={idx} className="bg-white/5 backdrop-blur-sm rounded-lg p-4 border border-white/10">
+                    <div className="flex items-center gap-2 mb-2">
+                      <system.icon className="w-4 h-4 text-blue-400" />
+                      <span className="text-xs text-gray-400">{system.name}</span>
+                    </div>
+                    <div className="text-2xl font-bold text-white mb-1">{system.value}%</div>
+                    <Progress value={system.value} className="h-1 bg-white/20" />
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          <div className="grid grid-cols-12 gap-6">
+            {/* Mission Lifecycle Visualization */}
+            <div className="col-span-7">
+              <Card className="bg-white/5 backdrop-blur-xl border-white/10">
+                <CardHeader>
+                  <CardTitle className="text-white text-lg flex items-center gap-2">
+                    <Layers className="w-5 h-5 text-purple-400" />
+                    Mission Lifecycle Engine
+                  </CardTitle>
+                  <p className="text-sm text-gray-400 mt-1">
+                    Every mission flows through these orchestration stages
+                  </p>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {lifecycleStages.map((stage, idx) => (
+                      <div key={stage.stage} className="relative">
+                        <Card className={cn(
+                          "border-2 transition-all",
+                          `border-${stage.color}-300 bg-${stage.color}-900/10` // Use a darker background variant for dark theme
+                        )}>
+                          <CardContent className="p-4">
+                            <div className="flex items-start justify-between mb-2">
+                              <div className="flex items-center gap-3">
+                                <div className={cn(
+                                  "w-8 h-8 rounded-full flex items-center justify-center font-bold text-white",
+                                  `bg-${stage.color}-600`
+                                )}>
+                                  {idx + 1}
+                                </div>
+                                <div>
+                                  <h4 className="text-sm font-bold text-white">{stage.label}</h4>
+                                  <p className="text-xs text-gray-400">{stage.description}</p>
+                                </div>
+                              </div>
+                              <Badge className={cn(
+                                "text-xs",
+                                `bg-${stage.color}-100 text-${stage.color}-700`
+                              )}>
+                                {stage.tool}
+                              </Badge>
+                            </div>
+                          </CardContent>
+                        </Card>
+                        {idx < lifecycleStages.length - 1 && (
+                          <div className="flex justify-center my-2">
+                            <ArrowRight className="w-5 h-5 text-gray-600 rotate-90" />
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+
+                  <Card className="mt-6 bg-blue-600/10 border-blue-600/30">
+                    <CardContent className="p-4">
+                      <p className="text-sm text-gray-300 italic">
+                        💡 You're no longer running automations — you're running <strong className="text-white">airspace operations</strong>.
+                      </p>
+                    </CardContent>
+                  </Card>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Active Missions */}
+            <div className="col-span-5">
+              <Card className="bg-white/5 backdrop-blur-xl border-white/10">
+                <CardHeader>
+                  <CardTitle className="text-white text-lg flex items-center gap-2">
+                    <Plane className="w-5 h-5 text-emerald-400" />
+                    Active Missions ({activeMissions.length})
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {activeMissions.map((mission) => {
+                      const stageInfo = getStageInfo(mission.stage);
+                      return (
+                        <Card 
+                          key={mission.id}
+                          className={cn(
+                            "border-2 transition-all cursor-pointer hover:bg-white/5",
+                            `border-${getStageColor(mission.stage)}-300`
+                          )}
+                        >
+                          <CardContent className="p-4">
+                            <div className="flex items-start justify-between mb-3">
+                              <div className="flex-1">
+                                <h4 className="text-sm font-bold text-white mb-1">{mission.name}</h4>
+                                <div className="flex items-center gap-2 mb-2">
+                                  <Badge className={cn(
+                                    "text-xs",
+                                    `bg-${getStageColor(mission.stage)}-100 text-${getStageColor(mission.stage)}-700`
+                                  )}>
+                                    {stageInfo?.label}
+                                  </Badge>
+                                  {mission.executions > 0 && (
+                                    <span className="text-xs text-gray-400">{mission.executions} runs</span>
+                                  )}
+                                </div>
+                                <div className="text-xs text-gray-500">
+                                  Owner: {mission.owner}
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <div className={cn(
+                                  "text-lg font-bold",
+                                  mission.health >= 95 ? "text-emerald-400" :
+                                  mission.health >= 80 ? "text-amber-400" :
+                                  "text-red-400"
+                                )}>
+                                  {mission.health}%
+                                </div>
+                                <div className="text-xs text-gray-500">health</div>
+                              </div>
+                            </div>
+
+                            <div className="space-y-2">
+                              <div className="flex items-center justify-between text-xs">
+                                <span className="text-gray-400">Last transition:</span>
+                                <span className="text-white">{mission.lastTransition}</span>
+                              </div>
+                              <div className="flex items-center justify-between text-xs">
+                                <span className="text-gray-400">Tools active:</span>
+                                <span className="text-white">{mission.triggeredTools.join(", ")}</span>
+                              </div>
+                            </div>
+
+                            {mission.nextStage && (
+                              <Button
+                                size="sm"
+                                onClick={() => handleMissionStageAdvance(mission.id)}
+                                className="w-full mt-3 bg-blue-600 hover:bg-blue-700 h-7 text-xs"
+                              >
+                                Advance to {getStageInfo(mission.nextStage)?.label}
+                                <ArrowRight className="w-3 h-3 ml-2" />
+                              </Button>
+                            )}
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+
+          {/* Telemetry Stream */}
+          <Card className="bg-white/5 backdrop-blur-xl border-white/10">
+            <CardHeader>
+              <CardTitle className="text-white text-lg flex items-center gap-2">
+                <Activity className="w-5 h-5 text-blue-400" />
+                Live Telemetry Stream
+              </CardTitle>
+              <p className="text-sm text-gray-400 mt-1">Real-time coordination between all Toolbox modules</p>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2 max-h-64 overflow-y-auto">
+                {telemetryStream.map((event, idx) => (
+                  <div 
+                    key={idx}
+                    className="flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-all"
+                  >
+                    <div className="text-xs text-gray-500 font-mono w-20">{event.time}</div>
+                    <Badge className={cn(
+                      "text-xs",
+                      event.type === "execution" && "bg-purple-100 text-purple-700",
+                      event.type === "policy" && "bg-blue-100 text-blue-700",
+                      event.type === "cost" && "bg-emerald-100 text-emerald-700",
+                      event.type === "simulation" && "bg-cyan-100 text-cyan-700",
+                      event.type === "alert" && "bg-amber-100 text-amber-700"
+                    )}>
+                      {event.type}
+                    </Badge>
+                    <div className="flex-1">
+                      <div className="text-sm text-white">{event.mission}</div>
+                      <div className="text-xs text-gray-400">{event.message}</div>
+                    </div>
+                    {event.status === "success" ? (
+                      <CheckCircle className="w-4 h-4 text-emerald-400" />
+                    ) : (
+                      <AlertTriangle className="w-4 h-4 text-amber-400" />
+                    )}
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Integration Fabric Features */}
+          <div className="grid grid-cols-3 gap-4">
+            <Card className="bg-gradient-to-br from-purple-900/20 to-blue-900/20 border-purple-500/30">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-3 bg-purple-600/20 rounded-lg">
+                    <Zap className="w-6 h-6 text-purple-400" />
+                  </div>
+                  <h3 className="text-lg font-bold text-white">AI Bus</h3>
+                </div>
+                <p className="text-sm text-gray-300 mb-3">
+                  Coordinates execution across Action Library, Data Mapper, Guardrails, and Cost Guardian
+                </p>
+                <div className="text-xs text-gray-500">
+                  Processing: 847 messages/min
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-cyan-900/20 to-blue-900/20 border-cyan-500/30">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-3 bg-cyan-600/20 rounded-lg">
+                    <Database className="w-6 h-6 text-cyan-400" />
+                  </div>
+                  <h3 className="text-lg font-bold text-white">Black Box</h3>
+                </div>
+                <p className="text-sm text-gray-300 mb-3">
+                  Shared contextual memory fabric for all AI agents. Every decision is logged and learned from.
+                </p>
+                <div className="text-xs text-gray-500">
+                  Memory size: 4.2 GB • 142k decisions
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-emerald-900/20 to-teal-900/20 border-emerald-500/30">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-3 bg-emerald-600/20 rounded-lg">
+                    <Shield className="w-6 h-6 text-emerald-400" />
+                  </div>
+                  <h3 className="text-lg font-bold text-white">Self-Healing</h3>
+                </div>
+                <p className="text-sm text-gray-300 mb-3">
+                  Automatic failure detection and recovery. No single failure brings the network down.
+                </p>
+                <div className="text-xs text-gray-500">
+                  Incidents resolved: 12 • Uptime: 99.8%
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </TabsContent>
 
@@ -961,7 +1396,7 @@ export default function ToolboxTab() {
                             </div>
                           </div>
 
-                          <Progress value={simulationResult.confidence} className="h-2 mb-3" />
+                          <Progress value={simulationResult.confidence} className="h-2" />
                         </CardContent>
                       </Card>
 
