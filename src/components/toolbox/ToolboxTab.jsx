@@ -16,7 +16,8 @@ import {
   ArrowRight, Sparkles, Plus, Trash2, Edit, Eye, GitBranch, Target,
   Zap, Lock, Unlock, TrendingUp, BarChart3, Code, Settings, Cpu,
   FileText, Link, MessageSquare, Layers, Network, Filter, ChevronRight,
-  Lightbulb, Activity, Users, CheckCircle, Brain
+  Lightbulb, Activity, Users, CheckCircle, Brain, Globe, Scale, BookOpen,
+  Award, Radar, FileCheck, Upload, Share2, Briefcase, ShieldCheck
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
@@ -472,6 +473,234 @@ export default function ToolboxTab() {
     meanTimeToOptimization: { current: 18, target: 24, trend: [28, 24, 21, 18], unit: "hours" }
   });
 
+  // NEW: Phase 4 - Enterprise Governance & Federated Intelligence State
+
+  // 1. Federated Learning Hub State
+  const [federatedLearning] = useState({
+    globalModel: {
+      version: "v4.2",
+      accuracy: 94.8,
+      contributingWorkspaces: 12,
+      lastUpdate: "2h ago",
+      improvementRate: "+2.4% this month"
+    },
+    localContributions: [
+      { mission: "invoice_reconciler_v2", gradientsPushed: 847, privacyBudget: 78, lastSync: "15m ago", status: "active" },
+      { mission: "crm_sync_agent", gradientsPushed: 423, privacyBudget: 82, lastSync: "1h ago", status: "active" },
+      { mission: "payment_retry_handler", gradientsPushed: 0, privacyBudget: 100, lastSync: "Never", status: "opted_out" }
+    ],
+    globalVsLocal: {
+      globalAccuracy: 94.8,
+      localAccuracy: 92.3,
+      improvement: "+2.5%"
+    },
+    optInScopes: [
+      { domain: "Finance", missions: 4, sharing: true },
+      { domain: "Operations", missions: 2, sharing: true },
+      { domain: "HR", missions: 1, sharing: false }
+    ]
+  });
+
+  // 2. Compliance & Policy Orchestrator State
+  const [compliancePolicies] = useState([
+    {
+      id: 1,
+      name: "SOX Financial Controls",
+      template: "SOX",
+      status: "active",
+      affectedMissions: 4,
+      lastUpdated: "1w ago",
+      rules: [
+        { rule: "No AI auto-approve >$5K without dual authorization", enforceable: true, tested: true },
+        { rule: "All financial decisions must be audit-logged", enforceable: true, tested: true },
+        { rule: "Segregation of duties: approval ≠ execution", enforceable: true, tested: true }
+      ],
+      testResults: { passed: 847, failed: 0, coverage: "100%" }
+    },
+    {
+      id: 2,
+      name: "GDPR Data Protection",
+      template: "GDPR",
+      status: "active",
+      affectedMissions: 7,
+      lastUpdated: "3d ago",
+      rules: [
+        { rule: "PII must be masked in all logs and traces", enforceable: true, tested: true },
+        { rule: "Right to delete propagates across all AI agents", enforceable: true, tested: true },
+        { rule: "No cross-border data transfer without consent", enforceable: true, tested: false }
+      ],
+      testResults: { passed: 423, failed: 2, coverage: "99.5%" }
+    }
+  ]);
+
+  const [policyDiff] = useState({
+    oldPolicy: "Auto-approve refunds <$500",
+    newPolicy: "Auto-approve refunds <$200",
+    affectedMissions: ["refund_handler", "payment_dispute_resolver"],
+    impact: { approvalLoad: "+15%", riskReduction: "8%", estimatedCost: "-$0.003/run" },
+    changeLog: [
+      { timestamp: "2024-11-08 14:32", user: "admin@acme.com", action: "Threshold reduced from $500 to $200" }
+    ]
+  });
+
+  // 3. Federated Cost & Performance Index State
+  const [benchmarkData] = useState({
+    yourRank: 8,
+    totalWorkspaces: 47,
+    percentile: 83,
+    metrics: {
+      costPerRun: { yours: 0.024, peerMedian: 0.031, delta: "-23%" },
+      latency: { yours: 840, peerMedian: 1120, delta: "-25%" },
+      successRate: { yours: 94.2, peerMedian: 91.7, delta: "+2.7%" },
+      slaBreachRate: { yours: 2.1, peerMedian: 4.8, delta: "-56%" }
+    },
+    topPerformers: [
+      { rank: 1, workspace: "Workspace Alpha", score: 98.4, anonymous: true },
+      { rank: 2, workspace: "Workspace Beta", score: 96.7, anonymous: true },
+      { rank: 3, workspace: "Workspace Gamma", score: 95.2, anonymous: true }
+    ]
+  });
+
+  // 4. Multi-Domain Policy Propagation State
+  const [policyPropagation] = useState([
+    {
+      id: 1,
+      sourcePolicy: "Refund Auto-Approval Logic",
+      sourceDomain: "Finance",
+      suggestedTargets: [
+        { domain: "Customer Success", mission: "Discount Approval Agent", similarity: 87, status: "pending_review" },
+        { domain: "Operations", mission: "Credit Note Generator", similarity: 92, status: "pending_review" }
+      ],
+      transferPattern: "approval logic based on amount thresholds",
+      confidence: 89,
+      safetyCheck: "Passed simulation on 200 historical cases"
+    },
+    {
+      id: 2,
+      sourcePolicy: "PII Masking Rules",
+      sourceDomain: "HR",
+      suggestedTargets: [
+        { domain: "Finance", mission: "Payroll Processor", similarity: 98, status: "approved" },
+        { domain: "Operations", mission: "Employee Onboarding", similarity: 94, status: "approved" }
+      ],
+      transferPattern: "PII field detection and masking",
+      confidence: 98,
+      safetyCheck: "Auto-approved (privacy enhancement)"
+    }
+  ]);
+
+  // 5. Data Governance Mesh State
+  const [dataGovernance] = useState({
+    classifiedFields: [
+      { name: "customer_email", sensitivity: "high", pii: true, uses: 7, lastAccessed: "5m ago" },
+      { name: "order_amount", sensitivity: "low", pii: false, uses: 12, lastAccessed: "2m ago" },
+      { name: "ssn", sensitivity: "critical", pii: true, uses: 2, lastAccessed: "1d ago" },
+      { name: "credit_card_last4", sensitivity: "medium", pii: true, uses: 4, lastAccessed: "1h ago" }
+    ],
+    lineageGraph: {
+      field: "customer_email",
+      sources: ["CRM", "Orders", "Support Tickets"],
+      destinations: ["Invoice Reconciler", "CRM Sync", "Refund Handler"],
+      transformations: 3
+    },
+    rightToForget: [
+      { requestId: "RTF-2024-001", email: "user@example.com", status: "processing", affectedMissions: 5, progress: 78 }
+    ]
+  });
+
+  // 6. Federated Trust & Certification State
+  const [trustCertification] = useState({
+    auditLedger: {
+      totalDecisions: 142847,
+      hashedToLedger: 142847,
+      verifiable: "100%",
+      lastBlock: "0x7a3f...",
+      blockTime: "2m ago"
+    },
+    complianceReports: [
+      { type: "SOC2", status: "ready", coverage: "98%", exportReady: true, lastGenerated: "1w ago" },
+      { type: "ISO 27001", status: "ready", coverage: "94%", exportReady: true, lastGenerated: "2w ago" },
+      { type: "HIPAA", status: "pending", coverage: "87%", exportReady: false, lastGenerated: "Never" }
+    ],
+    verificationLog: [
+      { auditor: "External Audit Firm A", verified: 847, timestamp: "1d ago", result: "Pass" },
+      { auditor: "Internal Compliance", verified: 2145, timestamp: "3h ago", result: "Pass" }
+    ]
+  });
+
+  // 7. Meta-Learning Controller State
+  const [metaLearning] = useState({
+    trainingAllocation: [
+      { agent: "invoice_reconciler_v2", computeHours: 12.4, expectedROI: "+8.2%", priority: "high", allocated: true },
+      { agent: "crm_sync_agent", computeHours: 8.7, expectedROI: "+5.1%", priority: "medium", allocated: true },
+      { agent: "payment_retry_handler", computeHours: 3.2, expectedROI: "+1.8%", priority: "low", allocated: false }
+    ],
+    learningSignals: {
+      userFeedback: { weight: 0.35, effectivenessScore: 87 },
+      outcomeAccuracy: { weight: 0.40, effectivenessScore: 94 },
+      costEfficiency: { weight: 0.25, effectivenessScore: 78 }
+    },
+    missionImportance: [
+      { mission: "invoice_reconciler_v2", importance: 94, shareholderImpact: "High", reweightedAt: "1d ago" },
+      { mission: "crm_sync_agent", importance: 78, shareholderImpact: "Medium", reweightedAt: "2d ago" },
+      { mission: "refund_handler", importance: 62, shareholderImpact: "Low", reweightedAt: "1w ago" }
+    ]
+  });
+
+  // 8. Cross-Organization Sandbox State
+  const [sandboxNetwork] = useState({
+    activeCollaborations: [
+      {
+        id: 1,
+        partner: "Vendor Corp",
+        mission: "Supply Chain Optimizer",
+        dataSharing: "aggregated_insights_only",
+        expires: "30 days",
+        zeroCopy: true,
+        lastSync: "4h ago",
+        status: "active"
+      },
+      {
+        id: 2,
+        partner: "Partner Solutions",
+        mission: "Joint Customer Analytics",
+        dataSharing: "learned_patterns",
+        expires: "90 days",
+        zeroCopy: true,
+        lastSync: "1d ago",
+        status: "active"
+      }
+    ],
+    isolationRules: [
+      { rule: "No raw customer records shared", enforced: true },
+      { rule: "Only statistical summaries exchanged", enforced: true },
+      { rule: "Auto-expiration on collaboration end", enforced: true }
+    ]
+  });
+
+  // 9. Enterprise Mode Dashboard State
+  const [enterpriseDashboard] = useState({
+    trustMeter: {
+      score: 92,
+      modelConfidence: 94,
+      policyCompliance: 98,
+      auditCoverage: 96
+    },
+    governanceTimeline: [
+      { date: "2024-11-08", event: "SOX Policy Updated", impact: "4 missions affected", status: "deployed" },
+      { date: "2024-11-05", event: "GDPR Rules Tightened", impact: "7 missions affected", status: "deployed" },
+      { date: "2024-11-01", event: "Cost Cap Increased", impact: "All missions", status: "deployed" }
+    ],
+    industryBenchmarks: {
+      aiAdoptionRate: { yours: 78, industry: 54, delta: "+44%" },
+      automationCoverage: { yours: 62, industry: 41, delta: "+51%" },
+      complianceScore: { yours: 96, industry: 82, delta: "+17%" }
+    },
+    driftAlerts: [
+      { mission: "crm_sync_agent", metric: "error_rate", drift: "+12%", severity: "medium", detectedAt: "45m ago" }
+    ]
+  });
+
   const lifecycleStages = [
     {
       stage: "draft",
@@ -727,7 +956,27 @@ export default function ToolboxTab() {
 
   const getStageColor = (stage) => {
     const stageData = lifecycleStages.find(s => s.stage === stage);
-    return stageData?.color || "slate";
+    // Tailwind classes like bg-emerald-100 are expected to be full strings.
+    // If 'emerald' is passed, the class needs to be formed outside cn to work,
+    // or cn needs to be configured with a safelist.
+    // For this example, let's return the full string for class generation.
+    const colorsMap = {
+      slate: "slate",
+      blue: "blue",
+      cyan: "cyan",
+      emerald: "emerald",
+      purple: "purple",
+      amber: "amber",
+      indigo: "indigo",
+      red: "red",
+      green: "green",
+      orange: "orange",
+      pink: "pink",
+      violet: "violet",
+      teal: "teal",
+      gray: "gray"
+    }
+    return colorsMap[stageData?.color] || "slate";
   };
 
   const getStageInfo = (stage) => {
@@ -783,6 +1032,15 @@ export default function ToolboxTab() {
             <TabsTrigger value="playbooks"><FileText className="w-4 h-4 mr-2" />Playbooks</TabsTrigger>
             <TabsTrigger value="what-if"><FlaskConical className="w-4 h-4 mr-2" />What-If</TabsTrigger>
             <TabsTrigger value="intelligence"><Brain className="w-4 h-4 mr-2" />Intelligence</TabsTrigger>
+            <TabsTrigger value="federated-learning"><Globe className="w-4 h-4 mr-2" />Fed Learning</TabsTrigger>
+            <TabsTrigger value="compliance"><Scale className="w-4 h-4 mr-2" />Compliance</TabsTrigger>
+            <TabsTrigger value="benchmarks"><Award className="w-4 h-4 mr-2" />Benchmarks</TabsTrigger>
+            <TabsTrigger value="policy-propagation"><Share2 className="w-4 h-4 mr-2" />Policy Prop</TabsTrigger>
+            <TabsTrigger value="data-governance"><Database className="w-4 h-4 mr-2" />Data Gov</TabsTrigger>
+            <TabsTrigger value="trust-cert"><ShieldCheck className="w-4 h-4 mr-2" />Trust & Cert</TabsTrigger>
+            <TabsTrigger value="meta-learning"><Brain className="w-4 h-4 mr-2" />Meta-Learn</TabsTrigger>
+            <TabsTrigger value="sandbox"><Briefcase className="w-4 h-4 mr-2" />Sandbox</TabsTrigger>
+            <TabsTrigger value="enterprise"><Radar className="w-4 h-4 mr-2" />Enterprise</TabsTrigger>
             <TabsTrigger value="mission-builder"><Plane className="w-4 h-4 mr-2" />Mission Builder</TabsTrigger>
             <TabsTrigger value="action-library"><Boxes className="w-4 h-4 mr-2" />Actions</TabsTrigger>
             <TabsTrigger value="spec-writer"><FileCode className="w-4 h-4 mr-2" />SpecWriter</TabsTrigger>
@@ -956,14 +1214,14 @@ export default function ToolboxTab() {
                       <div key={stage.stage} className="relative">
                         <Card className={cn(
                           "border-2 transition-all",
-                          `border-${stage.color}-300 bg-${stage.color}-50`
+                          `border-${getStageColor(stage.stage)}-300 bg-${getStageColor(stage.stage)}-50`
                         )}>
                           <CardContent className="p-4">
                             <div className="flex items-start justify-between mb-2">
                               <div className="flex items-center gap-3">
                                 <div className={cn(
                                   "w-8 h-8 rounded-full flex items-center justify-center font-bold text-white",
-                                  `bg-${stage.color}-600`
+                                  `bg-${getStageColor(stage.stage)}-600`
                                 )}>
                                   {idx + 1}
                                 </div>
@@ -974,7 +1232,7 @@ export default function ToolboxTab() {
                               </div>
                               <Badge className={cn(
                                 "text-xs",
-                                `bg-${stage.color}-100 text-${stage.color}-700`
+                                `bg-${getStageColor(stage.stage)}-100 text-${getStageColor(stage.stage)}-700`
                               )}>
                                 {stage.tool}
                               </Badge>
@@ -1396,10 +1654,10 @@ export default function ToolboxTab() {
                             <TrendingUp className="w-3 h-3 mr-1" />
                             Promote to Champion
                           </Button>
-                          <Button variant="outline" className="text-xs h-8">
+                          <Button variant="outline" className="flex-1 text-xs h-8">
                             View Impact Card
                           </Button>
-                          <Button variant="outline" className="text-xs h-8">
+                          <Button variant="outline" className="flex-1 text-xs h-8">
                             <Eye className="w-3 h-3 mr-1" />
                             Diff
                           </Button>
@@ -1665,7 +1923,7 @@ export default function ToolboxTab() {
                           <FlaskConical className="w-3 h-3 mr-1" />
                           Dry Run
                         </Button>
-                        <Button variant="outline" className="text-xs h-8">
+                        <Button variant="outline" className="flex-1 text-xs h-8">
                           Explain
                         </Button>
                       </div>
@@ -2024,6 +2282,1142 @@ export default function ToolboxTab() {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* NEW: FEDERATED LEARNING HUB TAB */}
+        <TabsContent value="federated-learning" className="space-y-6 mt-6">
+          <Card className="bg-gradient-to-br from-blue-600 to-indigo-600 text-white shadow-2xl">
+            <CardContent className="p-8">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-4">
+                  <div className="p-4 bg-white/20 backdrop-blur-sm rounded-2xl">
+                    <Globe className="w-8 h-8" />
+                  </div>
+                  <div>
+                    <h2 className="text-3xl font-bold mb-1">Federated Learning Hub</h2>
+                    <p className="text-blue-100">Privacy-preserving global model training • Zero PII sharing • Gradient aggregation</p>
+                  </div>
+                </div>
+                <Badge className="bg-white/20 backdrop-blur-sm text-white border-white/30 px-4 py-2">
+                  <CheckCircle className="w-4 h-4 mr-2" />
+                  {federatedLearning.globalModel.contributingWorkspaces} Workspaces Contributing
+                </Badge>
+              </div>
+
+              <div className="grid grid-cols-3 gap-4">
+                <Card className="bg-white/10 backdrop-blur-sm border-white/20">
+                  <CardContent className="p-4">
+                    <div className="text-xs text-blue-100 mb-1">Global Model Accuracy</div>
+                    <div className="text-3xl font-bold text-white mb-1">{federatedLearning.globalModel.accuracy}%</div>
+                    <Badge className="bg-emerald-500/90 text-white text-xs">
+                      {federatedLearning.globalModel.improvementRate}
+                    </Badge>
+                  </CardContent>
+                </Card>
+                <Card className="bg-white/10 backdrop-blur-sm border-white/20">
+                  <CardContent className="p-4">
+                    <div className="text-xs text-blue-100 mb-1">Your Local Accuracy</div>
+                    <div className="text-3xl font-bold text-white mb-1">{federatedLearning.globalVsLocal.localAccuracy}%</div>
+                    <Badge className="bg-white/20 text-white text-xs">
+                      Global: +{federatedLearning.globalVsLocal.improvement}
+                    </Badge>
+                  </CardContent>
+                </Card>
+                <Card className="bg-white/10 backdrop-blur-sm border-white/20">
+                  <CardContent className="p-4">
+                    <div className="text-xs text-blue-100 mb-1">Model Version</div>
+                    <div className="text-2xl font-bold text-white mb-1">{federatedLearning.globalModel.version}</div>
+                    <div className="text-xs text-blue-100">Updated {federatedLearning.globalModel.lastUpdate}</div>
+                  </CardContent>
+                </Card>
+              </div>
+            </CardContent>
+          </Card>
+
+          <div className="grid grid-cols-2 gap-6">
+            <Card className="bg-white border-slate-200">
+              <CardHeader>
+                <CardTitle className="text-slate-900 text-lg flex items-center gap-2">
+                  <Upload className="w-5 h-5 text-blue-600" />
+                  Your Contributions
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {federatedLearning.localContributions.map((contrib, idx) => (
+                    <Card key={idx} className={cn(
+                      "border-2",
+                      contrib.status === "active" ? "border-blue-200 bg-blue-50" : "border-slate-200 bg-slate-50"
+                    )}>
+                      <CardContent className="p-4">
+                        <div className="flex items-center justify-between mb-3">
+                          <h4 className="text-sm font-bold text-slate-900">{contrib.mission}</h4>
+                          <Badge className={cn(
+                            "text-xs",
+                            contrib.status === "active" ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-700"
+                          )}>
+                            {contrib.status.replace(/_/g, " ")}
+                          </Badge>
+                        </div>
+                        <div className="grid grid-cols-2 gap-3 text-xs mb-3">
+                          <div>
+                            <span className="text-slate-600">Gradients Pushed:</span>
+                            <div className="font-bold text-slate-900">{contrib.gradientsPushed}</div>
+                          </div>
+                          <div>
+                            <span className="text-slate-600">Privacy Budget:</span>
+                            <div className="font-bold text-slate-900">{contrib.privacyBudget}%</div>
+                          </div>
+                        </div>
+                        <Progress value={contrib.privacyBudget} className="h-2 mb-2" />
+                        <div className="text-xs text-slate-500">Last sync: {contrib.lastSync}</div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white border-slate-200">
+              <CardHeader>
+                <CardTitle className="text-slate-900 text-lg flex items-center gap-2">
+                  <Settings className="w-5 h-5 text-purple-600" />
+                  Opt-In Scopes
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {federatedLearning.optInScopes.map((scope, idx) => (
+                    <div key={idx} className="flex items-center justify-between p-4 bg-slate-50 rounded-lg border border-slate-200">
+                      <div className="flex items-center gap-3">
+                        <div className={cn(
+                          "w-10 h-10 rounded-lg flex items-center justify-center",
+                          scope.sharing ? "bg-emerald-100" : "bg-slate-100"
+                        )}>
+                          {scope.sharing ? (
+                            <CheckCircle className="w-5 h-5 text-emerald-600" />
+                          ) : (
+                            <Lock className="w-5 h-5 text-slate-400" />
+                          )}
+                        </div>
+                        <div>
+                          <div className="text-sm font-bold text-slate-900">{scope.domain}</div>
+                          <div className="text-xs text-slate-600">{scope.missions} missions</div>
+                        </div>
+                      </div>
+                      <Switch checked={scope.sharing} />
+                    </div>
+                  ))}
+                </div>
+                <Card className="mt-4 bg-blue-50 border-blue-200">
+                  <CardContent className="p-3">
+                    <div className="text-xs text-blue-900 font-semibold mb-1">Privacy Guarantee</div>
+                    <div className="text-xs text-slate-700">
+                      Only gradients and summaries shared. Zero PII or raw records leave your workspace.
+                    </div>
+                  </CardContent>
+                </Card>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        {/* NEW: COMPLIANCE & POLICY ORCHESTRATOR TAB */}
+        <TabsContent value="compliance" className="space-y-6 mt-6">
+          <Card className="bg-gradient-to-br from-red-600 to-orange-600 text-white shadow-2xl">
+            <CardContent className="p-8">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-4">
+                  <div className="p-4 bg-white/20 backdrop-blur-sm rounded-2xl">
+                    <Scale className="w-8 h-8" />
+                  </div>
+                  <div>
+                    <h2 className="text-3xl font-bold mb-1">Compliance & Policy Orchestrator 2.0</h2>
+                    <p className="text-orange-100">Natural language → Enforceable rules • Regulatory templates • Change control</p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <div className="grid grid-cols-2 gap-6">
+            <Card className="bg-white border-slate-200">
+              <CardHeader>
+                <CardTitle className="text-slate-900 text-lg flex items-center gap-2">
+                  <FileCheck className="w-5 h-5 text-red-600" />
+                  Active Policies
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {compliancePolicies.map((policy) => (
+                    <Card key={policy.id} className="border-2 border-red-200 bg-red-50">
+                      <CardContent className="p-5">
+                        <div className="flex items-start justify-between mb-3">
+                          <div>
+                            <h4 className="text-lg font-bold text-slate-900 mb-1">{policy.name}</h4>
+                            <div className="flex items-center gap-2">
+                              <Badge className="bg-red-100 text-red-700 text-xs">{policy.template}</Badge>
+                              <Badge className="bg-emerald-100 text-emerald-700 text-xs">{policy.status}</Badge>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-sm text-slate-600">Affected</div>
+                            <div className="text-2xl font-bold text-slate-900">{policy.affectedMissions}</div>
+                          </div>
+                        </div>
+
+                        <div className="mb-4">
+                          <h5 className="text-xs font-bold text-slate-900 mb-2">Enforceable Rules</h5>
+                          <div className="space-y-2">
+                            {policy.rules.map((rule, ridx) => (
+                              <div key={ridx} className="flex items-start gap-2 p-2 bg-white rounded border border-red-200">
+                                <div className="flex-1 text-xs text-slate-900">{rule.rule}</div>
+                                <div className="flex gap-1">
+                                  {rule.enforceable && <Badge className="bg-emerald-100 text-emerald-700 text-[10px]">Enforced</Badge>}
+                                  {rule.tested && <Badge className="bg-blue-100 text-blue-700 text-[10px]">Tested</Badge>}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-3 gap-3 p-3 bg-emerald-50 border border-emerald-200 rounded">
+                          <div className="text-center">
+                            <div className="text-lg font-bold text-emerald-600">{policy.testResults.passed}</div>
+                            <div className="text-xs text-slate-600">Passed</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="text-lg font-bold text-red-600">{policy.testResults.failed}</div>
+                            <div className="text-xs text-slate-600">Failed</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="text-lg font-bold text-slate-900">{policy.testResults.coverage}</div>
+                            <div className="text-xs text-slate-600">Coverage</div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white border-slate-200">
+              <CardHeader>
+                <CardTitle className="text-slate-900 text-lg flex items-center gap-2">
+                  <GitBranch className="w-5 h-5 text-amber-600" />
+                  Policy Change Diff
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Card className="border-2 border-amber-200 bg-amber-50 mb-4">
+                  <CardContent className="p-5">
+                    <div className="mb-4">
+                      <div className="text-xs text-slate-600 mb-2">Old Policy:</div>
+                      <div className="p-2 bg-red-100 border border-red-200 rounded text-sm text-slate-900 line-through">
+                        {policyDiff.oldPolicy}
+                      </div>
+                    </div>
+                    <div className="mb-4">
+                      <div className="text-xs text-slate-600 mb-2">New Policy:</div>
+                      <div className="p-2 bg-emerald-100 border border-emerald-200 rounded text-sm text-slate-900 font-semibold">
+                        {policyDiff.newPolicy}
+                      </div>
+                    </div>
+
+                    <div className="space-y-2 mb-4">
+                      <div className="flex justify-between text-xs">
+                        <span className="text-slate-600">Affected Missions:</span>
+                        <span className="text-slate-900 font-semibold">{policyDiff.affectedMissions.join(", ")}</span>
+                      </div>
+                      <div className="flex justify-between text-xs">
+                        <span className="text-slate-600">Approval Load:</span>
+                        <span className="text-amber-600 font-semibold">{policyDiff.impact.approvalLoad}</span>
+                      </div>
+                      <div className="flex justify-between text-xs">
+                        <span className="text-slate-600">Risk Reduction:</span>
+                        <span className="text-emerald-600 font-semibold">{policyDiff.impact.riskReduction}</span>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-2">
+                      <Button size="sm" className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-xs h-8">
+                        <Check className="w-3 h-3 mr-1" />
+                        Approve Change
+                      </Button>
+                      <Button size="sm" variant="outline" className="flex-1 text-xs h-8">
+                        Test First
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-slate-50 border-slate-200">
+                  <CardHeader>
+                    <div className="text-sm font-bold text-slate-900">Change Log</div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2">
+                      {policyDiff.changeLog.map((log, idx) => (
+                        <div key={idx} className="text-xs p-2 bg-white rounded border border-slate-200">
+                          <div className="text-slate-600">{log.timestamp}</div>
+                          <div className="text-slate-900 font-semibold">{log.user}</div>
+                          <div className="text-slate-700">{log.action}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        {/* NEW: FEDERATED COST & PERFORMANCE INDEX TAB */}
+        <TabsContent value="benchmarks" className="space-y-6 mt-6">
+          <Card className="bg-gradient-to-br from-purple-600 to-pink-600 text-white shadow-2xl">
+            <CardContent className="p-8">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="p-4 bg-white/20 backdrop-blur-sm rounded-2xl">
+                    <Award className="w-8 h-8" />
+                  </div>
+                  <div>
+                    <h2 className="text-3xl font-bold mb-1">Federated Performance Index</h2>
+                    <p className="text-purple-100">Anonymous benchmarking • Global rankings • Efficiency scorecard</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-sm text-purple-100">Your Global Rank</div>
+                  <div className="text-5xl font-bold text-white">#{benchmarkData.yourRank}</div>
+                  <div className="text-xs text-purple-100">Top {benchmarkData.percentile}%</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <div className="grid grid-cols-2 gap-6">
+            <Card className="bg-white border-slate-200">
+              <CardHeader>
+                <CardTitle className="text-slate-900 text-lg flex items-center gap-2">
+                  <Radar className="w-5 h-5 text-purple-600" />
+                  Benchmark Radar
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {Object.entries(benchmarkData.metrics).map(([key, metric]) => (
+                    <div key={key}>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-semibold text-slate-900">{key.replace(/([A-Z])/g, " $1").trim()}</span>
+                        <Badge className={cn(
+                          "text-xs",
+                          metric.delta.startsWith("-") || metric.delta.startsWith("+") && parseFloat(metric.delta) > 0
+                            ? "bg-emerald-100 text-emerald-700"
+                            : "bg-red-100 text-red-700"
+                        )}>
+                          {metric.delta} vs peers
+                        </Badge>
+                      </div>
+                      <div className="grid grid-cols-2 gap-3 text-xs mb-2">
+                        <div className="p-2 bg-blue-50 rounded border border-blue-200">
+                          <div className="text-slate-600">Your Value</div>
+                          <div className="font-bold text-blue-600">{metric.yours}</div>
+                        </div>
+                        <div className="p-2 bg-slate-50 rounded border border-slate-200">
+                          <div className="text-slate-600">Peer Median</div>
+                          <div className="font-bold text-slate-900">{metric.peerMedian}</div>
+                        </div>
+                      </div>
+                      {/* Placeholder for actual progress value, assuming a comparison logic */}
+                      <Progress value={
+                         (metric.yours > metric.peerMedian && key !== 'slaBreachRate') || (metric.yours < metric.peerMedian && key === 'slaBreachRate')
+                            ? 75 : 25
+                      } className="h-2" />
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white border-slate-200">
+              <CardHeader>
+                <CardTitle className="text-slate-900 text-lg flex items-center gap-2">
+                  <Award className="w-5 h-5 text-amber-600" />
+                  Top Performers (Anonymous)
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {benchmarkData.topPerformers.map((performer) => (
+                    <div key={performer.rank} className="flex items-center gap-3 p-3 bg-gradient-to-r from-amber-50 to-yellow-50 rounded-lg border-2 border-amber-200">
+                      <div className={cn(
+                        "w-10 h-10 rounded-full flex items-center justify-center font-bold text-white",
+                        performer.rank === 1 ? "bg-yellow-500" :
+                        performer.rank === 2 ? "bg-slate-400" :
+                        "bg-amber-600"
+                      )}>
+                        #{performer.rank}
+                      </div>
+                      <div className="flex-1">
+                        <div className="text-sm font-semibold text-slate-900">{performer.workspace}</div>
+                        <div className="text-xs text-slate-600">Anonymous participant</div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-2xl font-bold text-slate-900">{performer.score}</div>
+                        <div className="text-xs text-slate-600">score</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <Card className="mt-4 bg-purple-50 border-purple-200">
+                  <CardContent className="p-3">
+                    <div className="text-xs text-purple-900 italic">
+                      💡 Learn from top performers while preserving your competitive advantage
+                    </div>
+                  </CardContent>
+                </Card>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        {/* NEW: MULTI-DOMAIN POLICY PROPAGATION TAB */}
+        <TabsContent value="policy-propagation" className="space-y-6 mt-6">
+          <Card className="bg-gradient-to-br from-indigo-600 to-purple-600 text-white shadow-2xl">
+            <CardContent className="p-8">
+              <div className="flex items-center gap-4">
+                <div className="p-4 bg-white/20 backdrop-blur-sm rounded-2xl">
+                  <Share2 className="w-8 h-8" />
+                </div>
+                <div>
+                  <h2 className="text-3xl font-bold mb-1">Multi-Domain Policy Propagation</h2>
+                  <p className="text-indigo-100">Auto-suggest proven policies across similar domains • Transfer approval logic</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <div className="space-y-4">
+            {policyPropagation.map((prop) => (
+              <Card key={prop.id} className="bg-white border-slate-200">
+                <CardContent className="p-6">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex-1">
+                      <h3 className="text-xl font-bold text-slate-900 mb-2">{prop.sourcePolicy}</h3>
+                      <div className="flex items-center gap-2 mb-3">
+                        <Badge className="bg-indigo-100 text-indigo-700 text-xs">{prop.sourceDomain}</Badge>
+                        <ArrowRight className="w-4 h-4 text-slate-400" />
+                        <span className="text-sm text-slate-600">Suggested for {prop.suggestedTargets.length} domains</span>
+                      </div>
+                    </div>
+                    <Badge className="bg-blue-100 text-blue-700 text-xs">
+                      {prop.confidence}% confidence
+                    </Badge>
+                  </div>
+
+                  <div className="mb-4">
+                    <h4 className="text-sm font-bold text-slate-900 mb-2">Transfer Pattern</h4>
+                    <div className="p-3 bg-purple-50 border border-purple-200 rounded text-sm text-slate-900">
+                      {prop.transferPattern}
+                    </div>
+                  </div>
+
+                  <div className="space-y-2 mb-4">
+                    <h4 className="text-sm font-bold text-slate-900">Suggested Targets</h4>
+                    {prop.suggestedTargets.map((target, tidx) => (
+                      <Card key={tidx} className="border-2 border-blue-200 bg-blue-50">
+                        <CardContent className="p-3">
+                          <div className="flex items-center justify-between mb-2">
+                            <div>
+                              <div className="text-sm font-bold text-slate-900">{target.mission}</div>
+                              <Badge className="bg-blue-100 text-blue-700 text-xs mt-1">{target.domain}</Badge>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Badge className="bg-slate-100 text-slate-700 text-xs">{target.similarity}% similar</Badge>
+                              <Badge className={cn(
+                                "text-xs",
+                                target.status === "approved" ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"
+                              )}>
+                                {target.status.replace(/_/g, " ")}
+                              </Badge>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+
+                  <div className="p-3 bg-emerald-50 border border-emerald-200 rounded mb-4">
+                    <div className="text-xs text-emerald-800 font-semibold mb-1">Safety Check:</div>
+                    <div className="text-sm text-slate-900">{prop.safetyCheck}</div>
+                  </div>
+
+                  <div className="flex gap-2">
+                    <Button size="sm" className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-xs h-8">
+                      <Check className="w-3 h-3 mr-1" />
+                      Propagate to All
+                    </Button>
+                    <Button size="sm" variant="outline" className="flex-1 text-xs h-8">
+                      Review Each
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </TabsContent>
+
+        {/* NEW: DATA GOVERNANCE MESH TAB */}
+        <TabsContent value="data-governance" className="space-y-6 mt-6">
+          <Card className="bg-gradient-to-br from-cyan-600 to-blue-600 text-white shadow-2xl">
+            <CardContent className="p-8">
+              <div className="flex items-center gap-4">
+                <div className="p-4 bg-white/20 backdrop-blur-sm rounded-2xl">
+                  <Database className="w-8 h-8" />
+                </div>
+                <div>
+                  <h2 className="text-3xl font-bold mb-1">Data Governance Mesh</h2>
+                  <p className="text-cyan-100">Field classification • Lineage tracking • Access policies • Right to forget</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <div className="grid grid-cols-2 gap-6">
+            <Card className="bg-white border-slate-200">
+              <CardHeader>
+                <CardTitle className="text-slate-900 text-lg flex items-center gap-2">
+                  <Shield className="w-5 h-5 text-cyan-600" />
+                  Classified Fields
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {dataGovernance.classifiedFields.map((field, idx) => (
+                    <Card key={idx} className={cn(
+                      "border-2",
+                      field.sensitivity === "critical" ? "border-red-300 bg-red-50" :
+                      field.sensitivity === "high" ? "border-amber-300 bg-amber-50" :
+                      field.sensitivity === "medium" ? "border-blue-300 bg-blue-50" :
+                      "border-slate-200 bg-slate-50"
+                    )}>
+                      <CardContent className="p-3">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            {field.pii && <Lock className="w-4 h-4 text-red-600" />}
+                            <span className="text-sm font-bold text-slate-900">{field.name}</span>
+                          </div>
+                          <Badge className={cn(
+                            "text-xs",
+                            field.sensitivity === "critical" ? "bg-red-100 text-red-700" :
+                            field.sensitivity === "high" ? "bg-amber-100 text-amber-700" :
+                            field.sensitivity === "medium" ? "bg-blue-100 text-blue-700" :
+                            "bg-slate-100 text-slate-700"
+                          )}>
+                            {field.sensitivity}
+                          </Badge>
+                        </div>
+                        <div className="flex justify-between text-xs text-slate-600">
+                          <span>{field.uses} missions using</span>
+                          <span>Last accessed: {field.lastAccessed}</span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white border-slate-200">
+              <CardHeader>
+                <CardTitle className="text-slate-900 text-lg flex items-center gap-2">
+                  <Network className="w-5 h-5 text-purple-600" />
+                  Data Lineage Graph
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="mb-4">
+                  <div className="text-sm font-bold text-slate-900 mb-2">
+                    Field: <span className="text-purple-600">{dataGovernance.lineageGraph.field}</span>
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <div>
+                    <div className="text-xs text-slate-600 mb-2">Sources ({dataGovernance.lineageGraph.sources.length})</div>
+                    <div className="flex flex-wrap gap-2">
+                      {dataGovernance.lineageGraph.sources.map((source, idx) => (
+                        <Badge key={idx} className="bg-blue-100 text-blue-700 text-xs">{source}</Badge>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="flex justify-center">
+                    <ArrowRight className="w-5 h-5 text-purple-400 rotate-90" />
+                  </div>
+                  <div>
+                    <div className="text-xs text-slate-600 mb-2">Transformations</div>
+                    <Badge className="bg-purple-100 text-purple-700 text-xs">
+                      {dataGovernance.lineageGraph.transformations} applied
+                    </Badge>
+                  </div>
+                  <div className="flex justify-center">
+                    <ArrowRight className="w-5 h-5 text-purple-400 rotate-90" />
+                  </div>
+                  <div>
+                    <div className="text-xs text-slate-600 mb-2">Destinations ({dataGovernance.lineageGraph.destinations.length})</div>
+                    <div className="flex flex-wrap gap-2">
+                      {dataGovernance.lineageGraph.destinations.map((dest, idx) => (
+                        <Badge key={idx} className="bg-emerald-100 text-emerald-700 text-xs">{dest}</Badge>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {dataGovernance.rightToForget.length > 0 && (
+            <Card className="bg-white border-slate-200">
+              <CardHeader>
+                <CardTitle className="text-slate-900 text-lg flex items-center gap-2">
+                  <AlertTriangle className="w-5 h-5 text-red-600" />
+                  Right to Forget Requests
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {dataGovernance.rightToForget.map((request, idx) => (
+                  <Card key={idx} className="border-2 border-red-200 bg-red-50">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <div>
+                          <div className="text-sm font-bold text-slate-900">{request.requestId}</div>
+                          <div className="text-xs text-slate-600">User: {request.email}</div>
+                        </div>
+                        <Badge className="bg-amber-100 text-amber-700 text-xs">{request.status}</Badge>
+                      </div>
+                      <div className="mb-3">
+                        <div className="flex justify-between text-xs text-slate-600 mb-1">
+                          <span>Affected missions: {request.affectedMissions}</span>
+                          <span>Progress: {request.progress}</span>
+                        </div>
+                        <Progress value={request.progress} className="h-2" />
+                      </div>
+                      <Button size="sm" className="w-full bg-red-600 hover:bg-red-700 text-xs h-7">
+                        View Details
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ))}
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
+
+        {/* NEW: FEDERATED TRUST & CERTIFICATION TAB */}
+        <TabsContent value="trust-cert" className="space-y-6 mt-6">
+          <Card className="bg-gradient-to-br from-emerald-600 to-teal-600 text-white shadow-2xl">
+            <CardContent className="p-8">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="p-4 bg-white/20 backdrop-blur-sm rounded-2xl">
+                    <ShieldCheck className="w-8 h-8" />
+                  </div>
+                  <div>
+                    <h2 className="text-3xl font-bold mb-1">Federated Trust & Certification</h2>
+                    <p className="text-emerald-100">Immutable audit ledger • Verifiable proofs • Compliance exports</p>
+                  </div>
+                </div>
+                <Badge className="bg-white/20 backdrop-blur-sm text-white border-white/30 px-4 py-2">
+                  <CheckCircle className="w-4 h-4 mr-2" />
+                  {trustCertification.auditLedger.verifiable} Verifiable
+                </Badge>
+              </div>
+            </CardContent>
+          </Card>
+
+          <div className="grid grid-cols-3 gap-4 mb-6">
+            <Card className="bg-white border-slate-200">
+              <CardContent className="p-4 text-center">
+                <div className="text-xs text-slate-600 mb-1">Total Decisions</div>
+                <div className="text-3xl font-bold text-slate-900 mb-1">{trustCertification.auditLedger.totalDecisions.toLocaleString()}</div>
+                <Badge className="bg-emerald-100 text-emerald-700 text-xs">All hashed</Badge>
+              </CardContent>
+            </Card>
+            <Card className="bg-white border-slate-200">
+              <CardContent className="p-4 text-center">
+                <div className="text-xs text-slate-600 mb-1">Last Block</div>
+                <div className="text-lg font-bold text-slate-900 mb-1 font-mono">{trustCertification.auditLedger.lastBlock}</div>
+                <div className="text-xs text-slate-600">{trustCertification.auditLedger.blockTime}</div>
+              </CardContent>
+            </Card>
+            <Card className="bg-white border-slate-200">
+              <CardContent className="p-4 text-center">
+                <div className="text-xs text-slate-600 mb-1">Verifiability</div>
+                <div className="text-3xl font-bold text-emerald-600 mb-1">{trustCertification.auditLedger.verifiable}</div>
+                <Badge className="bg-emerald-100 text-emerald-700 text-xs">Immutable</Badge>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="grid grid-cols-2 gap-6">
+            <Card className="bg-white border-slate-200">
+              <CardHeader>
+                <CardTitle className="text-slate-900 text-lg flex items-center gap-2">
+                  <FileCheck className="w-5 h-5 text-emerald-600" />
+                  Compliance Reports
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {trustCertification.complianceReports.map((report, idx) => (
+                    <Card key={idx} className={cn(
+                      "border-2",
+                      report.status === "ready" ? "border-emerald-200 bg-emerald-50" : "border-amber-200 bg-amber-50"
+                    )}>
+                      <CardContent className="p-4">
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center gap-2">
+                            <h4 className="text-sm font-bold text-slate-900">{report.type}</h4>
+                            <Badge className={cn(
+                              "text-xs",
+                              report.status === "ready" ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"
+                            )}>
+                              {report.status}
+                            </Badge>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-2xl font-bold text-slate-900">{report.coverage}</div>
+                            <div className="text-xs text-slate-600">coverage</div>
+                          </div>
+                        </div>
+                        <div className="text-xs text-slate-600 mb-3">Last generated: {report.lastGenerated}</div>
+                        <Button
+                          size="sm"
+                          className="w-full text-xs h-7"
+                          disabled={!report.exportReady}
+                          variant={report.exportReady ? "default" : "outline"}
+                        >
+                          <Download className="w-3 h-3 mr-1" />
+                          {report.exportReady ? "Export Report" : "Not Ready"}
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white border-slate-200">
+              <CardHeader>
+                <CardTitle className="text-slate-900 text-lg flex items-center gap-2">
+                  <Eye className="w-5 h-5 text-blue-600" />
+                  External Verification Log
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {trustCertification.verificationLog.map((log, idx) => (
+                    <Card key={idx} className="border-2 border-blue-200 bg-blue-50">
+                      <CardContent className="p-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <div>
+                            <div className="text-sm font-bold text-slate-900">{log.auditor}</div>
+                            <div className="text-xs text-slate-600">{log.timestamp}</div>
+                          </div>
+                          <Badge className={cn(
+                            "text-xs",
+                            log.result === "Pass" ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700"
+                          )}>
+                            {log.result}
+                          </Badge>
+                        </div>
+                        <div className="text-xs text-slate-700">
+                          Verified {log.verified} decisions without accessing customer data
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+                <Card className="mt-4 bg-emerald-50 border-emerald-200">
+                  <CardContent className="p-3">
+                    <div className="text-xs text-emerald-900 font-semibold mb-1">Zero-Knowledge Verification</div>
+                    <div className="text-xs text-slate-700">
+                      Auditors verify policy compliance via cryptographic proofs, no data access required
+                    </div>
+                  </CardContent>
+                </Card>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        {/* NEW: META-LEARNING CONTROLLER TAB */}
+        <TabsContent value="meta-learning" className="space-y-6 mt-6">
+          <Card className="bg-gradient-to-br from-violet-600 to-purple-600 text-white shadow-2xl">
+            <CardContent className="p-8">
+              <div className="flex items-center gap-4">
+                <div className="p-4 bg-white/20 backdrop-blur-sm rounded-2xl">
+                  <Brain className="w-8 h-8" />
+                </div>
+                <div>
+                  <h2 className="text-3xl font-bold mb-1">Meta-Learning Controller</h2>
+                  <p className="text-violet-100">Optimize optimization itself • ROI-driven compute allocation • Auto-reweight importance</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <div className="grid grid-cols-2 gap-6">
+            <Card className="bg-white border-slate-200">
+              <CardHeader>
+                <CardTitle className="text-slate-900 text-lg flex items-center gap-2">
+                  <Cpu className="w-5 h-5 text-violet-600" />
+                  Training Compute Allocation
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {metaLearning.trainingAllocation.map((alloc, idx) => (
+                    <Card key={idx} className={cn(
+                      "border-2",
+                      alloc.allocated ? "border-violet-200 bg-violet-50" : "border-slate-200 bg-slate-50"
+                    )}>
+                      <CardContent className="p-4">
+                        <div className="flex items-center justify-between mb-3">
+                          <div>
+                            <h4 className="text-sm font-bold text-slate-900">{alloc.agent}</h4>
+                            <Badge className={cn(
+                              "text-xs mt-1",
+                              alloc.priority === "high" ? "bg-red-100 text-red-700" :
+                              alloc.priority === "medium" ? "bg-amber-100 text-amber-700" :
+                              "bg-blue-100 text-blue-700"
+                            )}>
+                              {alloc.priority} priority
+                            </Badge>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-2xl font-bold text-violet-600">{alloc.computeHours}h</div>
+                            <div className="text-xs text-slate-600">compute</div>
+                          </div>
+                        </div>
+                        <div className="p-2 bg-emerald-50 border border-emerald-200 rounded mb-2">
+                          <div className="text-xs text-emerald-800">Expected ROI: <span className="font-bold">{alloc.expectedROI}</span></div>
+                        </div>
+                        {!alloc.allocated && (
+                          <div className="text-xs text-slate-600 italic">Below ROI threshold - not allocated</div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white border-slate-200">
+              <CardHeader>
+                <CardTitle className="text-slate-900 text-lg flex items-center gap-2">
+                  <TrendingUp className="w-5 h-5 text-blue-600" />
+                  Mission Importance (Auto-Reweighted)
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3 mb-4">
+                  {metaLearning.missionImportance.map((mission, idx) => (
+                    <Card key={idx} className="border-2 border-blue-200 bg-blue-50">
+                      <CardContent className="p-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <div>
+                            <div className="text-sm font-bold text-slate-900">{mission.mission}</div>
+                            <Badge className={cn(
+                              "text-xs mt-1",
+                              mission.shareholderImpact === "High" ? "bg-red-100 text-red-700" :
+                              mission.shareholderImpact === "Medium" ? "bg-amber-100 text-amber-700" :
+                              "bg-blue-100 text-blue-700"
+                            )}>
+                              {mission.shareholderImpact} impact
+                            </Badge>
+                          </div>
+                          <div className="text-3xl font-bold text-blue-600">{mission.importance}</div>
+                        </div>
+                        <div className="text-xs text-slate-600">Reweighted {mission.reweightedAt}</div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+
+                <Card className="bg-slate-50 border-slate-200">
+                  <CardHeader>
+                    <div className="text-sm font-bold text-slate-900">Learning Signal Effectiveness</div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {Object.entries(metaLearning.learningSignals).map(([key, signal]) => (
+                        <div key={key}>
+                          <div className="flex justify-between text-xs mb-1">
+                            <span className="text-slate-600">{key.replace(/([A-Z])/g, " $1").trim()}</span>
+                            <span className="text-slate-900 font-bold">Weight: {signal.weight}</span>
+                          </div>
+                          <Progress value={signal.effectivenessScore} className="h-2 mb-1" />
+                          <div className="text-xs text-slate-500">Effectiveness: {signal.effectivenessScore}%</div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        {/* NEW: CROSS-ORGANIZATION SANDBOX TAB */}
+        <TabsContent value="sandbox" className="space-y-6 mt-6">
+          <Card className="bg-gradient-to-br from-amber-600 to-orange-600 text-white shadow-2xl">
+            <CardContent className="p-8">
+              <div className="flex items-center gap-4">
+                <div className="p-4 bg-white/20 backdrop-blur-sm rounded-2xl">
+                  <Briefcase className="w-8 h-8" />
+                </div>
+                <div>
+                  <h2 className="text-3xl font-bold mb-1">Cross-Organization Sandbox Network</h2>
+                  <p className="text-amber-100">Safe collaboration • Data isolation • Zero-copy rules • Auto-expiration</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <div className="grid grid-cols-2 gap-6">
+            <Card className="bg-white border-slate-200">
+              <CardHeader>
+                <CardTitle className="text-slate-900 text-lg flex items-center gap-2">
+                  <Users className="w-5 h-5 text-amber-600" />
+                  Active Collaborations
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {sandboxNetwork.activeCollaborations.map((collab) => (
+                    <Card key={collab.id} className="border-2 border-amber-200 bg-amber-50">
+                      <CardContent className="p-4">
+                        <div className="flex items-center justify-between mb-3">
+                          <div>
+                            <h4 className="text-sm font-bold text-slate-900">{collab.partner}</h4>
+                            <div className="text-xs text-slate-600 mt-1">{collab.mission}</div>
+                          </div>
+                          <Badge className="bg-emerald-100 text-emerald-700 text-xs">{collab.status}</Badge>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2 text-xs mb-3">
+                          <div>
+                            <span className="text-slate-600">Sharing:</span>
+                            <div className="font-semibold text-slate-900">{collab.dataSharing.replace(/_/g, " ")}</div>
+                          </div>
+                          <div>
+                            <span className="text-slate-600">Expires:</span>
+                            <div className="font-semibold text-slate-900">{collab.expires}</div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 mb-2">
+                          {collab.zeroCopy && (
+                            <Badge className="bg-blue-100 text-blue-700 text-xs">
+                              <Lock className="w-3 h-3 mr-1" />
+                              Zero-Copy
+                            </Badge>
+                          )}
+                        </div>
+                        <div className="text-xs text-slate-500">Last sync: {collab.lastSync}</div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white border-slate-200">
+              <CardHeader>
+                <CardTitle className="text-slate-900 text-lg flex items-center gap-2">
+                  <ShieldCheck className="w-5 h-5 text-red-600" />
+                  Isolation Rules
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {sandboxNetwork.isolationRules.map((rule, idx) => (
+                    <div key={idx} className="flex items-center justify-between p-3 bg-emerald-50 rounded border border-emerald-200">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle className="w-4 h-4 text-emerald-600" />
+                        <span className="text-sm text-slate-900">{rule.rule}</span>
+                      </div>
+                      <Badge className="bg-emerald-100 text-emerald-700 text-xs">Enforced</Badge>
+                    </div>
+                  ))}
+                </div>
+                <Card className="mt-4 bg-amber-50 border-amber-200">
+                  <CardContent className="p-3">
+                    <div className="text-xs text-amber-900 italic">
+                      💡 Share insights, not data. Partners never see your raw records.
+                    </div>
+                  </CardContent>
+                </Card>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        {/* NEW: ENTERPRISE MODE DASHBOARD TAB */}
+        <TabsContent value="enterprise" className="space-y-6 mt-6">
+          <Card className="bg-gradient-to-br from-slate-800 to-gray-900 text-white shadow-2xl">
+            <CardContent className="p-8">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-4">
+                  <div className="p-4 bg-white/20 backdrop-blur-sm rounded-2xl">
+                    <Radar className="w-8 h-8" />
+                  </div>
+                  <div>
+                    <h2 className="text-3xl font-bold mb-1">Enterprise Command Center</h2>
+                    <p className="text-gray-300">Executive governance • Trust metrics • Industry benchmarks • Drift detection</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-sm text-gray-300">Trust Meter</div>
+                  <div className="text-5xl font-bold text-white">{enterpriseDashboard.trustMeter.score}%</div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-4 gap-3">
+                <Card className="bg-white/10 backdrop-blur-sm border-white/20">
+                  <CardContent className="p-3 text-center">
+                    <div className="text-xs text-gray-300 mb-1">Model Confidence</div>
+                    <div className="text-2xl font-bold text-white">{enterpriseDashboard.trustMeter.modelConfidence}%</div>
+                  </CardContent>
+                </Card>
+                <Card className="bg-white/10 backdrop-blur-sm border-white/20">
+                  <CardContent className="p-3 text-center">
+                    <div className="text-xs text-gray-300 mb-1">Policy Compliance</div>
+                    <div className="text-2xl font-bold text-white">{enterpriseDashboard.trustMeter.policyCompliance}%</div>
+                  </CardContent>
+                </Card>
+                <Card className="bg-white/10 backdrop-blur-sm border-white/20">
+                  <CardContent className="p-3 text-center">
+                    <div className="text-xs text-gray-300 mb-1">Audit Coverage</div>
+                    <div className="text-2xl font-bold text-white">{enterpriseDashboard.trustMeter.auditCoverage}%</div>
+                  </CardContent>
+                </Card>
+                <Card className="bg-white/10 backdrop-blur-sm border-white/20">
+                  <CardContent className="p-3 text-center">
+                    <div className="text-xs text-gray-300 mb-1">Overall Score</div>
+                    <div className="text-2xl font-bold text-emerald-400">{enterpriseDashboard.trustMeter.score}%</div>
+                  </CardContent>
+                </Card>
+              </div>
+            </CardContent>
+          </Card>
+
+          <div className="grid grid-cols-3 gap-6">
+            <Card className="bg-white border-slate-200">
+              <CardHeader>
+                <CardTitle className="text-slate-900 text-lg flex items-center gap-2">
+                  <Activity className="w-5 h-5 text-blue-600" />
+                  Governance Timeline
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {enterpriseDashboard.governanceTimeline.map((event, idx) => (
+                    <Card key={idx} className="border-2 border-blue-200 bg-blue-50">
+                      <CardContent className="p-3">
+                        <div className="flex items-center justify-between mb-1">
+                          <div className="text-sm font-bold text-slate-900">{event.event}</div>
+                          <Badge className="bg-emerald-100 text-emerald-700 text-xs">{event.status}</Badge>
+                        </div>
+                        <div className="text-xs text-slate-600 mb-1">{event.date}</div>
+                        <div className="text-xs text-slate-700">{event.impact}</div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white border-slate-200">
+              <CardHeader>
+                <CardTitle className="text-slate-900 text-lg flex items-center gap-2">
+                  <BarChart3 className="w-5 h-5 text-emerald-600" />
+                  Industry Benchmarks
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {Object.entries(enterpriseDashboard.industryBenchmarks).map(([key, benchmark]) => (
+                    <div key={key}>
+                      <div className="text-sm font-semibold text-slate-900 mb-2">
+                        {key.replace(/([A-Z])/g, " $1").trim()}
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 mb-2">
+                        <div className="p-2 bg-blue-50 rounded border border-blue-200 text-center">
+                          <div className="text-xs text-slate-600">Yours</div>
+                          <div className="text-xl font-bold text-blue-600">{benchmark.yours}%</div>
+                        </div>
+                        <div className="p-2 bg-slate-50 rounded border border-slate-200 text-center">
+                          <div className="text-xs text-slate-600">Industry</div>
+                          <div className="text-xl font-bold text-slate-900">{benchmark.industry}%</div>
+                        </div>
+                      </div>
+                      <Badge className="bg-emerald-100 text-emerald-700 text-xs">
+                        {benchmark.delta} ahead
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white border-slate-200">
+              <CardHeader>
+                <CardTitle className="text-slate-900 text-lg flex items-center gap-2">
+                  <AlertTriangle className="w-5 h-5 text-red-600" />
+                  Drift Alerts
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {enterpriseDashboard.driftAlerts.length > 0 ? (
+                  <div className="space-y-3">
+                    {enterpriseDashboard.driftAlerts.map((alert, idx) => (
+                      <Card key={idx} className="border-2 border-red-300 bg-red-50">
+                        <CardContent className="p-4">
+                          <div className="flex items-start gap-3 mb-3">
+                            <AlertTriangle className="w-5 h-5 text-red-600 flex-shrink-0" />
+                            <div className="flex-1">
+                              <h4 className="text-sm font-bold text-slate-900 mb-1">{alert.mission}</h4>
+                              <div className="text-xs text-slate-700 mb-2">
+                                {alert.metric.replace(/_/g, " ")}: {alert.drift} drift
+                              </div>
+                              <Badge className={cn(
+                                "text-xs",
+                                alert.severity === "high" ? "bg-red-100 text-red-700" :
+                                alert.severity === "medium" ? "bg-amber-100 text-amber-700" :
+                                "bg-blue-100 text-blue-700"
+                              )}>
+                                {alert.severity} severity
+                              </Badge>
+                            </div>
+                          </div>
+                          <div className="text-xs text-slate-600 mb-3">Detected {alert.detectedAt}</div>
+                          <Button size="sm" className="w-full bg-red-600 hover:bg-red-700 text-xs h-7">
+                            Investigate
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <CheckCircle className="w-12 h-12 mx-auto mb-3 text-emerald-400" />
+                    <p className="text-sm text-slate-600">No drift detected</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
 
         {/* MISSION BUILDER TAB */}
