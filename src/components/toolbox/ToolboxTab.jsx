@@ -26,16 +26,25 @@ import { LineChart, Line, ResponsiveContainer } from 'recharts';
 export default function ToolboxTab() {
   const [activeView, setActiveView] = useState("overview");
   const [selectedTool, setSelectedTool] = useState(null);
-  
+
+  // Define available guardrails for Mission Builder step 5
+  const defaultGuardrails = [
+    { name: "Require human approval for amounts > $5K", id: "human_approval_5k", defaultChecked: true },
+    { name: "Sandbox mode for first 3 runs", id: "sandbox_mode", defaultChecked: true },
+    { name: "PII data masking enabled", id: "pii_masking", defaultChecked: true },
+    { name: "Auto-rollback on error rate > 5%", id: "auto_rollback", defaultChecked: false }
+  ];
+
   // Mission Builder state
   const [missionBuildStep, setMissionBuildStep] = useState(1);
+  const defaultActiveGuardrailIds = defaultGuardrails.filter(g => g.defaultChecked).map(g => g.id); // Get IDs of default active guardrails
   const [missionSpec, setMissionSpec] = useState({
     name: "",
     objective: "",
     triggers: [],
     inputs: [],
     steps: [],
-    guardrails: [],
+    guardrails: defaultActiveGuardrailIds, // Initialize with default active guardrails
     successMetrics: [],
     rollbackPlan: ""
   });
@@ -138,7 +147,7 @@ export default function ToolboxTab() {
   ]);
 
   // NEW: Phase 3 - Advanced Intelligence State
-  
+
   // OpsGraph State
   const [opsGraphData] = useState({
     nodes: [
@@ -464,51 +473,51 @@ export default function ToolboxTab() {
   });
 
   const lifecycleStages = [
-    { 
-      stage: "draft", 
-      label: "Draft", 
+    {
+      stage: "draft",
+      label: "Draft",
       tool: "SpecWriter",
       description: "AI generates mission spec from intent",
       color: "slate"
     },
-    { 
-      stage: "validated", 
-      label: "Validated", 
+    {
+      stage: "validated",
+      label: "Validated",
       tool: "Simulator + Guardrails",
       description: "Policy check + dry-run simulation",
       color: "blue"
     },
-    { 
-      stage: "simulated", 
-      label: "Simulated", 
+    {
+      stage: "simulated",
+      label: "Simulated",
       tool: "Wind Tunnel",
       description: "Historical data test flight",
       color: "cyan"
     },
-    { 
-      stage: "cleared_for_flight", 
-      label: "Cleared for Flight", 
+    {
+      stage: "cleared_for_flight",
+      label: "Cleared for Flight",
       tool: "ATC + Cost Guardian",
       description: "Final clearance + budget check",
       color: "emerald"
     },
-    { 
-      stage: "active", 
-      label: "Active", 
+    {
+      stage: "active",
+      label: "Active",
       tool: "Pilot + Autopilot",
       description: "Mission running in production",
       color: "purple"
     },
-    { 
-      stage: "monitored", 
-      label: "Monitored", 
+    {
+      stage: "monitored",
+      label: "Monitored",
       tool: "ATC + Telemetry",
       description: "Real-time performance tracking",
       color: "amber"
     },
-    { 
-      stage: "audit", 
-      label: "Audit", 
+    {
+      stage: "audit",
+      label: "Audit",
       tool: "Evaluator + Flight Deck",
       description: "Post-flight performance review",
       color: "indigo"
@@ -822,7 +831,7 @@ export default function ToolboxTab() {
               </div>
             </CardContent>
           </Card>
-          
+
           <div className="grid grid-cols-3 gap-6">
             {tools.map((tool) => (
               <motion.div
@@ -1004,7 +1013,7 @@ export default function ToolboxTab() {
                     {activeMissions.map((mission) => {
                       const stageInfo = getStageInfo(mission.stage);
                       return (
-                        <Card 
+                        <Card
                           key={mission.id}
                           className={cn(
                             "border-2 transition-all cursor-pointer hover:bg-white/5",
@@ -1086,7 +1095,7 @@ export default function ToolboxTab() {
             <CardContent>
               <div className="space-y-2 max-h-64 overflow-y-auto">
                 {telemetryStream.map((event, idx) => (
-                  <div 
+                  <div
                     key={idx}
                     className="flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-all"
                   >
@@ -1209,10 +1218,10 @@ export default function ToolboxTab() {
                           {pattern.confidence}% confidence
                         </Badge>
                       </div>
-                      
+
                       <h4 className="text-lg font-bold text-white mb-2">{pattern.title}</h4>
                       <p className="text-sm text-gray-300 mb-4">{pattern.description}</p>
-                      
+
                       <div className="p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-lg mb-4">
                         <div className="text-xs text-emerald-400 font-semibold mb-1">Expected Impact:</div>
                         <div className="text-sm text-white">{pattern.impact}</div>
@@ -1378,7 +1387,7 @@ export default function ToolboxTab() {
 
                       {config.status === "ready_to_promote" && (
                         <div className="flex gap-2">
-                          <Button 
+                          <Button
                             onClick={() => handlePromoteConfig(config)}
                             className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-xs h-8"
                           >
@@ -1432,7 +1441,7 @@ export default function ToolboxTab() {
                             <span className="text-xs text-gray-400">Learned from {playbook.learnedFrom}</span>
                           </div>
                         </div>
-                        <Button 
+                        <Button
                           onClick={() => handleAdoptPlaybook(playbook)}
                           className="bg-indigo-600 hover:bg-indigo-700 text-xs h-8"
                         >
@@ -1619,7 +1628,7 @@ export default function ToolboxTab() {
                           <span>{scenario.ciLower} to {scenario.ciUpper}</span>
                         </div>
                         <div className="h-2 bg-white/10 rounded-full overflow-hidden">
-                          <div 
+                          <div
                             className="h-full bg-gradient-to-r from-blue-500 to-emerald-500"
                             style={{ width: `${scenario.impact.confidence}%` }}
                           ></div>
@@ -1642,7 +1651,7 @@ export default function ToolboxTab() {
                       )}
 
                       <div className="flex gap-2">
-                        <Button 
+                        <Button
                           onClick={() => handleApplyWhatIf(scenario)}
                           disabled={scenario.status !== "ready"}
                           className="flex-1 bg-cyan-600 hover:bg-cyan-700 text-xs h-8"
@@ -1758,8 +1767,8 @@ export default function ToolboxTab() {
                         )}
 
                         <div className="flex gap-2">
-                          <Button 
-                            size="sm" 
+                          <Button
+                            size="sm"
                             onClick={() => handleEnableCanary(envelope.mission)}
                             className="flex-1 bg-amber-600 hover:bg-amber-700 text-xs h-7"
                           >
@@ -1863,7 +1872,7 @@ export default function ToolboxTab() {
                             {template.mappingSuccess}% fields auto-resolved • Est. accuracy: {template.estimatedAccuracy}
                           </div>
                         </div>
-                        <Button 
+                        <Button
                           onClick={() => handleCloneSkills(template)}
                           className="bg-cyan-600 hover:bg-cyan-700 text-xs h-8"
                         >
@@ -1968,7 +1977,7 @@ export default function ToolboxTab() {
                           <h4 className="text-lg font-bold text-white mb-2">{opportunity.title}</h4>
                           <p className="text-sm text-gray-300 mb-3">{opportunity.description}</p>
                         </div>
-                        <Button 
+                        <Button
                           onClick={() => handleApplyFleetOptimization(opportunity)}
                           className="bg-emerald-600 hover:bg-emerald-700 text-xs h-8"
                         >
@@ -2164,18 +2173,24 @@ export default function ToolboxTab() {
                     <div className="space-y-4">
                       <Label className="text-sm font-bold text-slate-900 mb-2 block">Safety Guardrails</Label>
                       <div className="space-y-2">
-                        {[
-                          { name: "Require human approval for amounts > $5K", checked: true },
-                          { name: "Sandbox mode for first 3 runs", checked: true },
-                          { name: "PII data masking enabled", checked: true },
-                          { name: "Auto-rollback on error rate > 5%", checked: false }
-                        ].map((guard, idx) => (
-                          <div key={idx} className="flex items-center justify-between p-3 bg-red-50 rounded border border-red-200">
+                        {defaultGuardrails.map((guard) => (
+                          <div key={guard.id} className="flex items-center justify-between p-3 bg-red-50 rounded border border-red-200">
                             <div className="flex items-center gap-3">
                               <Shield className="w-4 h-4 text-red-600" />
                               <span className="text-sm text-slate-900">{guard.name}</span>
                             </div>
-                            <Switch checked={guard.checked} />
+                            <Switch
+                              checked={missionSpec.guardrails.includes(guard.id)}
+                              onCheckedChange={(checked) => {
+                                const newGuardrails = new Set(missionSpec.guardrails);
+                                if (checked) {
+                                  newGuardrails.add(guard.id);
+                                } else {
+                                  newGuardrails.delete(guard.id);
+                                }
+                                setMissionSpec({ ...missionSpec, guardrails: Array.from(newGuardrails) });
+                              }}
+                            />
                           </div>
                         ))}
                       </div>
@@ -2213,7 +2228,7 @@ export default function ToolboxTab() {
                           </div>
                           <div>
                             <span className="text-slate-600">Guardrails:</span>
-                            <span className="font-semibold text-slate-900 ml-2">4 active</span>
+                            <span className="font-semibold text-slate-900 ml-2">{missionSpec.guardrails.length} active</span>
                           </div>
                         </div>
                       </div>
@@ -2985,7 +3000,7 @@ export default function ToolboxTab() {
                       <div className="flex-1">
                         <div className="text-sm font-bold text-red-900 mb-1">Budget Alert</div>
                         <div className="text-xs text-slate-700">
-                          Projected spend exceeds daily budget by ${(costTracking.projectedSpend - costTracking.dailyBudget).toFixed(2)}. 
+                          Projected spend exceeds daily budget by ${(costTracking.projectedSpend - costTracking.dailyBudget).toFixed(2)}.
                           Consider applying cost optimizations or increasing budget.
                         </div>
                       </div>
