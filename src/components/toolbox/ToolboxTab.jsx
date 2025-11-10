@@ -774,23 +774,25 @@ export default function ToolboxTab() {
   return (
     <div className="space-y-6">
       <Tabs value={activeView} onValueChange={setActiveView} className="w-full">
-        <TabsList className="bg-white/80 backdrop-blur-sm border border-slate-200">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="flight-deck"><Settings className="w-4 h-4 mr-2" />Flight Deck</TabsTrigger>
-          <TabsTrigger value="ops-graph"><Network className="w-4 h-4 mr-2" />OpsGraph</TabsTrigger>
-          <TabsTrigger value="auto-tune"><TrendingUp className="w-4 h-4 mr-2" />Auto-Tune</TabsTrigger>
-          <TabsTrigger value="playbooks"><FileText className="w-4 h-4 mr-2" />Playbooks</TabsTrigger>
-          <TabsTrigger value="what-if"><FlaskConical className="w-4 h-4 mr-2" />What-If</TabsTrigger>
-          <TabsTrigger value="intelligence"><Brain className="w-4 h-4 mr-2" />Intelligence</TabsTrigger>
-          <TabsTrigger value="mission-builder"><Plane className="w-4 h-4 mr-2" />Mission Builder</TabsTrigger>
-          <TabsTrigger value="action-library"><Boxes className="w-4 h-4 mr-2" />Actions</TabsTrigger>
-          <TabsTrigger value="spec-writer"><FileCode className="w-4 h-4 mr-2" />SpecWriter</TabsTrigger>
-          <TabsTrigger value="data-mapper"><Database className="w-4 h-4 mr-2" />Data Mapper</TabsTrigger>
-          <TabsTrigger value="simulator"><Wind className="w-4 h-4 mr-2" />Simulator</TabsTrigger>
-          <TabsTrigger value="guardrails"><Shield className="w-4 h-4 mr-2" />Guardrails</TabsTrigger>
-          <TabsTrigger value="evaluator"><FlaskConical className="w-4 h-4 mr-2" />Evaluator</TabsTrigger>
-          <TabsTrigger value="cost-guardian"><DollarSign className="w-4 h-4 mr-2" />Cost Guardian</TabsTrigger>
-        </TabsList>
+        <div className="overflow-x-auto pb-2">
+          <TabsList className="bg-white/80 backdrop-blur-sm border border-slate-200 inline-flex w-auto min-w-full">
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="flight-deck"><Settings className="w-4 h-4 mr-2" />Flight Deck</TabsTrigger>
+            <TabsTrigger value="ops-graph"><Network className="w-4 h-4 mr-2" />OpsGraph</TabsTrigger>
+            <TabsTrigger value="auto-tune"><TrendingUp className="w-4 h-4 mr-2" />Auto-Tune</TabsTrigger>
+            <TabsTrigger value="playbooks"><FileText className="w-4 h-4 mr-2" />Playbooks</TabsTrigger>
+            <TabsTrigger value="what-if"><FlaskConical className="w-4 h-4 mr-2" />What-If</TabsTrigger>
+            <TabsTrigger value="intelligence"><Brain className="w-4 h-4 mr-2" />Intelligence</TabsTrigger>
+            <TabsTrigger value="mission-builder"><Plane className="w-4 h-4 mr-2" />Mission Builder</TabsTrigger>
+            <TabsTrigger value="action-library"><Boxes className="w-4 h-4 mr-2" />Actions</TabsTrigger>
+            <TabsTrigger value="spec-writer"><FileCode className="w-4 h-4 mr-2" />SpecWriter</TabsTrigger>
+            <TabsTrigger value="data-mapper"><Database className="w-4 h-4 mr-2" />Data Mapper</TabsTrigger>
+            <TabsTrigger value="simulator"><Wind className="w-4 h-4 mr-2" />Simulator</TabsTrigger>
+            <TabsTrigger value="guardrails"><Shield className="w-4 h-4 mr-2" />Guardrails</TabsTrigger>
+            <TabsTrigger value="evaluator"><FlaskConical className="w-4 h-4 mr-2" />Evaluator</TabsTrigger>
+            <TabsTrigger value="cost-guardian"><DollarSign className="w-4 h-4 mr-2" />Cost Guardian</TabsTrigger>
+          </TabsList>
+        </div>
 
         {/* OVERVIEW TAB */}
         <TabsContent value="overview" className="space-y-6 mt-6">
@@ -895,19 +897,19 @@ export default function ToolboxTab() {
 
         {/* NEW: FLIGHT DECK / INTEGRATION FABRIC TAB */}
         <TabsContent value="flight-deck" className="space-y-6 mt-6">
-          <Card className="bg-gradient-to-br from-slate-900 to-gray-900 border-white/10 text-white shadow-2xl">
+          <Card className="bg-gradient-to-br from-blue-600 to-purple-600 text-white shadow-2xl">
             <CardContent className="p-8">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-4">
-                  <div className="p-4 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl">
+                  <div className="p-4 bg-white/20 backdrop-blur-sm rounded-2xl">
                     <Network className="w-8 h-8" />
                   </div>
                   <div>
                     <h2 className="text-3xl font-bold mb-1">Integration Fabric</h2>
-                    <p className="text-gray-400">Mission Lifecycle Engine • Runtime Orchestration • AI Bus</p>
+                    <p className="text-purple-100">Mission Lifecycle Engine • Runtime Orchestration • AI Bus</p>
                   </div>
                 </div>
-                <Badge className="bg-emerald-600/20 text-emerald-400 border-emerald-600/30 px-4 py-2">
+                <Badge className="bg-white/20 backdrop-blur-sm text-white border-white/30 px-4 py-2">
                   <Activity className="w-4 h-4 mr-2" />
                   All Systems Operational
                 </Badge>
@@ -922,10 +924,10 @@ export default function ToolboxTab() {
                   { name: "Cost Guardian", value: systemHealth.costGuardian, icon: DollarSign },
                   { name: "Simulator", value: systemHealth.simulator, icon: Wind }
                 ].map((system, idx) => (
-                  <div key={idx} className="bg-white/5 backdrop-blur-sm rounded-lg p-4 border border-white/10">
+                  <div key={idx} className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
                     <div className="flex items-center gap-2 mb-2">
-                      <system.icon className="w-4 h-4 text-blue-400" />
-                      <span className="text-xs text-gray-400">{system.name}</span>
+                      <system.icon className="w-4 h-4 text-white" />
+                      <span className="text-xs text-purple-100">{system.name}</span>
                     </div>
                     <div className="text-2xl font-bold text-white mb-1">{system.value}%</div>
                     <Progress value={system.value} className="h-1 bg-white/20" />
@@ -938,13 +940,13 @@ export default function ToolboxTab() {
           <div className="grid grid-cols-12 gap-6">
             {/* Mission Lifecycle Visualization */}
             <div className="col-span-7">
-              <Card className="bg-white/5 backdrop-blur-xl border-white/10">
+              <Card className="bg-white/80 backdrop-blur-sm border-slate-200">
                 <CardHeader>
-                  <CardTitle className="text-white text-lg flex items-center gap-2">
-                    <Layers className="w-5 h-5 text-purple-400" />
+                  <CardTitle className="text-slate-900 text-lg flex items-center gap-2">
+                    <Layers className="w-5 h-5 text-purple-600" />
                     Mission Lifecycle Engine
                   </CardTitle>
-                  <p className="text-sm text-gray-400 mt-1">
+                  <p className="text-sm text-slate-600 mt-1">
                     Every mission flows through these orchestration stages
                   </p>
                 </CardHeader>
@@ -954,7 +956,7 @@ export default function ToolboxTab() {
                       <div key={stage.stage} className="relative">
                         <Card className={cn(
                           "border-2 transition-all",
-                          `border-${stage.color}-300 bg-${stage.color}-900/10` // Use a darker background variant for dark theme
+                          `border-${stage.color}-300 bg-${stage.color}-50`
                         )}>
                           <CardContent className="p-4">
                             <div className="flex items-start justify-between mb-2">
@@ -966,8 +968,8 @@ export default function ToolboxTab() {
                                   {idx + 1}
                                 </div>
                                 <div>
-                                  <h4 className="text-sm font-bold text-white">{stage.label}</h4>
-                                  <p className="text-xs text-gray-400">{stage.description}</p>
+                                  <h4 className="text-sm font-bold text-slate-900">{stage.label}</h4>
+                                  <p className="text-xs text-slate-600">{stage.description}</p>
                                 </div>
                               </div>
                               <Badge className={cn(
@@ -981,17 +983,17 @@ export default function ToolboxTab() {
                         </Card>
                         {idx < lifecycleStages.length - 1 && (
                           <div className="flex justify-center my-2">
-                            <ArrowRight className="w-5 h-5 text-gray-600 rotate-90" />
+                            <ArrowRight className="w-5 h-5 text-slate-400 rotate-90" />
                           </div>
                         )}
                       </div>
                     ))}
                   </div>
 
-                  <Card className="mt-6 bg-blue-600/10 border-blue-600/30">
+                  <Card className="mt-6 bg-blue-50 border-blue-200">
                     <CardContent className="p-4">
-                      <p className="text-sm text-gray-300 italic">
-                        💡 You're no longer running automations — you're running <strong className="text-white">airspace operations</strong>.
+                      <p className="text-sm text-slate-700 italic">
+                        💡 You're no longer running automations — you're running <strong className="text-blue-900">airspace operations</strong>.
                       </p>
                     </CardContent>
                   </Card>
@@ -1001,10 +1003,10 @@ export default function ToolboxTab() {
 
             {/* Active Missions */}
             <div className="col-span-5">
-              <Card className="bg-white/5 backdrop-blur-xl border-white/10">
+              <Card className="bg-white/80 backdrop-blur-sm border-slate-200">
                 <CardHeader>
-                  <CardTitle className="text-white text-lg flex items-center gap-2">
-                    <Plane className="w-5 h-5 text-emerald-400" />
+                  <CardTitle className="text-slate-900 text-lg flex items-center gap-2">
+                    <Plane className="w-5 h-5 text-emerald-600" />
                     Active Missions ({activeMissions.length})
                   </CardTitle>
                 </CardHeader>
@@ -1016,14 +1018,14 @@ export default function ToolboxTab() {
                         <Card
                           key={mission.id}
                           className={cn(
-                            "border-2 transition-all cursor-pointer hover:bg-white/5",
-                            `border-${getStageColor(mission.stage)}-300`
+                            "border-2 transition-all cursor-pointer hover:shadow-md",
+                            `border-${getStageColor(mission.stage)}-300 bg-${getStageColor(mission.stage)}-50`
                           )}
                         >
                           <CardContent className="p-4">
                             <div className="flex items-start justify-between mb-3">
                               <div className="flex-1">
-                                <h4 className="text-sm font-bold text-white mb-1">{mission.name}</h4>
+                                <h4 className="text-sm font-bold text-slate-900 mb-1">{mission.name}</h4>
                                 <div className="flex items-center gap-2 mb-2">
                                   <Badge className={cn(
                                     "text-xs",
@@ -1032,34 +1034,34 @@ export default function ToolboxTab() {
                                     {stageInfo?.label}
                                   </Badge>
                                   {mission.executions > 0 && (
-                                    <span className="text-xs text-gray-400">{mission.executions} runs</span>
+                                    <span className="text-xs text-slate-600">{mission.executions} runs</span>
                                   )}
                                 </div>
-                                <div className="text-xs text-gray-500">
+                                <div className="text-xs text-slate-600">
                                   Owner: {mission.owner}
                                 </div>
                               </div>
                               <div className="text-right">
                                 <div className={cn(
                                   "text-lg font-bold",
-                                  mission.health >= 95 ? "text-emerald-400" :
-                                  mission.health >= 80 ? "text-amber-400" :
-                                  "text-red-400"
+                                  mission.health >= 95 ? "text-emerald-600" :
+                                  mission.health >= 80 ? "text-amber-600" :
+                                  "text-red-600"
                                 )}>
                                   {mission.health}%
                                 </div>
-                                <div className="text-xs text-gray-500">health</div>
+                                <div className="text-xs text-slate-600">health</div>
                               </div>
                             </div>
 
                             <div className="space-y-2">
                               <div className="flex items-center justify-between text-xs">
-                                <span className="text-gray-400">Last transition:</span>
-                                <span className="text-white">{mission.lastTransition}</span>
+                                <span className="text-slate-600">Last transition:</span>
+                                <span className="text-slate-900">{mission.lastTransition}</span>
                               </div>
                               <div className="flex items-center justify-between text-xs">
-                                <span className="text-gray-400">Tools active:</span>
-                                <span className="text-white">{mission.triggeredTools.join(", ")}</span>
+                                <span className="text-slate-600">Tools active:</span>
+                                <span className="text-slate-900">{mission.triggeredTools.join(", ")}</span>
                               </div>
                             </div>
 
@@ -1084,22 +1086,22 @@ export default function ToolboxTab() {
           </div>
 
           {/* Telemetry Stream */}
-          <Card className="bg-white/5 backdrop-blur-xl border-white/10">
+          <Card className="bg-white/80 backdrop-blur-sm border-slate-200">
             <CardHeader>
-              <CardTitle className="text-white text-lg flex items-center gap-2">
-                <Activity className="w-5 h-5 text-blue-400" />
+              <CardTitle className="text-slate-900 text-lg flex items-center gap-2">
+                <Activity className="w-5 h-5 text-blue-600" />
                 Live Telemetry Stream
               </CardTitle>
-              <p className="text-sm text-gray-400 mt-1">Real-time coordination between all Toolbox modules</p>
+              <p className="text-sm text-slate-600 mt-1">Real-time coordination between all Toolbox modules</p>
             </CardHeader>
             <CardContent>
               <div className="space-y-2 max-h-64 overflow-y-auto">
                 {telemetryStream.map((event, idx) => (
                   <div
                     key={idx}
-                    className="flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-all"
+                    className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 border border-slate-200 hover:bg-slate-100 transition-all"
                   >
-                    <div className="text-xs text-gray-500 font-mono w-20">{event.time}</div>
+                    <div className="text-xs text-slate-600 font-mono w-20">{event.time}</div>
                     <Badge className={cn(
                       "text-xs",
                       event.type === "execution" && "bg-purple-100 text-purple-700",
@@ -1111,13 +1113,13 @@ export default function ToolboxTab() {
                       {event.type}
                     </Badge>
                     <div className="flex-1">
-                      <div className="text-sm text-white">{event.mission}</div>
-                      <div className="text-xs text-gray-400">{event.message}</div>
+                      <div className="text-sm text-slate-900">{event.mission}</div>
+                      <div className="text-xs text-slate-600">{event.message}</div>
                     </div>
                     {event.status === "success" ? (
-                      <CheckCircle className="w-4 h-4 text-emerald-400" />
+                      <CheckCircle className="w-4 h-4 text-emerald-600" />
                     ) : (
-                      <AlertTriangle className="w-4 h-4 text-amber-400" />
+                      <AlertTriangle className="w-4 h-4 text-amber-600" />
                     )}
                   </div>
                 ))}
@@ -1127,52 +1129,52 @@ export default function ToolboxTab() {
 
           {/* Integration Fabric Features */}
           <div className="grid grid-cols-3 gap-4">
-            <Card className="bg-gradient-to-br from-purple-900/20 to-blue-900/20 border-purple-500/30">
+            <Card className="bg-gradient-to-br from-purple-50 to-blue-50 border-purple-200">
               <CardContent className="p-6">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="p-3 bg-purple-600/20 rounded-lg">
-                    <Zap className="w-6 h-6 text-purple-400" />
+                  <div className="p-3 bg-purple-600 rounded-lg">
+                    <Zap className="w-6 h-6 text-white" />
                   </div>
-                  <h3 className="text-lg font-bold text-white">AI Bus</h3>
+                  <h3 className="text-lg font-bold text-slate-900">AI Bus</h3>
                 </div>
-                <p className="text-sm text-gray-300 mb-3">
+                <p className="text-sm text-slate-700 mb-3">
                   Coordinates execution across Action Library, Data Mapper, Guardrails, and Cost Guardian
                 </p>
-                <div className="text-xs text-gray-500">
+                <div className="text-xs text-slate-600">
                   Processing: 847 messages/min
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="bg-gradient-to-br from-cyan-900/20 to-blue-900/20 border-cyan-500/30">
+            <Card className="bg-gradient-to-br from-cyan-50 to-blue-50 border-cyan-200">
               <CardContent className="p-6">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="p-3 bg-cyan-600/20 rounded-lg">
-                    <Database className="w-6 h-6 text-cyan-400" />
+                  <div className="p-3 bg-cyan-600 rounded-lg">
+                    <Database className="w-6 h-6 text-white" />
                   </div>
-                  <h3 className="text-lg font-bold text-white">Black Box</h3>
+                  <h3 className="text-lg font-bold text-slate-900">Black Box</h3>
                 </div>
-                <p className="text-sm text-gray-300 mb-3">
+                <p className="text-sm text-slate-700 mb-3">
                   Shared contextual memory fabric for all AI agents. Every decision is logged and learned from.
                 </p>
-                <div className="text-xs text-gray-500">
+                <div className="text-xs text-slate-600">
                   Memory size: 4.2 GB • 142k decisions
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="bg-gradient-to-br from-emerald-900/20 to-teal-900/20 border-emerald-500/30">
+            <Card className="bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-200">
               <CardContent className="p-6">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="p-3 bg-emerald-600/20 rounded-lg">
-                    <Shield className="w-6 h-6 text-emerald-400" />
+                  <div className="p-3 bg-emerald-600 rounded-lg">
+                    <Shield className="w-6 h-6 text-white" />
                   </div>
-                  <h3 className="text-lg font-bold text-white">Self-Healing</h3>
+                  <h3 className="text-lg font-bold text-slate-900">Self-Healing</h3>
                 </div>
-                <p className="text-sm text-gray-300 mb-3">
+                <p className="text-sm text-slate-700 mb-3">
                   Automatic failure detection and recovery. No single failure brings the network down.
                 </p>
-                <div className="text-xs text-gray-500">
+                <div className="text-xs text-slate-600">
                   Incidents resolved: 12 • Uptime: 99.8%
                 </div>
               </CardContent>
@@ -1182,7 +1184,7 @@ export default function ToolboxTab() {
 
         {/* NEW: OPS GRAPH TAB */}
         <TabsContent value="ops-graph" className="space-y-6 mt-6">
-          <Card className="bg-gradient-to-br from-purple-900/20 to-blue-900/20 border-purple-500/30">
+          <Card className="bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200">
             <CardContent className="p-8">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-4">
@@ -1190,11 +1192,11 @@ export default function ToolboxTab() {
                     <Network className="w-8 h-8 text-white" />
                   </div>
                   <div>
-                    <h2 className="text-3xl font-bold text-white mb-1">Cross-Mission Brain (OpsGraph)</h2>
-                    <p className="text-gray-400">Live knowledge graph • Pattern mining • Root-cause linking</p>
+                    <h2 className="text-3xl font-bold text-slate-900 mb-1">Cross-Mission Brain (OpsGraph)</h2>
+                    <p className="text-slate-600">Live knowledge graph • Pattern mining • Root-cause linking</p>
                   </div>
                 </div>
-                <Badge className="bg-emerald-600/20 text-emerald-400 border-emerald-600/30 px-4 py-2">
+                <Badge className="bg-emerald-100 text-emerald-700 border-emerald-300 px-4 py-2">
                   <Activity className="w-4 h-4 mr-2" />
                   {opsGraphData.patterns.length} Patterns Detected
                 </Badge>
@@ -1203,7 +1205,7 @@ export default function ToolboxTab() {
               {/* Pattern Suggestions */}
               <div className="grid grid-cols-3 gap-4">
                 {opsGraphData.patterns.map((pattern) => (
-                  <Card key={pattern.id} className="bg-white/5 backdrop-blur-sm border-white/10">
+                  <Card key={pattern.id} className="bg-white border-slate-200">
                     <CardContent className="p-6">
                       <div className="flex items-start justify-between mb-4">
                         <Badge className={cn(
@@ -1214,23 +1216,23 @@ export default function ToolboxTab() {
                         )}>
                           {pattern.type}
                         </Badge>
-                        <Badge className="bg-white/10 text-white text-xs">
+                        <Badge className="bg-slate-100 text-slate-700 text-xs">
                           {pattern.confidence}% confidence
                         </Badge>
                       </div>
 
-                      <h4 className="text-lg font-bold text-white mb-2">{pattern.title}</h4>
-                      <p className="text-sm text-gray-300 mb-4">{pattern.description}</p>
+                      <h4 className="text-lg font-bold text-slate-900 mb-2">{pattern.title}</h4>
+                      <p className="text-sm text-slate-700 mb-4">{pattern.description}</p>
 
-                      <div className="p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-lg mb-4">
-                        <div className="text-xs text-emerald-400 font-semibold mb-1">Expected Impact:</div>
-                        <div className="text-sm text-white">{pattern.impact}</div>
+                      <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-lg mb-4">
+                        <div className="text-xs text-emerald-700 font-semibold mb-1">Expected Impact:</div>
+                        <div className="text-sm text-slate-900">{pattern.impact}</div>
                       </div>
 
                       <div className="flex flex-wrap gap-1 mb-4">
-                        <div className="text-xs text-gray-400 mr-2">Affects:</div>
+                        <div className="text-xs text-slate-600 mr-2">Affects:</div>
                         {pattern.affected.map((node, idx) => (
-                          <Badge key={idx} className="text-xs bg-white/10 text-white">
+                          <Badge key={idx} className="text-xs bg-slate-100 text-slate-700">
                             {opsGraphData.nodes.find(n => n.id === node)?.label}
                           </Badge>
                         ))}
@@ -1241,7 +1243,7 @@ export default function ToolboxTab() {
                           <Check className="w-3 h-3 mr-1" />
                           Apply
                         </Button>
-                        <Button size="sm" variant="outline" className="flex-1 bg-white/5 border-white/10 text-white hover:bg-white/10 text-xs h-8">
+                        <Button size="sm" variant="outline" className="flex-1 text-xs h-8">
                           Explain
                         </Button>
                       </div>
@@ -1253,20 +1255,20 @@ export default function ToolboxTab() {
           </Card>
 
           {/* Graph Visualization */}
-          <Card className="bg-white/5 backdrop-blur-xl border-white/10">
+          <Card className="bg-white/80 backdrop-blur-sm border-slate-200">
             <CardHeader>
-              <CardTitle className="text-white text-lg flex items-center gap-2">
-                <Network className="w-5 h-5 text-purple-400" />
+              <CardTitle className="text-slate-900 text-lg flex items-center gap-2">
+                <Network className="w-5 h-5 text-purple-600" />
                 Mission Dependency Graph
               </CardTitle>
-              <p className="text-sm text-gray-400 mt-1">Zoomable view of missions, data sources, and policies</p>
+              <p className="text-sm text-slate-600 mt-1">Zoomable view of missions, data sources, and policies</p>
             </CardHeader>
             <CardContent>
-              <div className="bg-slate-900/50 rounded-lg p-8 border border-white/10 min-h-[400px] flex items-center justify-center">
+              <div className="bg-slate-50 rounded-lg p-8 border border-slate-200 min-h-[400px] flex items-center justify-center">
                 <div className="text-center">
                   <Network className="w-16 h-16 mx-auto mb-4 text-purple-400 opacity-50" />
-                  <p className="text-white text-sm mb-2">Interactive Graph Visualization</p>
-                  <p className="text-gray-400 text-xs">Nodes: {opsGraphData.nodes.length} • Edges: {opsGraphData.edges.length}</p>
+                  <p className="text-slate-900 text-sm mb-2">Interactive Graph Visualization</p>
+                  <p className="text-slate-600 text-xs">Nodes: {opsGraphData.nodes.length} • Edges: {opsGraphData.edges.length}</p>
                 </div>
               </div>
 
@@ -1274,15 +1276,15 @@ export default function ToolboxTab() {
               <div className="flex gap-4 mt-4">
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded-full bg-purple-500"></div>
-                  <span className="text-xs text-gray-400">Missions</span>
+                  <span className="text-xs text-slate-600">Missions</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded-full bg-blue-500"></div>
-                  <span className="text-xs text-gray-400">Data Sources</span>
+                  <span className="text-xs text-slate-600">Data Sources</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                  <span className="text-xs text-gray-400">Policies</span>
+                  <span className="text-xs text-slate-600">Policies</span>
                 </div>
               </div>
             </CardContent>
@@ -1291,7 +1293,7 @@ export default function ToolboxTab() {
 
         {/* NEW: AUTO-TUNE TAB */}
         <TabsContent value="auto-tune" className="space-y-6 mt-6">
-          <Card className="bg-gradient-to-br from-emerald-900/20 to-teal-900/20 border-emerald-500/30">
+          <Card className="bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-200">
             <CardContent className="p-8">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-4">
@@ -1299,8 +1301,8 @@ export default function ToolboxTab() {
                     <TrendingUp className="w-8 h-8 text-white" />
                   </div>
                   <div>
-                    <h2 className="text-3xl font-bold text-white mb-1">Config Leaderboard</h2>
-                    <p className="text-gray-400">Champion/Challenger testing • Auto-promotion • Continuous optimization</p>
+                    <h2 className="text-3xl font-bold text-slate-900 mb-1">Config Leaderboard</h2>
+                    <p className="text-slate-600">Champion/Challenger testing • Auto-promotion • Continuous optimization</p>
                   </div>
                 </div>
               </div>
@@ -1310,14 +1312,14 @@ export default function ToolboxTab() {
                 {configLeaderboard.map((config) => (
                   <Card key={config.id} className={cn(
                     "border-2",
-                    config.status === "ready_to_promote" ? "border-emerald-300 bg-emerald-50/5" :
-                    config.status === "testing" ? "border-blue-300 bg-blue-50/5" :
-                    "border-slate-300 bg-white/5"
+                    config.status === "ready_to_promote" ? "border-emerald-300 bg-emerald-50" :
+                    config.status === "testing" ? "border-blue-300 bg-blue-50" :
+                    "border-slate-300 bg-white"
                   )}>
                     <CardContent className="p-6">
                       <div className="flex items-start justify-between mb-4">
                         <div>
-                          <h4 className="text-lg font-bold text-white mb-1">{config.mission}</h4>
+                          <h4 className="text-lg font-bold text-slate-900 mb-1">{config.mission}</h4>
                           <div className="flex items-center gap-2">
                             <Badge className={cn(
                               "text-xs",
@@ -1336,17 +1338,17 @@ export default function ToolboxTab() {
                           </div>
                         </div>
                         <div className="text-right">
-                          <div className="text-sm text-gray-400">Confidence</div>
-                          <div className="text-2xl font-bold text-white">{config.confidence}%</div>
+                          <div className="text-sm text-slate-600">Confidence</div>
+                          <div className="text-2xl font-bold text-slate-900">{config.confidence}%</div>
                         </div>
                       </div>
 
                       {/* Metrics Comparison */}
                       <div className="grid grid-cols-3 gap-4 mb-4">
                         <div>
-                          <div className="text-xs text-gray-400 mb-1">Success Rate</div>
+                          <div className="text-xs text-slate-600 mb-1">Success Rate</div>
                           <div className="flex items-baseline gap-2">
-                            <span className="text-lg font-bold text-white">{config.metrics.success}%</span>
+                            <span className="text-lg font-bold text-slate-900">{config.metrics.success}%</span>
                             <Badge className={cn(
                               "text-xs",
                               config.delta.success > 0 ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700"
@@ -1356,9 +1358,9 @@ export default function ToolboxTab() {
                           </div>
                         </div>
                         <div>
-                          <div className="text-xs text-gray-400 mb-1">Latency (p95)</div>
+                          <div className="text-xs text-slate-600 mb-1">Latency (p95)</div>
                           <div className="flex items-baseline gap-2">
-                            <span className="text-lg font-bold text-white">{config.metrics.latency}ms</span>
+                            <span className="text-lg font-bold text-slate-900">{config.metrics.latency}ms</span>
                             <Badge className={cn(
                               "text-xs",
                               config.delta.latency < 0 ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700"
@@ -1368,9 +1370,9 @@ export default function ToolboxTab() {
                           </div>
                         </div>
                         <div>
-                          <div className="text-xs text-gray-400 mb-1">Cost/Run</div>
+                          <div className="text-xs text-slate-600 mb-1">Cost/Run</div>
                           <div className="flex items-baseline gap-2">
-                            <span className="text-lg font-bold text-white">${config.metrics.cost}</span>
+                            <span className="text-lg font-bold text-slate-900">${config.metrics.cost}</span>
                             <Badge className={cn(
                               "text-xs",
                               config.delta.cost < 0 ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700"
@@ -1381,7 +1383,7 @@ export default function ToolboxTab() {
                         </div>
                       </div>
 
-                      <div className="flex items-center justify-between text-xs text-gray-400 mb-4">
+                      <div className="flex items-center justify-between text-xs text-slate-600 mb-4">
                         <span>Runs completed: {config.runsCompleted}</span>
                       </div>
 
@@ -1394,10 +1396,10 @@ export default function ToolboxTab() {
                             <TrendingUp className="w-3 h-3 mr-1" />
                             Promote to Champion
                           </Button>
-                          <Button variant="outline" className="bg-white/5 border-white/10 text-white hover:bg-white/10 text-xs h-8">
+                          <Button variant="outline" className="text-xs h-8">
                             View Impact Card
                           </Button>
-                          <Button variant="outline" className="bg-white/5 border-white/10 text-white hover:bg-white/10 text-xs h-8">
+                          <Button variant="outline" className="text-xs h-8">
                             <Eye className="w-3 h-3 mr-1" />
                             Diff
                           </Button>
@@ -1413,7 +1415,7 @@ export default function ToolboxTab() {
 
         {/* NEW: PLAYBOOKS TAB */}
         <TabsContent value="playbooks" className="space-y-6 mt-6">
-          <Card className="bg-gradient-to-br from-indigo-900/20 to-purple-900/20 border-indigo-500/30">
+          <Card className="bg-gradient-to-br from-indigo-50 to-purple-50 border-indigo-200">
             <CardContent className="p-8">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-4">
@@ -1421,24 +1423,24 @@ export default function ToolboxTab() {
                     <FileText className="w-8 h-8 text-white" />
                   </div>
                   <div>
-                    <h2 className="text-3xl font-bold text-white mb-1">Synthesized Playbooks</h2>
-                    <p className="text-gray-400">Learned from behavior • Company-specific strategies • Ready to deploy</p>
+                    <h2 className="text-3xl font-bold text-slate-900 mb-1">Synthesized Playbooks</h2>
+                    <p className="text-slate-600">Learned from behavior • Company-specific strategies • Ready to deploy</p>
                   </div>
                 </div>
               </div>
 
               <div className="space-y-6">
                 {synthesizedPlaybooks.map((playbook) => (
-                  <Card key={playbook.id} className="bg-white/5 backdrop-blur-sm border-white/10">
+                  <Card key={playbook.id} className="bg-white border-slate-200">
                     <CardContent className="p-6">
                       <div className="flex items-start justify-between mb-4">
                         <div className="flex-1">
-                          <h3 className="text-xl font-bold text-white mb-2">{playbook.name}</h3>
+                          <h3 className="text-xl font-bold text-slate-900 mb-2">{playbook.name}</h3>
                           <div className="flex items-center gap-2 mb-3">
                             <Badge className="bg-purple-100 text-purple-700 text-xs">
                               {playbook.confidence}% confidence
                             </Badge>
-                            <span className="text-xs text-gray-400">Learned from {playbook.learnedFrom}</span>
+                            <span className="text-xs text-slate-600">Learned from {playbook.learnedFrom}</span>
                           </div>
                         </div>
                         <Button
@@ -1452,13 +1454,13 @@ export default function ToolboxTab() {
 
                       {/* Segments */}
                       <div className="mb-4">
-                        <h4 className="text-sm font-bold text-white mb-3">Decision Segments</h4>
+                        <h4 className="text-sm font-bold text-slate-900 mb-3">Decision Segments</h4>
                         <div className="space-y-2">
                           {playbook.segments.map((segment, idx) => (
-                            <div key={idx} className="flex items-center justify-between p-3 bg-white/5 border border-white/10 rounded-lg">
+                            <div key={idx} className="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-lg">
                               <div className="flex-1">
-                                <div className="text-sm text-white font-mono">{segment.condition}</div>
-                                <div className="text-xs text-gray-400 mt-1">→ {segment.action}</div>
+                                <div className="text-sm text-slate-900 font-mono">{segment.condition}</div>
+                                <div className="text-xs text-slate-600 mt-1">→ {segment.action}</div>
                               </div>
                               <Badge className="bg-emerald-100 text-emerald-700 text-xs">
                                 {segment.success}% success
@@ -1471,7 +1473,7 @@ export default function ToolboxTab() {
                       {/* Metadata Grid */}
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <h5 className="text-xs font-bold text-gray-400 mb-2">Triggers</h5>
+                          <h5 className="text-xs font-bold text-slate-600 mb-2">Triggers</h5>
                           <div className="flex flex-wrap gap-1">
                             {playbook.triggers.map((trigger, idx) => (
                               <Badge key={idx} className="bg-blue-100 text-blue-700 text-xs">
@@ -1481,7 +1483,7 @@ export default function ToolboxTab() {
                           </div>
                         </div>
                         <div>
-                          <h5 className="text-xs font-bold text-gray-400 mb-2">Data Joins</h5>
+                          <h5 className="text-xs font-bold text-slate-600 mb-2">Data Joins</h5>
                           <div className="flex flex-wrap gap-1">
                             {playbook.dataJoins.map((join, idx) => (
                               <Badge key={idx} className="bg-amber-100 text-amber-700 text-xs">
@@ -1491,7 +1493,7 @@ export default function ToolboxTab() {
                           </div>
                         </div>
                         <div>
-                          <h5 className="text-xs font-bold text-gray-400 mb-2">Policies</h5>
+                          <h5 className="text-xs font-bold text-slate-600 mb-2">Policies</h5>
                           <div className="flex flex-wrap gap-1">
                             {playbook.policies.map((policy, idx) => (
                               <Badge key={idx} className="bg-red-100 text-red-700 text-xs">
@@ -1501,17 +1503,17 @@ export default function ToolboxTab() {
                           </div>
                         </div>
                         <div>
-                          <h5 className="text-xs font-bold text-gray-400 mb-2">KPIs</h5>
+                          <h5 className="text-xs font-bold text-slate-600 mb-2">KPIs</h5>
                           <div className="space-y-1 text-xs">
-                            <div className="flex justify-between text-white">
+                            <div className="flex justify-between text-slate-900">
                               <span>Avg Processing:</span>
                               <span className="font-semibold">{playbook.kpis.avgProcessingTime}</span>
                             </div>
-                            <div className="flex justify-between text-white">
+                            <div className="flex justify-between text-slate-900">
                               <span>Approval Rate:</span>
                               <span className="font-semibold">{playbook.kpis.approvalRate}%</span>
                             </div>
-                            <div className="flex justify-between text-white">
+                            <div className="flex justify-between text-slate-900">
                               <span>Cost/Case:</span>
                               <span className="font-semibold">${playbook.kpis.costPerCase}</span>
                             </div>
@@ -1520,11 +1522,11 @@ export default function ToolboxTab() {
                       </div>
 
                       {/* Provenance */}
-                      <div className="mt-4 pt-4 border-t border-white/10">
-                        <h5 className="text-xs font-bold text-gray-400 mb-2">Provenance</h5>
+                      <div className="mt-4 pt-4 border-t border-slate-200">
+                        <h5 className="text-xs font-bold text-slate-600 mb-2">Provenance</h5>
                         <div className="space-y-1">
                           {playbook.provenance.map((source, idx) => (
-                            <div key={idx} className="text-xs text-gray-300">• {source}</div>
+                            <div key={idx} className="text-xs text-slate-700">• {source}</div>
                           ))}
                         </div>
                       </div>
@@ -1538,7 +1540,7 @@ export default function ToolboxTab() {
 
         {/* NEW: WHAT-IF STUDIO TAB */}
         <TabsContent value="what-if" className="space-y-6 mt-6">
-          <Card className="bg-gradient-to-br from-cyan-900/20 to-blue-900/20 border-cyan-500/30">
+          <Card className="bg-gradient-to-br from-cyan-50 to-blue-50 border-cyan-200">
             <CardContent className="p-8">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-4">
@@ -1546,15 +1548,15 @@ export default function ToolboxTab() {
                     <FlaskConical className="w-8 h-8 text-white" />
                   </div>
                   <div>
-                    <h2 className="text-3xl font-bold text-white mb-1">What-If Studio</h2>
-                    <p className="text-gray-400">Always-on simulations • Counterfactual analysis • Shadow testing</p>
+                    <h2 className="text-3xl font-bold text-slate-900 mb-1">What-If Studio</h2>
+                    <p className="text-slate-600">Always-on simulations • Counterfactual analysis • Shadow testing</p>
                   </div>
                 </div>
               </div>
 
               <div className="space-y-4">
                 {whatIfScenarios.map((scenario) => (
-                  <Card key={scenario.id} className="bg-white/5 backdrop-blur-sm border-white/10">
+                  <Card key={scenario.id} className="bg-white border-slate-200">
                     <CardContent className="p-6">
                       <div className="flex items-start justify-between mb-4">
                         <div className="flex-1">
@@ -1574,41 +1576,41 @@ export default function ToolboxTab() {
                               {scenario.status.replace(/_/g, " ")}
                             </Badge>
                           </div>
-                          <h3 className="text-lg font-bold text-white mb-2">{scenario.title}</h3>
+                          <h3 className="text-lg font-bold text-slate-900 mb-2">{scenario.title}</h3>
                           <div className="space-y-1 text-sm mb-3">
-                            <div className="flex items-center gap-2 text-gray-400">
+                            <div className="flex items-center gap-2 text-slate-600">
                               <span>Current:</span>
-                              <span className="text-white">{scenario.current}</span>
+                              <span className="text-slate-900">{scenario.current}</span>
                             </div>
-                            <div className="flex items-center gap-2 text-gray-400">
+                            <div className="flex items-center gap-2 text-slate-600">
                               <span>Proposed:</span>
-                              <span className="text-emerald-400 font-semibold">{scenario.proposed}</span>
+                              <span className="text-emerald-600 font-semibold">{scenario.proposed}</span>
                             </div>
                           </div>
                         </div>
                         <div className="text-right">
-                          <div className="text-sm text-gray-400">Confidence</div>
-                          <div className="text-2xl font-bold text-white">{scenario.impact.confidence}%</div>
+                          <div className="text-sm text-slate-600">Confidence</div>
+                          <div className="text-2xl font-bold text-slate-900">{scenario.impact.confidence}%</div>
                         </div>
                       </div>
 
                       {/* Impact Metrics */}
-                      <div className="grid grid-cols-2 gap-4 mb-4 p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-lg">
+                      <div className="grid grid-cols-2 gap-4 mb-4 p-4 bg-emerald-50 border border-emerald-200 rounded-lg">
                         {Object.entries(scenario.impact).filter(([key]) => key !== "confidence").map(([key, value]) => (
                           <div key={key}>
-                            <div className="text-xs text-emerald-400 mb-1">{key.replace(/([A-Z])/g, " $1").trim()}</div>
+                            <div className="text-xs text-emerald-700 mb-1">{key.replace(/([A-Z])/g, " $1").trim()}</div>
                             <div className="space-y-1 text-xs">
-                              <div className="flex justify-between text-gray-400">
+                              <div className="flex justify-between text-slate-600">
                                 <span>Current:</span>
-                                <span className="text-white">{value.current}</span>
+                                <span className="text-slate-900">{value.current}</span>
                               </div>
-                              <div className="flex justify-between text-gray-400">
+                              <div className="flex justify-between text-slate-600">
                                 <span>Predicted:</span>
-                                <span className="text-white">{value.predicted}</span>
+                                <span className="text-slate-900">{value.predicted}</span>
                               </div>
                               <div className="flex justify-between font-bold">
-                                <span className="text-emerald-400">Delta:</span>
-                                <span className="text-emerald-400">{value.delta}</span>
+                                <span className="text-emerald-600">Delta:</span>
+                                <span className="text-emerald-600">{value.delta}</span>
                               </div>
                             </div>
                           </div>
@@ -1616,18 +1618,18 @@ export default function ToolboxTab() {
                       </div>
 
                       {/* Reasoning */}
-                      <div className="mb-4 p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg">
-                        <div className="text-xs text-blue-400 font-semibold mb-1">Reasoning:</div>
-                        <div className="text-sm text-white">{scenario.reasoning}</div>
+                      <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                        <div className="text-xs text-blue-700 font-semibold mb-1">Reasoning:</div>
+                        <div className="text-sm text-slate-900">{scenario.reasoning}</div>
                       </div>
 
                       {/* Confidence Band */}
                       <div className="mb-4">
-                        <div className="flex items-center justify-between text-xs text-gray-400 mb-1">
+                        <div className="flex items-center justify-between text-xs text-slate-600 mb-1">
                           <span>95% Confidence Interval</span>
                           <span>{scenario.ciLower} to {scenario.ciUpper}</span>
                         </div>
-                        <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                        <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
                           <div
                             className="h-full bg-gradient-to-r from-blue-500 to-emerald-500"
                             style={{ width: `${scenario.impact.confidence}%` }}
@@ -1638,10 +1640,10 @@ export default function ToolboxTab() {
                       {/* Risks */}
                       {scenario.risks.length > 0 && (
                         <div className="mb-4">
-                          <div className="text-xs text-gray-400 mb-2">Identified Risks:</div>
+                          <div className="text-xs text-slate-600 mb-2">Identified Risks:</div>
                           <div className="space-y-1">
                             {scenario.risks.map((risk, idx) => (
-                              <div key={idx} className="flex items-center gap-2 text-xs text-amber-400">
+                              <div key={idx} className="flex items-center gap-2 text-xs text-amber-600">
                                 <AlertTriangle className="w-3 h-3" />
                                 {risk}
                               </div>
@@ -1659,11 +1661,11 @@ export default function ToolboxTab() {
                           <Play className="w-3 h-3 mr-1" />
                           Apply
                         </Button>
-                        <Button variant="outline" className="flex-1 bg-white/5 border-white/10 text-white hover:bg-white/10 text-xs h-8">
+                        <Button variant="outline" className="flex-1 text-xs h-8">
                           <FlaskConical className="w-3 h-3 mr-1" />
                           Dry Run
                         </Button>
-                        <Button variant="outline" className="bg-white/5 border-white/10 text-white hover:bg-white/10 text-xs h-8">
+                        <Button variant="outline" className="text-xs h-8">
                           Explain
                         </Button>
                       </div>
@@ -1678,16 +1680,16 @@ export default function ToolboxTab() {
         {/* NEW: INTELLIGENCE TAB (combining remaining Phase 3 features) */}
         <TabsContent value="intelligence" className="space-y-6 mt-6">
           {/* KPI Dashboard */}
-          <Card className="bg-gradient-to-br from-slate-900 to-gray-900 border-white/10">
+          <Card className="bg-gradient-to-br from-slate-50 to-blue-50 border-slate-200">
             <CardContent className="p-8">
-              <h2 className="text-2xl font-bold text-white mb-6">Phase 3 Intelligence KPIs</h2>
+              <h2 className="text-2xl font-bold text-slate-900 mb-6">Phase 3 Intelligence KPIs</h2>
               <div className="grid grid-cols-5 gap-4">
                 {Object.entries(phase3KPIs).map(([key, kpi]) => (
-                  <Card key={key} className="bg-white/5 backdrop-blur-sm border-white/10">
+                  <Card key={key} className="bg-white border-slate-200">
                     <CardContent className="p-4">
-                      <div className="text-xs text-gray-400 mb-2">{key.replace(/([A-Z])/g, " $1").trim()}</div>
+                      <div className="text-xs text-slate-600 mb-2">{key.replace(/([A-Z])/g, " $1").trim()}</div>
                       <div className="flex items-baseline gap-2 mb-2">
-                        <span className="text-2xl font-bold text-white">{kpi.current}{kpi.unit}</span>
+                        <span className="text-2xl font-bold text-slate-900">{kpi.current}{kpi.unit}</span>
                         <Badge className={cn(
                           "text-xs",
                           kpi.current >= kpi.target ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"
@@ -1709,10 +1711,10 @@ export default function ToolboxTab() {
 
           <div className="grid grid-cols-2 gap-6">
             {/* Safety Envelope */}
-            <Card className="bg-white/5 backdrop-blur-xl border-white/10">
+            <Card className="bg-white/80 backdrop-blur-sm border-slate-200">
               <CardHeader>
-                <CardTitle className="text-white text-lg flex items-center gap-2">
-                  <Shield className="w-5 h-5 text-red-400" />
+                <CardTitle className="text-slate-900 text-lg flex items-center gap-2">
+                  <Shield className="w-5 h-5 text-red-600" />
                   Safety Envelope Learner
                 </CardTitle>
               </CardHeader>
@@ -1721,11 +1723,11 @@ export default function ToolboxTab() {
                   {safetyEnvelopes.map((envelope, idx) => (
                     <Card key={idx} className={cn(
                       "border-2",
-                      envelope.violations.length > 0 ? "border-red-300 bg-red-50/5" : "border-emerald-300 bg-emerald-50/5"
+                      envelope.violations.length > 0 ? "border-red-300 bg-red-50" : "border-emerald-300 bg-emerald-50"
                     )}>
                       <CardContent className="p-4">
                         <div className="flex items-center justify-between mb-3">
-                          <h4 className="text-sm font-bold text-white">{envelope.mission}</h4>
+                          <h4 className="text-sm font-bold text-slate-900">{envelope.mission}</h4>
                           {envelope.canaryActive && (
                             <Badge className="bg-amber-100 text-amber-700 text-xs">Canary Active</Badge>
                           )}
@@ -1734,9 +1736,9 @@ export default function ToolboxTab() {
                         <div className="space-y-2 mb-3">
                           {envelope.metrics.map((metric, midx) => (
                             <div key={midx} className="flex items-center justify-between text-xs">
-                              <span className="text-gray-400">{metric.name.replace(/_/g, " ")}</span>
+                              <span className="text-slate-600">{metric.name.replace(/_/g, " ")}</span>
                               <div className="flex items-center gap-2">
-                                <span className="text-white">{metric.current}</span>
+                                <span className="text-slate-900">{metric.current}</span>
                                 <div className={cn(
                                   "w-2 h-2 rounded-full",
                                   metric.status === "green" && "bg-emerald-500",
@@ -1749,10 +1751,10 @@ export default function ToolboxTab() {
                         </div>
 
                         {envelope.violations.length > 0 && (
-                          <div className="p-2 bg-red-500/10 border border-red-500/30 rounded mb-3">
-                            <div className="text-xs text-red-400 font-semibold mb-1">Violations:</div>
+                          <div className="p-2 bg-red-100 border border-red-300 rounded mb-3">
+                            <div className="text-xs text-red-700 font-semibold mb-1">Violations:</div>
                             {envelope.violations.map((violation, vidx) => (
-                              <div key={vidx} className="text-xs text-white">
+                              <div key={vidx} className="text-xs text-slate-900">
                                 {violation.metric}: {violation.value} (threshold: {violation.threshold}) • {violation.time}
                               </div>
                             ))}
@@ -1760,9 +1762,9 @@ export default function ToolboxTab() {
                         )}
 
                         {envelope.actionTaken && (
-                          <div className="p-2 bg-blue-500/10 border border-blue-500/30 rounded mb-3">
-                            <div className="text-xs text-blue-400 font-semibold mb-1">Action Taken:</div>
-                            <div className="text-xs text-white">{envelope.actionTaken}</div>
+                          <div className="p-2 bg-blue-50 border border-blue-300 rounded mb-3">
+                            <div className="text-xs text-blue-700 font-semibold mb-1">Action Taken:</div>
+                            <div className="text-xs text-slate-900">{envelope.actionTaken}</div>
                           </div>
                         )}
 
@@ -1774,7 +1776,7 @@ export default function ToolboxTab() {
                           >
                             Enable Canary
                           </Button>
-                          <Button size="sm" variant="outline" className="bg-white/5 border-white/10 text-white hover:bg-white/10 text-xs h-7">
+                          <Button size="sm" variant="outline" className="text-xs h-7">
                             View Envelope
                           </Button>
                         </div>
@@ -1786,26 +1788,26 @@ export default function ToolboxTab() {
             </Card>
 
             {/* Feedback Heatmap */}
-            <Card className="bg-white/5 backdrop-blur-xl border-white/10">
+            <Card className="bg-white/80 backdrop-blur-sm border-slate-200">
               <CardHeader>
-                <CardTitle className="text-white text-lg flex items-center gap-2">
-                  <Users className="w-5 h-5 text-purple-400" />
+                <CardTitle className="text-slate-900 text-lg flex items-center gap-2">
+                  <Users className="w-5 h-5 text-purple-600" />
                   Human-in-the-Loop Memory
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4 mb-4">
                   {feedbackHeatmap.data.map((row, idx) => (
-                    <div key={idx} className="flex items-center justify-between p-2 bg-white/5 rounded">
+                    <div key={idx} className="flex items-center justify-between p-2 bg-slate-50 rounded">
                       <div className="flex-1">
-                        <div className="text-sm text-white font-semibold">{row.team}</div>
-                        <div className="text-xs text-gray-400">{row.intent}</div>
+                        <div className="text-sm text-slate-900 font-semibold">{row.team}</div>
+                        <div className="text-xs text-slate-600">{row.intent}</div>
                       </div>
                       <div className="flex items-center gap-3">
                         <div className="text-xs">
-                          <span className="text-emerald-400">{row.approved}</span>
-                          <span className="text-gray-500">/</span>
-                          <span className="text-red-400">{row.rejected}</span>
+                          <span className="text-emerald-600">{row.approved}</span>
+                          <span className="text-slate-400">/</span>
+                          <span className="text-red-600">{row.rejected}</span>
                         </div>
                         <Badge className={cn(
                           "text-xs",
@@ -1820,22 +1822,22 @@ export default function ToolboxTab() {
                   ))}
                 </div>
 
-                <div className="border-t border-white/10 pt-4">
-                  <h5 className="text-sm font-bold text-white mb-3">Learned Patterns</h5>
+                <div className="border-t border-slate-200 pt-4">
+                  <h5 className="text-sm font-bold text-slate-900 mb-3">Learned Patterns</h5>
                   <div className="space-y-2">
                     {feedbackHeatmap.patterns.map((pattern, idx) => (
-                      <Card key={idx} className="bg-blue-500/10 border-blue-500/30">
+                      <Card key={idx} className="bg-blue-50 border-blue-200">
                         <CardContent className="p-3">
                           <div className="flex items-start justify-between mb-2">
                             <div className="flex-1">
-                              <div className="text-xs text-white font-semibold mb-1">{pattern.team}</div>
-                              <div className="text-xs text-gray-300">{pattern.pattern}</div>
+                              <div className="text-xs text-slate-900 font-semibold mb-1">{pattern.team}</div>
+                              <div className="text-xs text-slate-700">{pattern.pattern}</div>
                             </div>
                             <Badge className="bg-blue-100 text-blue-700 text-xs">
                               {pattern.confidence}%
                             </Badge>
                           </div>
-                          <div className="p-2 bg-white/5 rounded text-xs text-emerald-400">
+                          <div className="p-2 bg-white rounded text-xs text-emerald-700">
                             💡 {pattern.suggestedRule}
                           </div>
                         </CardContent>
@@ -1848,27 +1850,27 @@ export default function ToolboxTab() {
           </div>
 
           {/* Skill Transfer */}
-          <Card className="bg-white/5 backdrop-blur-xl border-white/10">
+          <Card className="bg-white/80 backdrop-blur-sm border-slate-200">
             <CardHeader>
-              <CardTitle className="text-white text-lg flex items-center gap-2">
-                <GitBranch className="w-5 h-5 text-cyan-400" />
+              <CardTitle className="text-slate-900 text-lg flex items-center gap-2">
+                <GitBranch className="w-5 h-5 text-cyan-600" />
                 Skill Transfer (Few-Shot Cloning)
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 {skillTransferTemplates.map((template) => (
-                  <Card key={template.id} className="bg-white/5 border-white/10">
+                  <Card key={template.id} className="bg-white border-slate-200">
                     <CardContent className="p-6">
                       <div className="flex items-start justify-between mb-4">
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-2">
                             <Badge className="bg-cyan-100 text-cyan-700 text-xs">{template.sourceDomain}</Badge>
-                            <ArrowRight className="w-4 h-4 text-gray-400" />
+                            <ArrowRight className="w-4 h-4 text-slate-400" />
                             <Badge className="bg-purple-100 text-purple-700 text-xs">{template.targetDomain}</Badge>
                           </div>
-                          <h4 className="text-lg font-bold text-white mb-1">Clone from: {template.sourceMission}</h4>
-                          <div className="text-sm text-gray-400">
+                          <h4 className="text-lg font-bold text-slate-900 mb-1">Clone from: {template.sourceMission}</h4>
+                          <div className="text-sm text-slate-600">
                             {template.mappingSuccess}% fields auto-resolved • Est. accuracy: {template.estimatedAccuracy}
                           </div>
                         </div>
@@ -1883,17 +1885,17 @@ export default function ToolboxTab() {
 
                       {/* Field Mapping */}
                       <div className="mb-4">
-                        <h5 className="text-xs font-bold text-gray-400 mb-2">Field Mapping</h5>
+                        <h5 className="text-xs font-bold text-slate-600 mb-2">Field Mapping</h5>
                         <div className="space-y-2">
                           {template.fieldMapping.map((mapping, idx) => (
                             <div key={idx} className={cn(
                               "flex items-center justify-between p-2 rounded",
-                              mapping.needsReview ? "bg-amber-500/10 border border-amber-500/30" : "bg-white/5"
+                              mapping.needsReview ? "bg-amber-50 border border-amber-200" : "bg-slate-50"
                             )}>
                               <div className="flex items-center gap-2 text-xs">
-                                <span className="text-white font-mono">{mapping.source}</span>
-                                <ArrowRight className="w-3 h-3 text-gray-500" />
-                                <span className="text-white font-mono">{mapping.target}</span>
+                                <span className="text-slate-900 font-mono">{mapping.source}</span>
+                                <ArrowRight className="w-3 h-3 text-slate-500" />
+                                <span className="text-slate-900 font-mono">{mapping.target}</span>
                               </div>
                               <div className="flex items-center gap-2">
                                 <Badge className={cn(
@@ -1913,17 +1915,17 @@ export default function ToolboxTab() {
 
                       {/* PII Handling */}
                       <div className="mb-4">
-                        <h5 className="text-xs font-bold text-gray-400 mb-2">PII Field Handling</h5>
+                        <h5 className="text-xs font-bold text-slate-600 mb-2">PII Field Handling</h5>
                         <div className="space-y-1">
                           {template.piiFields.map((pii, idx) => (
-                            <div key={idx} className="flex items-center justify-between p-2 bg-red-500/10 border border-red-500/30 rounded text-xs">
+                            <div key={idx} className="flex items-center justify-between p-2 bg-red-50 border border-red-200 rounded text-xs">
                               <div className="flex items-center gap-2">
-                                <Lock className="w-3 h-3 text-red-400" />
-                                <span className="text-white">{pii.field}</span>
+                                <Lock className="w-3 h-3 text-red-600" />
+                                <span className="text-slate-900">{pii.field}</span>
                               </div>
                               <div className="flex items-center gap-2">
                                 <Badge className="bg-red-100 text-red-700 text-xs">{pii.action}</Badge>
-                                <span className="text-gray-400">{pii.policy}</span>
+                                <span className="text-slate-600">{pii.policy}</span>
                               </div>
                             </div>
                           ))}
@@ -1932,10 +1934,10 @@ export default function ToolboxTab() {
 
                       {/* Risk Notes */}
                       {template.riskNotes.length > 0 && (
-                        <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded">
-                          <div className="text-xs text-amber-400 font-semibold mb-2">Risk Notes:</div>
+                        <div className="p-3 bg-amber-50 border border-amber-200 rounded">
+                          <div className="text-xs text-amber-700 font-semibold mb-2">Risk Notes:</div>
                           {template.riskNotes.map((note, idx) => (
-                            <div key={idx} className="text-xs text-white mb-1">• {note}</div>
+                            <div key={idx} className="text-xs text-slate-900 mb-1">• {note}</div>
                           ))}
                         </div>
                       )}
@@ -1947,17 +1949,17 @@ export default function ToolboxTab() {
           </Card>
 
           {/* Fleet Optimizer */}
-          <Card className="bg-white/5 backdrop-blur-xl border-white/10">
+          <Card className="bg-white/80 backdrop-blur-sm border-slate-200">
             <CardHeader>
-              <CardTitle className="text-white text-lg flex items-center gap-2">
-                <Network className="w-5 h-5 text-emerald-400" />
+              <CardTitle className="text-slate-900 text-lg flex items-center gap-2">
+                <Network className="w-5 h-5 text-emerald-600" />
                 Meta-Ops Optimizer (Fleet-Level)
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 {fleetOpportunities.map((opportunity) => (
-                  <Card key={opportunity.id} className="bg-white/5 border-white/10">
+                  <Card key={opportunity.id} className="bg-white border-slate-200">
                     <CardContent className="p-6">
                       <div className="flex items-start justify-between mb-4">
                         <div className="flex-1">
@@ -1970,12 +1972,12 @@ export default function ToolboxTab() {
                             )}>
                               {opportunity.type}
                             </Badge>
-                            <Badge className="bg-white/10 text-white text-xs">
+                            <Badge className="bg-slate-100 text-slate-700 text-xs">
                               {opportunity.confidence}% confidence
                             </Badge>
                           </div>
-                          <h4 className="text-lg font-bold text-white mb-2">{opportunity.title}</h4>
-                          <p className="text-sm text-gray-300 mb-3">{opportunity.description}</p>
+                          <h4 className="text-lg font-bold text-slate-900 mb-2">{opportunity.title}</h4>
+                          <p className="text-sm text-slate-700 mb-3">{opportunity.description}</p>
                         </div>
                         <Button
                           onClick={() => handleApplyFleetOptimization(opportunity)}
@@ -1987,14 +1989,14 @@ export default function ToolboxTab() {
                       </div>
 
                       {/* Impact Metrics */}
-                      <div className="grid grid-cols-2 gap-4 p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-lg mb-4">
+                      <div className="grid grid-cols-2 gap-4 p-4 bg-emerald-50 border border-emerald-200 rounded-lg mb-4">
                         {Object.entries(opportunity.impact).map(([key, value]) => (
                           <div key={key}>
-                            <div className="text-xs text-emerald-400 mb-1">{key.replace(/([A-Z])/g, " $1").trim()}</div>
+                            <div className="text-xs text-emerald-700 mb-1">{key.replace(/([A-Z])/g, " $1").trim()}</div>
                             <div className="flex items-baseline gap-2">
-                              <span className="text-sm text-white">{value.current}</span>
-                              <ArrowRight className="w-3 h-3 text-gray-500" />
-                              <span className="text-sm font-bold text-emerald-400">{value.predicted}</span>
+                              <span className="text-sm text-slate-900">{value.current}</span>
+                              <ArrowRight className="w-3 h-3 text-slate-500" />
+                              <span className="text-sm font-bold text-emerald-600">{value.predicted}</span>
                               <Badge className="bg-emerald-100 text-emerald-700 text-xs">{value.delta}</Badge>
                             </div>
                           </div>
@@ -2003,7 +2005,7 @@ export default function ToolboxTab() {
 
                       {/* Affected Missions */}
                       <div>
-                        <div className="text-xs text-gray-400 mb-2">Affected Missions:</div>
+                        <div className="text-xs text-slate-600 mb-2">Affected Missions:</div>
                         <div className="flex flex-wrap gap-2">
                           {opportunity.affected.map((mission, idx) => (
                             <Badge key={idx} className="bg-blue-100 text-blue-700 text-xs">
@@ -2013,7 +2015,7 @@ export default function ToolboxTab() {
                         </div>
                       </div>
 
-                      <div className="mt-4 p-2 bg-blue-500/10 border border-blue-500/30 rounded text-xs text-blue-400">
+                      <div className="mt-4 p-2 bg-blue-50 border border-blue-200 rounded text-xs text-blue-700">
                         💡 Recommended Action: {opportunity.action}
                       </div>
                     </CardContent>
