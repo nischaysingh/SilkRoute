@@ -150,7 +150,7 @@ export default function ToolboxTab() {
   // NEW: Phase 3 - Advanced Intelligence State
 
   // OpsGraph State
-  const [opsGraphData] = useState({
+  const [opsGraphData, setOpsGraphData] = useState({
     nodes: [
       { id: "invoice_rec", type: "mission", label: "Invoice Reconciler", runs: 2145, successRate: 97 },
       { id: "crm_sync", type: "mission", label: "CRM Sync", runs: 847, successRate: 94 },
@@ -173,7 +173,8 @@ export default function ToolboxTab() {
         confidence: 94,
         impact: "Consolidate into shared subflow → -$0.008/run",
         type: "optimization",
-        affected: ["invoice_rec", "payment_retry"]
+        affected: ["invoice_rec", "payment_retry"],
+        applied: false
       },
       {
         id: 2,
@@ -182,7 +183,8 @@ export default function ToolboxTab() {
         confidence: 87,
         impact: "Sequential dependency detected → parallelize to save 340ms avg",
         type: "performance",
-        affected: ["crm_sync", "invoice_rec"]
+        affected: ["crm_sync", "invoice_rec"],
+        applied: false
       },
       {
         id: 3,
@@ -191,13 +193,14 @@ export default function ToolboxTab() {
         confidence: 98,
         impact: "Reduce human review load by 40%",
         type: "automation",
-        affected: ["approval_policy"]
+        affected: ["approval_policy"],
+        applied: false
       }
     ]
   });
 
   // Config Leaderboard State
-  const [configLeaderboard] = useState([
+  const [configLeaderboard, setConfigLeaderboard] = useState([
     {
       id: 1,
       mission: "invoice_reconciler_v2",
@@ -237,7 +240,7 @@ export default function ToolboxTab() {
   ]);
 
   // Playbook Synthesis State
-  const [synthesizedPlaybooks] = useState([
+  const [synthesizedPlaybooks, setSynthesizedPlaybooks] = useState([
     {
       id: 1,
       name: "Refund Tiering Strategy",
@@ -256,7 +259,8 @@ export default function ToolboxTab() {
         "Derived from Invoice Reconciler (842 runs)",
         "Validated against Payment Retry (1,103 runs)",
         "Tested in CRM Sync (200 shadow runs)"
-      ]
+      ],
+      adopted: false
     },
     {
       id: 2,
@@ -275,12 +279,13 @@ export default function ToolboxTab() {
       provenance: [
         "Extracted from Finance Ops workflows",
         "Validated against AR Collection patterns"
-      ]
+      ],
+      adopted: false
     }
   ]);
 
   // What-If Scenarios State
-  const [whatIfScenarios] = useState([
+  const [whatIfScenarios, setWhatIfScenarios] = useState([
     {
       id: 1,
       title: "Shift Batch Processing to Off-Peak",
@@ -297,7 +302,8 @@ export default function ToolboxTab() {
       ciUpper: "-14%",
       dataSources: "Last 90 days traffic patterns",
       risks: ["Timezone dependencies", "Reporting delays"],
-      status: "ready"
+      status: "ready",
+      applied: false
     },
     {
       id: 2,
@@ -315,7 +321,8 @@ export default function ToolboxTab() {
       ciUpper: "-65%",
       dataSources: "2,847 historical approvals",
       risks: ["Policy change lag", "Edge case detection"],
-      status: "ready"
+      status: "ready",
+      applied: false
     },
     {
       id: 3,
@@ -333,7 +340,8 @@ export default function ToolboxTab() {
       ciUpper: "-34%",
       dataSources: "Simulation on last 30 days",
       risks: ["Timeout on large batches", "Memory pressure"],
-      status: "needs_review"
+      status: "needs_review",
+      applied: false
     }
   ]);
 
@@ -983,28 +991,86 @@ export default function ToolboxTab() {
     return lifecycleStages.find(s => s.stage === stage);
   };
 
+  // Update handlers to make them functional
+
   const handlePromoteConfig = (config) => {
-    toast.success(`Promoting ${config.version} for ${config.mission}`, {
-      description: `Expected savings: $${Math.abs(config.delta.cost).toFixed(3)}/run`
+    setConfigLeaderboard(prev => prev.map(c =>
+      c.id === config.id ? {
+        ...c,
+        type: "champion",
+        status: "stable",
+        runsCompleted: c.runsCompleted + 500
+      } : c.type === "champion" ? { ...c, type: "retired", status: "archived" } : c
+    ));
+    toast.success(`Promoted ${config.version} to Champion`, {
+      description: `Expected savings: $${Math.abs(config.delta.cost).toFixed(3)}/run - Now in production`
     });
   };
 
   const handleApplyWhatIf = (scenario) => {
-    toast.success(`Applying: ${scenario.title}`, {
-      description: `Expected impact: ${scenario.impact.cost?.delta || scenario.impact.humanLoad?.delta}`
+    setWhatIfScenarios(prev => prev.map(s =>
+      s.id === scenario.id ? { ...s, applied: true, status: "applied" } : s
+    ));
+    toast.success(`Applied: ${scenario.title}`, {
+      description: `Expected impact: ${scenario.impact.cost?.delta || scenario.impact.humanLoad?.delta} - Monitoring results...`
+    });
+  };
+
+  const handleDryRunWhatIf = (scenario) => {
+    toast.info("Running dry-run simulation...", {
+      description: `Testing ${scenario.title} against historical data`
+    });
+    setTimeout(() => {
+      toast.success("Dry-run complete", {
+        description: `Confidence: ${scenario.impact.confidence}% - Safe to apply`
+      });
+    }, 2000);
+  };
+
+  const handleExplainWhatIf = (scenario) => {
+    toast.info("Opening detailed analysis...", {
+      description: `Showing reasoning for ${scenario.title}`
     });
   };
 
   const handleAdoptPlaybook = (playbook) => {
-    toast.success(`Adopting playbook: ${playbook.name}`, {
-      description: "Opening in Mission Builder..."
+    setSynthesizedPlaybooks(prev => prev.map(p =>
+      p.id === playbook.id ? { ...p, adopted: true } : p
+    ));
+    toast.success(`Adopted playbook: ${playbook.name}`, {
+      description: "Navigating to Mission Builder..."
     });
-    setActiveView("mission-builder");
+    setTimeout(() => {
+      setActiveView("mission-builder");
+      setMissionSpec({
+        ...missionSpec,
+        name: playbook.name,
+        objective: `Implement ${playbook.name} strategy learned from ${playbook.learnedFrom}`
+      });
+    }, 500);
+  };
+
+  const handleApplyOpsGraphPattern = (pattern) => {
+    setOpsGraphData(prev => ({
+      ...prev,
+      patterns: prev.patterns.map(p =>
+        p.id === pattern.id ? { ...p, applied: true } : p
+      )
+    }));
+    toast.success(`Applied: ${pattern.title}`, {
+      description: `Expected impact: ${pattern.impact}`
+    });
+  };
+
+  const handleExplainOpsGraphPattern = (pattern) => {
+    toast.info("Opening pattern analysis...", {
+      description: `Detailed breakdown of ${pattern.title}`
+    });
   };
 
   const handleApplyFleetOptimization = (opportunity) => {
     toast.success(`Applying: ${opportunity.title}`, {
-      description: `Expected impact: ${opportunity.impact.cost?.delta || opportunity.impact.apiCalls?.delta}`
+      description: `Action: ${opportunity.action} - Expected impact: ${opportunity.impact.cost?.delta || opportunity.impact.apiCalls?.delta}`
     });
   };
 
@@ -1456,14 +1522,17 @@ export default function ToolboxTab() {
                 </div>
                 <Badge className="bg-emerald-100 text-emerald-700 border-emerald-300 px-4 py-2">
                   <Activity className="w-4 h-4 mr-2" />
-                  {opsGraphData.patterns.length} Patterns Detected
+                  {opsGraphData.patterns.filter(p => !p.applied).length} Patterns Detected
                 </Badge>
               </div>
 
               {/* Pattern Suggestions */}
               <div className="grid grid-cols-3 gap-4">
                 {opsGraphData.patterns.map((pattern) => (
-                  <Card key={pattern.id} className="bg-white border-slate-200">
+                  <Card key={pattern.id} className={cn(
+                    "bg-white border-slate-200",
+                    pattern.applied && "opacity-60 border-emerald-300"
+                  )}>
                     <CardContent className="p-6">
                       <div className="flex items-start justify-between mb-4">
                         <Badge className={cn(
@@ -1496,15 +1565,31 @@ export default function ToolboxTab() {
                         ))}
                       </div>
 
-                      <div className="flex gap-2">
-                        <Button size="sm" className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-xs h-8">
+                      {pattern.applied ? (
+                        <Badge className="w-full justify-center bg-emerald-100 text-emerald-700 text-xs py-2">
                           <Check className="w-3 h-3 mr-1" />
-                          Apply
-                        </Button>
-                        <Button size="sm" variant="outline" className="flex-1 text-xs h-8">
-                          Explain
-                        </Button>
-                      </div>
+                          Applied
+                        </Badge>
+                      ) : (
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-xs h-8"
+                            onClick={() => handleApplyOpsGraphPattern(pattern)}
+                          >
+                            <Check className="w-3 h-3 mr-1" />
+                            Apply
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="flex-1 text-xs h-8"
+                            onClick={() => handleExplainOpsGraphPattern(pattern)}
+                          >
+                            Explain
+                          </Button>
+                        </div>
+                      )}
                     </CardContent>
                   </Card>
                 ))}
@@ -1572,7 +1657,9 @@ export default function ToolboxTab() {
                     "border-2",
                     config.status === "ready_to_promote" ? "border-emerald-300 bg-emerald-50" :
                     config.status === "testing" ? "border-blue-300 bg-blue-50" :
-                    "border-slate-300 bg-white"
+                    config.status === "stable" ? "border-purple-300 bg-purple-50" :
+                    "border-slate-300 bg-white",
+                    config.type === "retired" && "opacity-60"
                   )}>
                     <CardContent className="p-6">
                       <div className="flex items-start justify-between mb-4">
@@ -1581,7 +1668,9 @@ export default function ToolboxTab() {
                           <div className="flex items-center gap-2">
                             <Badge className={cn(
                               "text-xs",
-                              config.type === "challenger" ? "bg-blue-100 text-blue-700" : "bg-purple-100 text-purple-700"
+                              config.type === "challenger" ? "bg-blue-100 text-blue-700" :
+                              config.type === "champion" ? "bg-purple-100 text-purple-700" :
+                              "bg-slate-100 text-slate-700"
                             )}>
                               {config.version} ({config.type})
                             </Badge>
@@ -1589,6 +1678,7 @@ export default function ToolboxTab() {
                               "text-xs",
                               config.status === "ready_to_promote" ? "bg-emerald-100 text-emerald-700" :
                               config.status === "testing" ? "bg-amber-100 text-amber-700" :
+                              config.status === "stable" ? "bg-emerald-100 text-emerald-700" :
                               "bg-slate-100 text-slate-700"
                             )}>
                               {config.status.replace(/_/g, " ")}
@@ -1654,14 +1744,37 @@ export default function ToolboxTab() {
                             <TrendingUp className="w-3 h-3 mr-1" />
                             Promote to Champion
                           </Button>
-                          <Button variant="outline" className="flex-1 text-xs h-8">
+                          <Button
+                            variant="outline"
+                            className="flex-1 text-xs h-8"
+                            onClick={() => toast.info("Opening impact analysis for config " + config.version)}
+                          >
                             View Impact Card
                           </Button>
-                          <Button variant="outline" className="flex-1 text-xs h-8">
+                          <Button
+                            variant="outline"
+                            className="flex-1 text-xs h-8"
+                            onClick={() => toast.info("Opening diff viewer for config " + config.version)}
+                          >
                             <Eye className="w-3 h-3 mr-1" />
                             Diff
                           </Button>
                         </div>
+                      )}
+                      {config.status === "stable" && (
+                        <Badge className="w-full justify-center bg-purple-100 text-purple-700 text-xs py-2">
+                           <CheckCircle className="w-3 h-3 mr-1" /> Currently Champion
+                        </Badge>
+                      )}
+                       {config.status === "testing" && (
+                        <Badge className="w-full justify-center bg-blue-100 text-blue-700 text-xs py-2">
+                           <FlaskConical className="w-3 h-3 mr-1" /> Challenger in Test
+                        </Badge>
+                      )}
+                       {config.type === "retired" && (
+                        <Badge className="w-full justify-center bg-slate-100 text-slate-700 text-xs py-2">
+                           Archived
+                        </Badge>
                       )}
                     </CardContent>
                   </Card>
@@ -1689,7 +1802,10 @@ export default function ToolboxTab() {
 
               <div className="space-y-6">
                 {synthesizedPlaybooks.map((playbook) => (
-                  <Card key={playbook.id} className="bg-white border-slate-200">
+                  <Card key={playbook.id} className={cn(
+                    "bg-white border-slate-200",
+                    playbook.adopted && "border-emerald-300 bg-emerald-50 opacity-90"
+                  )}>
                     <CardContent className="p-6">
                       <div className="flex items-start justify-between mb-4">
                         <div className="flex-1">
@@ -1699,15 +1815,23 @@ export default function ToolboxTab() {
                               {playbook.confidence}% confidence
                             </Badge>
                             <span className="text-xs text-slate-600">Learned from {playbook.learnedFrom}</span>
+                            {playbook.adopted && (
+                              <Badge className="bg-emerald-100 text-emerald-700 text-xs">
+                                <Check className="w-3 h-3 mr-1" />
+                                Adopted
+                              </Badge>
+                            )}
                           </div>
                         </div>
-                        <Button
-                          onClick={() => handleAdoptPlaybook(playbook)}
-                          className="bg-indigo-600 hover:bg-indigo-700 text-xs h-8"
-                        >
-                          <Plus className="w-3 h-3 mr-1" />
-                          Adopt as Subflow
-                        </Button>
+                        {!playbook.adopted && (
+                          <Button
+                            onClick={() => handleAdoptPlaybook(playbook)}
+                            className="bg-indigo-600 hover:bg-indigo-700 text-xs h-8"
+                          >
+                            <Plus className="w-3 h-3 mr-1" />
+                            Adopt as Subflow
+                          </Button>
+                        )}
                       </div>
 
                       {/* Segments */}
@@ -1814,7 +1938,10 @@ export default function ToolboxTab() {
 
               <div className="space-y-4">
                 {whatIfScenarios.map((scenario) => (
-                  <Card key={scenario.id} className="bg-white border-slate-200">
+                  <Card key={scenario.id} className={cn(
+                    "bg-white border-slate-200",
+                    scenario.applied && "border-emerald-300 bg-emerald-50 opacity-90"
+                  )}>
                     <CardContent className="p-6">
                       <div className="flex items-start justify-between mb-4">
                         <div className="flex-1">
@@ -1829,10 +1956,17 @@ export default function ToolboxTab() {
                             </Badge>
                             <Badge className={cn(
                               "text-xs",
-                              scenario.status === "ready" ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"
+                              scenario.status === "ready" ? "bg-emerald-100 text-emerald-700" :
+                              scenario.status === "needs_review" ? "bg-amber-100 text-amber-700" :
+                              "bg-slate-100 text-slate-700"
                             )}>
                               {scenario.status.replace(/_/g, " ")}
                             </Badge>
+                            {scenario.applied && (
+                              <Badge className="bg-emerald-100 text-emerald-700 text-xs">
+                                <Check className="w-3 h-3 mr-1" /> Applied
+                              </Badge>
+                            )}
                           </div>
                           <h3 className="text-lg font-bold text-slate-900 mb-2">{scenario.title}</h3>
                           <div className="space-y-1 text-sm mb-3">
@@ -1910,23 +2044,38 @@ export default function ToolboxTab() {
                         </div>
                       )}
 
-                      <div className="flex gap-2">
-                        <Button
-                          onClick={() => handleApplyWhatIf(scenario)}
-                          disabled={scenario.status !== "ready"}
-                          className="flex-1 bg-cyan-600 hover:bg-cyan-700 text-xs h-8"
-                        >
-                          <Play className="w-3 h-3 mr-1" />
-                          Apply
-                        </Button>
-                        <Button variant="outline" className="flex-1 text-xs h-8">
-                          <FlaskConical className="w-3 h-3 mr-1" />
-                          Dry Run
-                        </Button>
-                        <Button variant="outline" className="flex-1 text-xs h-8">
-                          Explain
-                        </Button>
-                      </div>
+                      {scenario.applied ? (
+                        <Badge className="w-full justify-center bg-emerald-100 text-emerald-700 text-xs py-2">
+                          <Check className="w-3 h-3 mr-1" />
+                          Applied - Monitoring results
+                        </Badge>
+                      ) : (
+                        <div className="flex gap-2">
+                          <Button
+                            onClick={() => handleApplyWhatIf(scenario)}
+                            disabled={scenario.status !== "ready"}
+                            className="flex-1 bg-cyan-600 hover:bg-cyan-700 text-xs h-8"
+                          >
+                            <Play className="w-3 h-3 mr-1" />
+                            Apply
+                          </Button>
+                          <Button
+                            variant="outline"
+                            className="flex-1 text-xs h-8"
+                            onClick={() => handleDryRunWhatIf(scenario)}
+                          >
+                            <FlaskConical className="w-3 h-3 mr-1" />
+                            Dry Run
+                          </Button>
+                          <Button
+                            variant="outline"
+                            className="flex-1 text-xs h-8"
+                            onClick={() => handleExplainWhatIf(scenario)}
+                          >
+                            Explain
+                          </Button>
+                        </div>
+                      )}
                     </CardContent>
                   </Card>
                 ))}
@@ -2151,9 +2300,9 @@ export default function ToolboxTab() {
                               mapping.needsReview ? "bg-amber-50 border border-amber-200" : "bg-slate-50"
                             )}>
                               <div className="flex items-center gap-2 text-xs">
-                                <span className="text-slate-900 font-mono">{mapping.source}</span>
+                                <span className="font-mono text-slate-900">{mapping.source}</span>
                                 <ArrowRight className="w-3 h-3 text-slate-500" />
-                                <span className="text-slate-900 font-mono">{mapping.target}</span>
+                                <span className="font-mono text-slate-900">{mapping.target}</span>
                               </div>
                               <div className="flex items-center gap-2">
                                 <Badge className={cn(
