@@ -24,6 +24,7 @@ import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { Input } from "@/components/ui/input";
 import { motion, AnimatePresence } from "framer-motion";
+import { useExplainableWidget } from "../components/explain/useExplainableWidget";
 
 export default function Overview() {
   const navigate = useNavigate();
@@ -452,46 +453,61 @@ export default function Overview() {
       {/* Bento Grid Layout */}
       <div className="grid grid-cols-12 gap-4">
         
-        {/* TOP ROW: KPI Cards - 3 columns each */}
-        {kpis.map((kpi, idx) => (
-          <Card key={idx} className="col-span-3 bg-white/5 backdrop-blur-xl border-white/10 rounded-xl overflow-hidden group hover:bg-white/10 transition-all">
-            <CardContent className="p-5">
-              <div className="flex items-center justify-between mb-3">
-                <TooltipProvider>
-                  <UITooltip>
-                    <UITooltipTrigger asChild>
-                      <div className="flex items-center gap-1.5 cursor-help">
-                        <span className="text-xs font-medium text-gray-400">{kpi.label}</span>
-                        <Info className="w-3 h-3 text-gray-500" />
-                      </div>
-                    </UITooltipTrigger>
-                    <UITooltipContent className="bg-gray-900 border-white/20 text-white max-w-xs">
-                      <p className="text-xs">{kpi.tooltip}</p>
-                    </UITooltipContent>
-                  </UITooltip>
-                </TooltipProvider>
-                <div className={`p-2 rounded-lg bg-gradient-to-br ${kpi.color} shadow-lg`}>
-                  <kpi.icon className="w-4 h-4 text-white" />
+        {/* TOP ROW: KPI Cards - 3 columns each with Explain Mode support */}
+        {kpis.map((kpi, idx) => {
+          const { explainableProps } = useExplainableWidget({
+            title: kpi.label,
+            metric: kpi.value,
+            delta: kpi.delta,
+            trend: kpi.positive ? 'up' : 'down',
+            period: "This Month",
+            actions: ['simulate', 'alert', 'create_policy']
+          });
+
+          return (
+            <Card 
+              key={idx} 
+              {...explainableProps}
+              className="col-span-3 bg-white/5 backdrop-blur-xl border-white/10 rounded-xl overflow-hidden group hover:bg-white/10 transition-all"
+            >
+              <CardContent className="p-5">
+                <div className="flex items-center justify-between mb-3">
+                  <TooltipProvider>
+                    <UITooltip>
+                      <UITooltipTrigger asChild>
+                        <div className="flex items-center gap-1.5 cursor-help">
+                          <span className="text-xs font-medium text-gray-400">{kpi.label}</span>
+                          <Info className="w-3 h-3 text-gray-500" />
+                        </div>
+                      </UITooltipTrigger>
+                      <UITooltipContent className="bg-gray-900 border-white/20 text-white max-w-xs">
+                        <p className="text-xs">{kpi.tooltip}</p>
+                      </UITooltipContent>
+                    </UITooltip>
+                  </TooltipProvider>
+                  <div className={`p-2 rounded-lg bg-gradient-to-br ${kpi.color} shadow-lg`}>
+                    <kpi.icon className="w-4 h-4 text-white" />
+                  </div>
                 </div>
-              </div>
-              <div>
-                <div className="text-2xl font-bold text-white mb-2">{kpi.value}</div>
-                <Badge 
-                  className={cn(
-                    "text-xs",
-                    kpi.warning && runway < 3 ? "bg-red-500/20 text-red-400 border-red-500/30" :
-                    kpi.warning && runway < 6 ? "bg-orange-500/20 text-orange-400 border-orange-500/30" :
-                    kpi.positive ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30" : 
-                    "bg-red-500/20 text-red-400 border-red-500/30"
-                  )}
-                >
-                  {kpi.positive ? <TrendingUp className="w-3 h-3 mr-1 inline" /> : <TrendingDown className="w-3 h-3 mr-1 inline" />}
-                  {kpi.delta}
-                </Badge>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+                <div>
+                  <div className="text-2xl font-bold text-white mb-2">{kpi.value}</div>
+                  <Badge 
+                    className={cn(
+                      "text-xs",
+                      kpi.warning && runway < 3 ? "bg-red-500/20 text-red-400 border-red-500/30" :
+                      kpi.warning && runway < 6 ? "bg-orange-500/20 text-orange-400 border-orange-500/30" :
+                      kpi.positive ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30" : 
+                      "bg-red-500/20 text-red-400 border-red-500/30"
+                    )}
+                  >
+                    {kpi.positive ? <TrendingUp className="w-3 h-3 mr-1 inline" /> : <TrendingDown className="w-3 h-3 mr-1 inline" />}
+                    {kpi.delta}
+                  </Badge>
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
 
         {/* MIDDLE LEFT: Cash Balance Chart - 5 columns */}
         <Card className="col-span-5 bg-white/5 backdrop-blur-xl border-white/10 rounded-xl">
