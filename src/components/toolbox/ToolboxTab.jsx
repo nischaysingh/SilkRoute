@@ -1106,7 +1106,7 @@ export default function ToolboxTab() {
                         <div>✓ Max ${globalCaps.spendPerDay}/day AI spend</div>
                         <div>✓ Max {globalCaps.rowsTouchedPerJob.toLocaleString()} records/job</div>
                         <div>✓ Max {globalCaps.marketsAffected} markets per operation</div>
-                      </d
+                      </div>
                     </CardContent>
                   </Card>
                 </div>
