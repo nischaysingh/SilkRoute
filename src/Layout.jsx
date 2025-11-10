@@ -1,9 +1,10 @@
+
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import {
   LayoutDashboard, DollarSign, CreditCard, Users, PiggyBank,
-  BarChart, CheckCircle, Settings, Bell, ChevronDown, Menu, X, Package, Radar } from
+  BarChart, CheckCircle, Settings, Bell, ChevronDown, Menu, X, Package, Radar, Wifi } from
 "lucide-react";
 import { Button } from "@/components/ui/button";
 import { base44 } from "@/api/base44Client";
@@ -91,8 +92,20 @@ export default function Layout({ children, currentPageName }) {
             </h1>
           </div>
 
-          {/* Right: Period Selector, Alert Bell, Avatar */}
+          {/* Right: System Status, M.POS, Period Selector, Alert Bell, Avatar */}
           <div className="flex items-center gap-3">
+            {/* All Systems Online */}
+            <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/20 backdrop-blur-sm">
+              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+              <span className="text-xs font-medium text-white">All systems online</span>
+            </div>
+
+            {/* M.POS Connected */}
+            <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/20 backdrop-blur-sm">
+              <Wifi className="w-3.5 h-3.5 text-emerald-400" />
+              <span className="text-xs font-medium text-white">M.POS connected</span>
+            </div>
+
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="hidden sm:flex items-center gap-2 text-gray-300 hover:bg-white/10">
