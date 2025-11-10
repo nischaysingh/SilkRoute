@@ -253,44 +253,6 @@ export default function ToolboxTab() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <Card className="bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 text-white shadow-2xl">
-        <CardContent className="p-8">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="p-4 bg-white/20 backdrop-blur-sm rounded-2xl">
-                <Wrench className="w-8 h-8" />
-              </div>
-              <div>
-                <h2 className="text-3xl font-bold mb-1">Toolbox: Mission Control Suite</h2>
-                <p className="text-purple-100">9 operational tools for building, testing, and deploying AI missions</p>
-              </div>
-            </div>
-            <Badge className="bg-white/20 backdrop-blur-sm text-white border-white/30 px-4 py-2">
-              <Sparkles className="w-4 h-4 mr-2" />
-              9 Tools Active
-            </Badge>
-          </div>
-
-          {/* Tool Grid Preview */}
-          <div className="grid grid-cols-9 gap-2 mt-6">
-            {tools.map((tool) => (
-              <div
-                key={tool.id}
-                className="bg-white/10 backdrop-blur-sm rounded-lg p-2 border border-white/20 text-center cursor-pointer hover:bg-white/20 transition-all"
-                onClick={() => {
-                  setActiveView(tool.id);
-                  setSelectedTool(tool);
-                }}
-              >
-                <tool.icon className="w-5 h-5 mx-auto mb-1" />
-                <div className="text-[10px] font-semibold leading-tight">{tool.name.split(" ")[0]}</div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
       <Tabs value={activeView} onValueChange={setActiveView} className="w-full">
         <TabsList className="bg-white/80 backdrop-blur-sm border border-slate-200">
           <TabsTrigger value="overview">Overview</TabsTrigger>
@@ -306,6 +268,44 @@ export default function ToolboxTab() {
 
         {/* OVERVIEW TAB */}
         <TabsContent value="overview" className="space-y-6 mt-6">
+          {/* Header */}
+          <Card className="bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 text-white shadow-2xl">
+            <CardContent className="p-8">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="p-4 bg-white/20 backdrop-blur-sm rounded-2xl">
+                    <Wrench className="w-8 h-8" />
+                  </div>
+                  <div>
+                    <h2 className="text-3xl font-bold mb-1">Toolbox: Mission Control Suite</h2>
+                    <p className="text-purple-100">9 operational tools for building, testing, and deploying AI missions</p>
+                  </div>
+                </div>
+                <Badge className="bg-white/20 backdrop-blur-sm text-white border-white/30 px-4 py-2">
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  9 Tools Active
+                </Badge>
+              </div>
+
+              {/* Tool Grid Preview */}
+              <div className="grid grid-cols-9 gap-2 mt-6">
+                {tools.map((tool) => (
+                  <div
+                    key={tool.id}
+                    className="bg-white/10 backdrop-blur-sm rounded-lg p-2 border border-white/20 text-center cursor-pointer hover:bg-white/20 transition-all"
+                    onClick={() => {
+                      setActiveView(tool.id);
+                      setSelectedTool(tool);
+                    }}
+                  >
+                    <tool.icon className="w-5 h-5 mx-auto mb-1" />
+                    <div className="text-[10px] font-semibold leading-tight">{tool.name.split(" ")[0]}</div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+          
           <div className="grid grid-cols-3 gap-6">
             {tools.map((tool) => (
               <motion.div
