@@ -92,20 +92,8 @@ export default function Layout({ children, currentPageName }) {
             </h1>
           </div>
 
-          {/* Right: System Status, M.POS, Period Selector, Alert Bell, Avatar */}
+          {/* Right: Period Selector, Alert Bell, Avatar */}
           <div className="flex items-center gap-3">
-            {/* All Systems Online */}
-            <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/20 backdrop-blur-sm">
-              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-              <span className="text-xs font-medium text-white">All systems online</span>
-            </div>
-
-            {/* M.POS Connected */}
-            <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/20 backdrop-blur-sm">
-              <Wifi className="w-3.5 h-3.5 text-emerald-400" />
-              <span className="text-xs font-medium text-white">M.POS connected</span>
-            </div>
-
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="hidden sm:flex items-center gap-2 text-gray-300 hover:bg-white/10">
@@ -163,7 +151,7 @@ export default function Layout({ children, currentPageName }) {
         </div>
 
         {/* Horizontal Navigation Tabs (Desktop) */}
-        <div className="bg-slate-50 text-slate-950 mx-6 px-6 rounded-[10px] hidden lg:flex border-t border-white/10">
+        <div className="bg-slate-50 text-slate-950 mx-6 px-6 rounded-[10px] hidden lg:flex items-center border-t border-white/10">
           {navItems.map((item) =>
           <Link
             key={item.name}
@@ -179,6 +167,21 @@ export default function Layout({ children, currentPageName }) {
               <span className="text-slate-950">{item.name}</span>
             </Link>
           )}
+          
+          {/* Status Indicators on the right */}
+          <div className="ml-auto flex items-center gap-3">
+            {/* All Systems Online */}
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-50 border border-emerald-200">
+              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+              <span className="text-xs font-medium text-slate-700">All systems online</span>
+            </div>
+
+            {/* M.POS Connected */}
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-50 border border-blue-200">
+              <Wifi className="w-3.5 h-3.5 text-blue-600" />
+              <span className="text-xs font-medium text-slate-700">M.POS connected</span>
+            </div>
+          </div>
         </div>
       </div>
 
