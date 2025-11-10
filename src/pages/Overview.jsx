@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -444,18 +445,9 @@ export default function Overview() {
         <MessageCircle className="w-5 h-5 text-white" />
       </Button>
 
-      {/* Header - Management Style */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h2 className="text-3xl font-bold text-white">Overview</h2>
-          <p className="text-gray-400 text-sm mt-1">Financial snapshot and key metrics</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" className="bg-white/5 border-white/10 text-white hover:bg-white/10 h-9">
-            <ArrowRight className="w-4 h-4 mr-2" />
-            View Full Reports
-          </Button>
-        </div>
+      <div className="mb-6">
+        <h2 className="text-2xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">Overview</h2>
+        <p className="text-gray-400 text-sm mt-1">Financial snapshot and key metrics</p>
       </div>
 
       {/* Bento Grid Layout */}
@@ -473,69 +465,62 @@ export default function Overview() {
           });
 
           return (
-            <motion.div
-              key={idx}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: idx * 0.05 }}
-              className="col-span-3"
+            <Card 
+              key={idx} 
+              {...explainableProps}
+              className="col-span-3 bg-white/5 backdrop-blur-xl border-white/10 rounded-xl overflow-hidden group hover:bg-white/10 transition-all"
             >
-              <Card 
-                {...explainableProps}
-                className="bg-white/5 backdrop-blur-xl border-white/10 rounded-xl overflow-hidden group hover:bg-white/10 transition-all shadow-lg"
-              >
-                <CardContent className="p-5">
-                  <div className="flex items-center justify-between mb-3">
-                    <TooltipProvider>
-                      <UITooltip>
-                        <UITooltipTrigger asChild>
-                          <div className="flex items-center gap-1.5 cursor-help">
-                            <span className="text-xs font-semibold text-gray-300">{kpi.label}</span>
-                            <Info className="w-3 h-3 text-gray-500" />
-                          </div>
-                        </UITooltipTrigger>
-                        <UITooltipContent className="bg-gray-900 border-white/20 text-white max-w-xs">
-                          <p className="text-xs">{kpi.tooltip}</p>
-                        </UITooltipContent>
-                      </UITooltip>
-                    </TooltipProvider>
-                    <div className={`p-2.5 rounded-lg bg-gradient-to-br ${kpi.color} shadow-lg`}>
-                      <kpi.icon className="w-5 h-5 text-white" />
-                    </div>
+              <CardContent className="p-5">
+                <div className="flex items-center justify-between mb-3">
+                  <TooltipProvider>
+                    <UITooltip>
+                      <UITooltipTrigger asChild>
+                        <div className="flex items-center gap-1.5 cursor-help">
+                          <span className="text-xs font-medium text-gray-400">{kpi.label}</span>
+                          <Info className="w-3 h-3 text-gray-500" />
+                        </div>
+                      </UITooltipTrigger>
+                      <UITooltipContent className="bg-gray-900 border-white/20 text-white max-w-xs">
+                        <p className="text-xs">{kpi.tooltip}</p>
+                      </UITooltipContent>
+                    </UITooltip>
+                  </TooltipProvider>
+                  <div className={`p-2 rounded-lg bg-gradient-to-br ${kpi.color} shadow-lg`}>
+                    <kpi.icon className="w-4 h-4 text-white" />
                   </div>
-                  <div>
-                    <div className="text-3xl font-bold text-white mb-2">{kpi.value}</div>
-                    <Badge 
-                      className={cn(
-                        "text-xs font-semibold",
-                        kpi.warning && runway < 3 ? "bg-red-500/20 text-red-400 border-red-500/30" :
-                        kpi.warning && runway < 6 ? "bg-orange-500/20 text-orange-400 border-orange-500/30" :
-                        kpi.positive ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30" : 
-                        "bg-red-500/20 text-red-400 border-red-500/30"
-                      )}
-                    >
-                      {kpi.positive ? <TrendingUp className="w-3 h-3 mr-1 inline" /> : <TrendingDown className="w-3 h-3 mr-1 inline" />}
-                      {kpi.delta}
-                    </Badge>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-white mb-2">{kpi.value}</div>
+                  <Badge 
+                    className={cn(
+                      "text-xs",
+                      kpi.warning && runway < 3 ? "bg-red-500/20 text-red-400 border-red-500/30" :
+                      kpi.warning && runway < 6 ? "bg-orange-500/20 text-orange-400 border-orange-500/30" :
+                      kpi.positive ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30" : 
+                      "bg-red-500/20 text-red-400 border-red-500/30"
+                    )}
+                  >
+                    {kpi.positive ? <TrendingUp className="w-3 h-3 mr-1 inline" /> : <TrendingDown className="w-3 h-3 mr-1 inline" />}
+                    {kpi.delta}
+                  </Badge>
+                </div>
+              </CardContent>
+            </Card>
           );
         })}
 
         {/* MIDDLE LEFT: Cash Balance Chart - 5 columns */}
-        <Card className="col-span-5 bg-white/5 backdrop-blur-xl border-white/10 rounded-xl shadow-lg hover:shadow-xl transition-all">
+        <Card className="col-span-5 bg-white/5 backdrop-blur-xl border-white/10 rounded-xl">
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-white text-base font-bold">Cash Balance (Last 6 Months)</CardTitle>
+              <CardTitle className="text-white text-sm">Cash Balance (Last 6 Months)</CardTitle>
               <Button
                 variant={includeCreditLine ? "default" : "outline"}
                 size="sm"
                 onClick={() => setIncludeCreditLine(!includeCreditLine)}
                 className={includeCreditLine ? 
-                  "bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 border-0 rounded-lg text-xs h-8" : 
-                  "bg-white/5 border-white/10 text-white hover:bg-white/10 rounded-lg text-xs h-8"
+                  "bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 border-0 rounded-lg text-xs h-7" : 
+                  "bg-white/5 border-white/10 text-white hover:bg-white/10 rounded-lg text-xs h-7"
                 }
               >
                 Credit Line
@@ -543,7 +528,7 @@ export default function Overview() {
             </div>
           </CardHeader>
           <CardContent className="pt-0">
-            <ResponsiveContainer width="100%" height={200}>
+            <ResponsiveContainer width="100%" height={180}>
               <LineChart data={cashBalanceData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
                 <XAxis dataKey="month" stroke="#9ca3af" tick={{ fontSize: 11 }} />
@@ -563,8 +548,8 @@ export default function Overview() {
                   type="monotone" 
                   dataKey="balance" 
                   stroke="#3b82f6" 
-                  strokeWidth={3}
-                  dot={{ r: 4, fill: '#3b82f6', strokeWidth: 2, stroke: '#1e40af' }}
+                  strokeWidth={2}
+                  dot={{ r: 3, fill: '#3b82f6', strokeWidth: 2, stroke: '#1e40af' }}
                 />
                 {includeCreditLine && (
                   <Line 
@@ -582,10 +567,10 @@ export default function Overview() {
         </Card>
 
         {/* MIDDLE CENTER: Revenue vs Expenses - 4 columns */}
-        <Card className="col-span-4 bg-white/5 backdrop-blur-xl border-white/10 rounded-xl shadow-lg hover:shadow-xl transition-all">
+        <Card className="col-span-4 bg-white/5 backdrop-blur-xl border-white/10 rounded-xl">
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-white text-base font-bold">Revenue vs Expenses</CardTitle>
+              <CardTitle className="text-white text-sm">Revenue vs Expenses</CardTitle>
               <div className="flex gap-1">
                 <Button
                   variant={revenueExpenseView === "MTD" ? "default" : "outline"}
@@ -613,7 +598,7 @@ export default function Overview() {
             </div>
           </CardHeader>
           <CardContent className="pt-0">
-            <ResponsiveContainer width="100%" height={200}>
+            <ResponsiveContainer width="100%" height={180}>
               <BarChart 
                 data={revenueExpenseView === "MTD" ? revenueExpenseDataMTD : revenueExpenseDataYTD}
                 onClick={(data) => data?.activePayload && handleBarClick(data.activePayload[0].payload)}
@@ -641,9 +626,9 @@ export default function Overview() {
         </Card>
 
         {/* MIDDLE RIGHT: Revenue Mix - 3 columns */}
-        <Card className="col-span-3 bg-white/5 backdrop-blur-xl border-white/10 rounded-xl shadow-lg hover:shadow-xl transition-all">
+        <Card className="col-span-3 bg-white/5 backdrop-blur-xl border-white/10 rounded-xl">
           <CardHeader className="pb-2">
-            <CardTitle className="text-white text-base font-bold">Revenue Mix</CardTitle>
+            <CardTitle className="text-white text-sm">Revenue Mix</CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
             <ResponsiveContainer width="100%" height={120}>
@@ -693,19 +678,19 @@ export default function Overview() {
         </Card>
 
         {/* BOTTOM LEFT: Top Vendors - 4 columns */}
-        <Card className="col-span-4 bg-white/5 backdrop-blur-xl border-white/10 rounded-xl shadow-lg hover:shadow-xl transition-all">
+        <Card className="col-span-4 bg-white/5 backdrop-blur-xl border-white/10 rounded-xl">
           <CardHeader className="pb-2">
-            <CardTitle className="text-white text-base font-bold">Top Vendors by Spend Variance</CardTitle>
+            <CardTitle className="text-white text-sm">Top Vendors by Spend Variance</CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow className="border-white/10 hover:bg-transparent">
-                    <TableHead className="text-gray-400 text-xs h-8 font-semibold">Vendor</TableHead>
-                    <TableHead className="text-gray-400 text-xs h-8 font-semibold">This Month</TableHead>
-                    <TableHead className="text-gray-400 text-xs h-8 font-semibold">Last Month</TableHead>
-                    <TableHead className="text-gray-400 text-xs h-8 font-semibold">Variance</TableHead>
+                    <TableHead className="text-gray-400 text-xs h-8">Vendor</TableHead>
+                    <TableHead className="text-gray-400 text-xs h-8">This Month</TableHead>
+                    <TableHead className="text-gray-400 text-xs h-8">Last Month</TableHead>
+                    <TableHead className="text-gray-400 text-xs h-8">Variance</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -718,12 +703,12 @@ export default function Overview() {
                         className="cursor-pointer hover:bg-white/5 border-white/10 transition-all h-10"
                         onClick={() => handleVendorClick(vendor.vendor)}
                       >
-                        <TableCell className="font-semibold text-white text-sm">{vendor.vendor}</TableCell>
-                        <TableCell className="text-white text-sm font-medium">${vendor.thisMonth.toLocaleString()}</TableCell>
-                        <TableCell className="text-gray-400 text-sm">${vendor.lastMonth.toLocaleString()}</TableCell>
+                        <TableCell className="font-medium text-white text-xs">{vendor.vendor}</TableCell>
+                        <TableCell className="text-white text-xs">${vendor.thisMonth.toLocaleString()}</TableCell>
+                        <TableCell className="text-gray-400 text-xs">${vendor.lastMonth.toLocaleString()}</TableCell>
                         <TableCell>
                           <Badge className={cn(
-                            "text-xs font-semibold",
+                            "text-xs",
                             varianceNum > 40 ? "bg-red-500/20 text-red-400 border-red-500/30" :
                             varianceNum > 20 ? "bg-amber-500/20 text-amber-400 border-amber-500/30" :
                             "bg-gray-500/20 text-gray-400 border-gray-500/30"
@@ -741,38 +726,38 @@ export default function Overview() {
         </Card>
 
         {/* BOTTOM CENTER: Risk & Alerts - 3 columns */}
-        <Card className="col-span-3 bg-white/5 backdrop-blur-xl border-white/10 rounded-xl shadow-lg hover:shadow-xl transition-all">
+        <Card className="col-span-3 bg-white/5 backdrop-blur-xl border-white/10 rounded-xl">
           <CardHeader className="pb-2">
-            <CardTitle className="text-white text-base font-bold">Risk & Alerts</CardTitle>
+            <CardTitle className="text-white text-sm">Risk & Alerts</CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
             <div className="space-y-2">
               {activeAlerts.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-6 text-gray-400">
                   <CheckCircle className="w-8 h-8 mb-2 text-emerald-400" />
-                  <p className="text-xs font-medium">All clear!</p>
+                  <p className="text-xs">All clear!</p>
                 </div>
               ) : (
                 activeAlerts.map((alert) => (
                   <div 
                     key={alert.id}
                     className={cn(
-                      "flex items-center justify-between p-3 rounded-lg border-2 cursor-pointer hover:bg-white/5 transition-all",
-                      alert.severity === "critical" ? "bg-red-500/10 border-red-500/30 hover:border-red-500/50" : "bg-amber-500/10 border-amber-500/30 hover:border-amber-500/50"
+                      "flex items-center justify-between p-2.5 rounded-lg border cursor-pointer hover:bg-white/5 transition-all",
+                      alert.severity === "critical" ? "bg-red-500/10 border-red-500/30" : "bg-amber-500/10 border-amber-500/30"
                     )}
                     onClick={() => navigate(createPageUrl(alert.page))}
                   >
                     <div className="flex items-center gap-2">
                       <div className={cn(
-                        "p-2 rounded-md",
+                        "p-1.5 rounded-md",
                         alert.severity === "critical" ? "bg-red-500/20" : "bg-amber-500/20"
                       )}>
                         <alert.icon className={cn(
-                          "w-4 h-4",
+                          "w-3.5 h-3.5",
                           alert.severity === "critical" ? "text-red-400" : "text-amber-400"
                         )} />
                       </div>
-                      <p className="text-white font-semibold text-sm">{alert.title}</p>
+                      <p className="text-white font-medium text-xs">{alert.title}</p>
                     </div>
                     <Button
                       variant="ghost"
@@ -792,66 +777,59 @@ export default function Overview() {
           </CardContent>
         </Card>
 
-        {/* BOTTOM CENTER-RIGHT: Payroll Coverage - 3 columns - HERO CARD STYLE */}
+        {/* BOTTOM CENTER-RIGHT: Payroll Coverage - 3 columns */}
         <Card className={cn(
-          "col-span-3 backdrop-blur-xl border-2 rounded-xl shadow-2xl transition-all",
-          shortfall < 0 ? "bg-gradient-to-br from-red-600 to-orange-600 border-red-500/50 text-white" : "bg-gradient-to-br from-blue-600 to-purple-600 border-blue-500/50 text-white"
+          "col-span-3 backdrop-blur-xl border rounded-xl",
+          shortfall < 0 ? "bg-red-500/10 border-red-500/30" : "bg-white/5 border-white/10"
         )}>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-4">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-white text-sm">Payroll Coverage</CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0 space-y-3">
+            <div className="grid grid-cols-2 gap-2">
               <div>
-                <h3 className="text-lg font-bold text-white mb-1">Payroll Coverage</h3>
-                <p className="text-white/80 text-xs">{payrollCoverage.nextPayDate}</p>
+                <div className="text-xs text-gray-400">Next Pay Run</div>
+                <div className="text-sm font-semibold text-white">{payrollCoverage.nextPayDate}</div>
               </div>
-              <div className={cn(
-                "px-3 py-1 rounded-full text-xs font-bold",
-                shortfall < 0 ? "bg-white/20 text-white" : "bg-white/20 text-white"
-              )}>
-                {shortfall < 0 ? 'At Risk' : 'Covered'}
+              <div>
+                <div className="text-xs text-gray-400">Gross Due</div>
+                <div className="text-sm font-semibold text-white">${payrollCoverage.grossDue.toLocaleString()}</div>
               </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3">
-                <div className="text-xs text-white/70 mb-1">Gross Due</div>
-                <div className="text-xl font-bold text-white">${payrollCoverage.grossDue.toLocaleString()}</div>
+              <div>
+                <div className="text-xs text-gray-400">Projected Cash</div>
+                <div className="text-sm font-semibold text-white">${payrollCoverage.projectedCash.toLocaleString()}</div>
               </div>
-              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3">
-                <div className="text-xs text-white/70 mb-1">Projected Cash</div>
-                <div className="text-xl font-bold text-white">${payrollCoverage.projectedCash.toLocaleString()}</div>
-              </div>
-              <div className="col-span-2 bg-white/10 backdrop-blur-sm rounded-lg p-3">
-                <div className="text-xs text-white/70 mb-1">Shortfall</div>
+              <div>
+                <div className="text-xs text-gray-400">Shortfall</div>
                 <div className={cn(
-                  "text-2xl font-bold",
-                  shortfall < 0 ? "text-white" : "text-white"
+                  "text-sm font-bold",
+                  shortfall < 0 ? "text-red-400" : "text-emerald-400"
                 )}>
-                  {shortfall < 0 ? '-' : '+'}${Math.abs(shortfall).toLocaleString()}
+                  {shortfall < 0 ? '-' : ''}${Math.abs(shortfall).toLocaleString()}
                 </div>
               </div>
             </div>
-
             {shortfall < 0 && (
               <Button
                 variant="outline"
                 size="sm"
-                className="w-full mt-4 bg-white text-red-600 hover:bg-white/90 border-0 font-semibold"
+                className="w-full bg-white/5 border-white/10 text-white hover:bg-white/10 rounded-lg text-xs h-7"
                 onClick={() => navigate(createPageUrl("MoneyOut") + "?suggestedDelay=true")}
               >
                 View Suggested Bills
-                <ArrowRight className="w-4 h-4 ml-2" />
+                <ArrowRight className="w-3 h-3 ml-1" />
               </Button>
             )}
           </CardContent>
         </Card>
 
         {/* BOTTOM RIGHT: Collections - 2 columns */}
-        <Card className="col-span-2 bg-white/5 backdrop-blur-xl border-white/10 rounded-xl shadow-lg hover:shadow-xl transition-all">
+        <Card className="col-span-2 bg-white/5 backdrop-blur-xl border-white/10 rounded-xl">
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-white text-sm font-bold">Collections</CardTitle>
+              <CardTitle className="text-white text-sm">Collections</CardTitle>
               <Badge className={cn(
-                "text-xs font-semibold",
+                "text-xs",
                 totalOverdue > 50000 ? "bg-red-500/20 text-red-400 border-red-500/30" :
                 totalOverdue > 10000 ? "bg-amber-500/20 text-amber-400 border-amber-500/30" :
                 "bg-emerald-500/20 text-emerald-400 border-emerald-500/30"
@@ -863,13 +841,13 @@ export default function Overview() {
           <CardContent className="pt-0">
             <div className="space-y-2">
               {collections.map((item, idx) => (
-                <div key={idx} className="flex items-center justify-between p-2.5 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-all">
+                <div key={idx} className="flex items-center justify-between p-2 rounded-lg bg-white/5 border border-white/10">
                   <div className="flex-1">
-                    <div className="text-sm font-semibold text-white">{item.customer}</div>
+                    <div className="text-xs font-medium text-white">{item.customer}</div>
                     <div className="text-xs text-gray-400">${item.amount.toLocaleString()}</div>
                   </div>
                   <Badge className={cn(
-                    "text-xs font-semibold",
+                    "text-xs",
                     item.daysPastDue > 30 ? "bg-red-500/20 text-red-400 border-red-500/30" :
                     item.daysPastDue > 15 ? "bg-amber-500/20 text-amber-400 border-amber-500/30" :
                     "bg-gray-500/20 text-gray-400 border-gray-500/30"
@@ -885,9 +863,9 @@ export default function Overview() {
         {/* NEW WIDGETS ROW */}
 
         {/* Financial Feed - 3 columns */}
-        <Card className="col-span-3 bg-white/5 backdrop-blur-xl border-white/10 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all">
+        <Card className="col-span-3 bg-white/5 backdrop-blur-xl border-white/10 rounded-xl overflow-hidden">
           <CardHeader className="pb-2">
-            <CardTitle className="text-white text-base font-bold flex items-center gap-2">
+            <CardTitle className="text-white text-sm flex items-center gap-2">
               <Clock className="w-4 h-4" />
               Financial Feed
             </CardTitle>
@@ -895,7 +873,7 @@ export default function Overview() {
           <CardContent className="pt-0">
             <div className="space-y-2 max-h-[300px] overflow-y-auto">
               {financialFeed.map((item, idx) => (
-                <div key={idx} className="flex items-start gap-3 p-2.5 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-all cursor-pointer">
+                <div key={idx} className="flex items-start gap-3 p-2 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-all cursor-pointer">
                   <div className={cn(
                     "p-2 rounded-lg",
                     item.color === "emerald" && "bg-emerald-500/20",
@@ -904,7 +882,7 @@ export default function Overview() {
                     item.color === "red" && "bg-red-500/20"
                   )}>
                     <item.icon className={cn(
-                      "w-4 h-4",
+                      "w-3 h-3",
                       item.color === "emerald" && "text-emerald-400",
                       item.color === "orange" && "text-orange-400",
                       item.color === "blue" && "text-blue-400",
@@ -912,7 +890,7 @@ export default function Overview() {
                     )} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="text-xs font-semibold text-white truncate">{item.title}</div>
+                    <div className="text-xs font-medium text-white truncate">{item.title}</div>
                     <div className="flex items-center justify-between mt-1">
                       <span className="text-xs text-gray-500">{item.time}</span>
                       {item.amount > 0 && (
@@ -927,9 +905,9 @@ export default function Overview() {
         </Card>
 
         {/* Anomaly Widget - 3 columns */}
-        <Card className="col-span-3 bg-white/5 backdrop-blur-xl border-white/10 rounded-xl shadow-lg hover:shadow-xl transition-all">
+        <Card className="col-span-3 bg-white/5 backdrop-blur-xl border-white/10 rounded-xl">
           <CardHeader className="pb-2">
-            <CardTitle className="text-white text-base font-bold flex items-center gap-2">
+            <CardTitle className="text-white text-sm flex items-center gap-2">
               <AlertTriangle className="w-4 h-4 text-amber-400" />
               Unusual Activity
             </CardTitle>
@@ -937,24 +915,24 @@ export default function Overview() {
           <CardContent className="pt-0">
             <div className="space-y-3">
               {anomalies.map((anomaly, idx) => (
-                <div key={idx} className="p-3 rounded-lg bg-white/5 border-2 border-white/10 hover:bg-white/10 hover:border-white/20 transition-all cursor-pointer">
+                <div key={idx} className="p-3 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-all cursor-pointer">
                   <div className="flex items-start justify-between mb-2">
-                    <p className="text-xs text-white font-semibold flex-1">{anomaly.title}</p>
+                    <p className="text-xs text-white font-medium flex-1">{anomaly.title}</p>
                     {anomaly.trend === "up" ? (
-                      <TrendingUp className="w-4 h-4 text-orange-400 flex-shrink-0 ml-2" />
+                      <TrendingUp className="w-3 h-3 text-orange-400 flex-shrink-0 ml-2" />
                     ) : (
-                      <TrendingDown className="w-4 h-4 text-blue-400 flex-shrink-0 ml-2" />
+                      <TrendingDown className="w-3 h-3 text-blue-400 flex-shrink-0 ml-2" />
                     )}
                   </div>
                   <div className="flex items-center justify-between">
                     <Badge className={cn(
-                      "text-xs font-semibold",
+                      "text-xs",
                       anomaly.severity === "warning" ? "bg-amber-500/20 text-amber-400 border-amber-500/30" : "bg-blue-500/20 text-blue-400 border-blue-500/30"
                     )}>
                       {anomaly.severity === "warning" ? "Warning" : "Info"}
                     </Badge>
                     <span className={cn(
-                      "text-sm font-bold",
+                      "text-xs font-bold",
                       anomaly.trend === "up" ? "text-orange-400" : "text-blue-400"
                     )}>
                       {anomaly.value}
@@ -962,7 +940,7 @@ export default function Overview() {
                   </div>
                 </div>
               ))}
-              <Button variant="outline" size="sm" className="w-full bg-white/5 border-white/10 text-white hover:bg-white/10 text-xs h-8 font-medium">
+              <Button variant="outline" size="sm" className="w-full bg-white/5 border-white/10 text-white hover:bg-white/10 text-xs h-8">
                 View All Anomalies
                 <ArrowRight className="w-3 h-3 ml-1" />
               </Button>
@@ -971,10 +949,10 @@ export default function Overview() {
         </Card>
 
         {/* Mini P&L Snapshot - 3 columns */}
-        <Card className="col-span-3 bg-white/5 backdrop-blur-xl border-white/10 rounded-xl shadow-lg hover:shadow-xl transition-all">
+        <Card className="col-span-3 bg-white/5 backdrop-blur-xl border-white/10 rounded-xl">
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-white text-base font-bold">P&L Snapshot (MTD)</CardTitle>
+              <CardTitle className="text-white text-sm">P&L Snapshot (MTD)</CardTitle>
               <Button
                 variant="ghost"
                 size="sm"
@@ -988,35 +966,35 @@ export default function Overview() {
           <CardContent className="pt-0">
             <div className="space-y-3">
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-400 font-medium">Revenue</span>
-                <span className="text-lg font-bold text-emerald-400">${plData.revenue.toLocaleString()}</span>
+                <span className="text-xs text-gray-400">Revenue</span>
+                <span className="text-sm font-bold text-emerald-400">${plData.revenue.toLocaleString()}</span>
               </div>
               
               {plExpanded && (
                 <>
                   <div className="flex justify-between items-center pl-3 border-l-2 border-white/10">
-                    <span className="text-sm text-gray-400 font-medium">COGS</span>
-                    <span className="text-base font-semibold text-red-400">-${plData.cogs.toLocaleString()}</span>
+                    <span className="text-xs text-gray-400">COGS</span>
+                    <span className="text-sm font-semibold text-red-400">-${plData.cogs.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between items-center font-semibold">
-                    <span className="text-sm text-white">Gross Profit</span>
-                    <span className="text-base font-bold text-white">${plData.grossProfit.toLocaleString()}</span>
+                    <span className="text-xs text-white">Gross Profit</span>
+                    <span className="text-sm text-white">${plData.grossProfit.toLocaleString()}</span>
                   </div>
                   <div className="h-px bg-white/10"></div>
                 </>
               )}
 
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-400 font-medium">Operating Expenses</span>
-                <span className="text-base font-semibold text-orange-400">-${plData.opex.toLocaleString()}</span>
+                <span className="text-xs text-gray-400">Operating Expenses</span>
+                <span className="text-sm font-semibold text-orange-400">-${plData.opex.toLocaleString()}</span>
               </div>
 
               <div className="h-px bg-white/10"></div>
 
               <div className="flex justify-between items-center pt-2">
-                <span className="text-base font-bold text-white">Net Income</span>
+                <span className="text-sm font-bold text-white">Net Income</span>
                 <span className={cn(
-                  "text-2xl font-bold",
+                  "text-lg font-bold",
                   plData.net > 0 ? "text-emerald-400" : "text-red-400"
                 )}>
                   ${plData.net.toLocaleString()}
@@ -1024,14 +1002,14 @@ export default function Overview() {
               </div>
 
               <div className="pt-2">
-                <div className="text-xs text-gray-500 mb-1 font-medium">Net Margin</div>
-                <div className="w-full bg-white/10 rounded-full h-2.5 overflow-hidden">
+                <div className="text-xs text-gray-500 mb-1">Net Margin</div>
+                <div className="w-full bg-white/10 rounded-full h-2 overflow-hidden">
                   <div 
                     className="h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full"
                     style={{ width: `${((plData.net / plData.revenue) * 100).toFixed(0)}%` }}
                   ></div>
                 </div>
-                <div className="text-xs text-gray-400 mt-1 font-semibold">
+                <div className="text-xs text-gray-400 mt-1">
                   {((plData.net / plData.revenue) * 100).toFixed(1)}%
                 </div>
               </div>
@@ -1039,22 +1017,25 @@ export default function Overview() {
           </CardContent>
         </Card>
 
-        {/* Next Best Action - 3 columns - HERO CARD STYLE */}
-        <Card className="col-span-3 bg-gradient-to-br from-purple-600 to-blue-600 backdrop-blur-xl border-2 border-purple-500/50 rounded-xl shadow-2xl text-white">
-          <CardContent className="p-6">
+        {/* Next Best Action - 3 columns */}
+        <Card className="col-span-3 bg-white/5 backdrop-blur-xl border-white/10 rounded-xl">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-white text-sm flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-purple-400" />
+              Next Best Action
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0">
             <div className="space-y-4">
               <div>
-                <div className="flex items-center gap-2 mb-3">
-                  <Sparkles className="w-5 h-5 text-yellow-300" />
-                  <Badge className={cn(
-                    "text-xs font-bold",
-                    nextBestAction.priority === "high" ? "bg-red-500/30 text-white border-red-300/50" : "bg-amber-500/30 text-white border-amber-300/50"
-                  )}>
-                    {nextBestAction.priority === "high" ? "High Priority" : "Medium Priority"}
-                  </Badge>
-                </div>
-                <h4 className="text-xl font-bold text-white mb-2">{nextBestAction.title}</h4>
-                <p className="text-sm text-white/90 leading-relaxed">{nextBestAction.description}</p>
+                <Badge className={cn(
+                  "text-xs mb-3",
+                  nextBestAction.priority === "high" ? "bg-red-500/20 text-red-400 border-red-500/30" : "bg-amber-500/20 text-amber-400 border-amber-500/30"
+                )}>
+                  {nextBestAction.priority === "high" ? "High Priority" : "Medium Priority"}
+                </Badge>
+                <h4 className="text-base font-bold text-white mb-2">{nextBestAction.title}</h4>
+                <p className="text-xs text-gray-300 leading-relaxed">{nextBestAction.description}</p>
               </div>
 
               <div className="flex flex-col gap-2">
@@ -1064,16 +1045,16 @@ export default function Overview() {
                     variant="outline"
                     size="sm"
                     onClick={() => navigate(createPageUrl(action.link))}
-                    className="w-full bg-white/10 backdrop-blur-sm border-white/30 text-white hover:bg-white/20 text-sm h-9 justify-between font-medium"
+                    className="w-full bg-white/5 border-white/10 text-white hover:bg-white/10 text-xs h-8 justify-between"
                   >
                     {action.label}
-                    <ArrowRight className="w-4 h-4" />
+                    <ArrowRight className="w-3 h-3" />
                   </Button>
                 ))}
               </div>
 
-              <div className="pt-3 border-t border-white/20">
-                <p className="text-xs text-white/70">
+              <div className="pt-2 border-t border-white/10">
+                <p className="text-xs text-gray-400">
                   💡 AI-powered recommendation based on your current financial position
                 </p>
               </div>
