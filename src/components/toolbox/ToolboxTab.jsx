@@ -16,12 +16,12 @@ import {
   ArrowRight, Sparkles, Plus, Trash2, Edit, Eye, GitBranch, Target,
   Zap, Lock, Unlock, TrendingUp, BarChart3, Code, Settings, Cpu,
   FileText, Link, MessageSquare, Layers, Network, Filter, ChevronRight,
-  Lightbulb, Activity, CheckCircle, Brain, Users // NEW ICONS
+  Lightbulb, Activity, Users, CheckCircle, Brain
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { LineChart, Line, ResponsiveContainer } from 'recharts'; // NEW: Recharts for KPI trend visualization
+import { LineChart, Line, ResponsiveContainer } from 'recharts';
 
 export default function ToolboxTab() {
   const [activeView, setActiveView] = useState("overview");
@@ -2196,7 +2196,7 @@ export default function ToolboxTab() {
                       <div className="p-4 bg-emerald-50 rounded-lg border-2 border-emerald-200">
                         <div className="flex items-center gap-3 mb-3">
                           <Check className="w-6 h-6 text-emerald-600" />
-                          <h4 className="text-lg font-bold text-emerald-900">Mission Spec Validated</h4>
+                          <h4 className="text-lg font-bold text-emerald-900}>Mission Spec Validated</h4>
                         </div>
                         <div className="grid grid-cols-2 gap-3 text-sm">
                           <div>
