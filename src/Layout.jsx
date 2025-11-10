@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -19,6 +20,7 @@ import { cn } from "@/lib/utils";
 import { ExplainModeProvider, useExplainMode } from "@/components/explain/ExplainModeContext";
 import ExplainCoPilotPanel from "@/components/explain/ExplainCoPilotPanel";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { motion, AnimatePresence } from "framer-motion";
 
 function LayoutContent({ children, currentPageName }) {
   const location = useLocation();
@@ -308,19 +310,21 @@ function LayoutContent({ children, currentPageName }) {
       </TooltipProvider>
 
       {/* Floating instruction banner when Explain Mode is active */}
-      {isExplainModeActive && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 20 }}
-          className="fixed bottom-24 right-6 z-[90] px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 text-white text-xs font-semibold shadow-lg border border-white/20"
-        >
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-white animate-pulse"></div>
-            <span>Explain Mode Active - Click any widget to understand it</span>
-          </div>
-        </motion.div>
-      )}
+      <AnimatePresence>
+        {isExplainModeActive && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            className="fixed bottom-24 right-6 z-[90] px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 text-white text-xs font-semibold shadow-lg border border-white/20"
+          >
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-white animate-pulse"></div>
+              <span>Explain Mode Active - Click any widget to understand it</span>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Explain Co-Pilot Panel */}
       <ExplainCoPilotPanel />
