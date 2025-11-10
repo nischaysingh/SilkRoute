@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import {
   LayoutDashboard, DollarSign, CreditCard, Users, PiggyBank,
-  BarChart, CheckCircle, Settings, Bell, ChevronDown, Menu, X, Package, Radar, Wifi, Sparkles, Eye
+  BarChart, CheckCircle, Settings, Bell, ChevronDown, Menu, X, Package, Radar, Wifi, Eye
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { base44 } from "@/api/base44Client";
@@ -18,6 +18,7 @@ import {
 import { cn } from "@/lib/utils";
 import { ExplainModeProvider, useExplainMode } from "@/components/explain/ExplainModeContext";
 import ExplainCoPilotPanel from "@/components/explain/ExplainCoPilotPanel";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 function LayoutContent({ children, currentPageName }) {
   const location = useLocation();
@@ -53,58 +54,43 @@ function LayoutContent({ children, currentPageName }) {
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-slate-900 to-gray-900">
       {/* Explain Mode Global Styles */}
       <style>{`
-        /* Explain Mode Highlight Glow */
-        [data-explainable="true"].explain-mode-active {
-          outline: 2px solid rgba(147, 51, 234, 0.5);
-          outline-offset: 2px;
-          box-shadow: 0 0 0 4px rgba(147, 51, 234, 0.1), 0 0 16px rgba(147, 51, 234, 0.3);
-          transition: all 150ms ease-in-out;
-          cursor: pointer;
-          position: relative;
-        }
+        /* Explain Mode Highlight Glow for ANY element clicked */
+        ${isExplainModeActive ? `
+          [class*="Card"]:hover,
+          [class*="recharts"]:hover,
+          table:hover,
+          [class*="bg-"][class*="border"]:hover {
+            outline: 2px solid rgba(147, 51, 234, 0.6) !important;
+            outline-offset: 2px !important;
+            box-shadow: 0 0 0 4px rgba(147, 51, 234, 0.15), 0 0 20px rgba(147, 51, 234, 0.4) !important;
+            cursor: pointer !important;
+            transition: all 150ms ease-in-out !important;
+          }
 
-        [data-explainable="true"].explain-mode-active:hover {
-          outline-color: rgba(147, 51, 234, 0.8);
-          box-shadow: 0 0 0 4px rgba(147, 51, 234, 0.2), 0 0 20px rgba(147, 51, 234, 0.5);
-        }
+          [data-explainable="true"] {
+            outline: 2px solid rgba(147, 51, 234, 0.5) !important;
+            outline-offset: 2px !important;
+            box-shadow: 0 0 0 4px rgba(147, 51, 234, 0.1), 0 0 16px rgba(147, 51, 234, 0.3) !important;
+            cursor: pointer !important;
+            transition: all 150ms ease-in-out !important;
+          }
 
-        [data-explainable="true"].explain-mode-active:focus-visible {
-          outline: 3px solid rgba(147, 51, 234, 1);
-          box-shadow: 0 0 0 6px rgba(147, 51, 234, 0.3), 0 0 24px rgba(147, 51, 234, 0.6);
-        }
+          [data-explainable="true"]:hover {
+            outline-color: rgba(147, 51, 234, 0.8) !important;
+            box-shadow: 0 0 0 4px rgba(147, 51, 234, 0.2), 0 0 24px rgba(147, 51, 234, 0.5) !important;
+          }
+        ` : ''}
 
         /* Background dimming when Explain Mode is active */
         .explain-mode-active-bg::before {
           content: '';
           position: fixed;
           inset: 0;
-          background: rgba(0, 0, 0, 0.3);
+          background: rgba(0, 0, 0, 0.25);
           pointer-events: none;
           z-index: 40;
           transition: opacity 200ms ease-in-out;
         }
-
-        /* Apply highlight class to all explainable widgets when mode is active */
-        ${isExplainModeActive ? `
-          [data-explainable="true"] {
-            outline: 2px solid rgba(147, 51, 234, 0.5);
-            outline-offset: 2px;
-            box-shadow: 0 0 0 4px rgba(147, 51, 234, 0.1), 0 0 16px rgba(147, 51, 234, 0.3);
-            transition: all 150ms ease-in-out;
-            cursor: pointer;
-            position: relative;
-          }
-
-          [data-explainable="true"]:hover {
-            outline-color: rgba(147, 51, 234, 0.8);
-            box-shadow: 0 0 0 4px rgba(147, 51, 234, 0.2), 0 0 20px rgba(147, 51, 234, 0.5);
-          }
-
-          [data-explainable="true"]:focus-visible {
-            outline: 3px solid rgba(147, 51, 234, 1);
-            box-shadow: 0 0 0 6px rgba(147, 51, 234, 0.3), 0 0 24px rgba(147, 51, 234, 0.6);
-          }
-        ` : ''}
       `}</style>
 
       {/* Top Navigation Bar */}
@@ -289,29 +275,51 @@ function LayoutContent({ children, currentPageName }) {
         {children}
       </main>
 
-      {/* Sticky Explain Mode Button */}
-      <Button
-        onClick={toggleExplainMode}
-        className={cn(
-          "fixed bottom-6 right-6 z-[90] rounded-full w-14 h-14 shadow-2xl transition-all duration-200",
-          isExplainModeActive
-            ? "bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 scale-110"
-            : "bg-gradient-to-r from-slate-700 to-slate-800 hover:from-slate-600 hover:to-slate-700"
-        )}
-        aria-label={isExplainModeActive ? "Exit Explain Mode (Press E)" : "Enter Explain Mode (Press E)"}
-      >
-        {isExplainModeActive ? (
-          <X className="w-6 h-6 text-white" />
-        ) : (
-          <Eye className="w-6 h-6 text-white" />
-        )}
-      </Button>
+      {/* Sticky Explain Mode Button with Tooltip */}
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              onClick={toggleExplainMode}
+              className={cn(
+                "fixed bottom-6 right-6 z-[90] rounded-full w-16 h-16 shadow-2xl transition-all duration-200 flex items-center justify-center",
+                isExplainModeActive
+                  ? "bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 scale-110 animate-pulse"
+                  : "bg-gradient-to-r from-slate-700 to-slate-800 hover:from-slate-600 hover:to-slate-700"
+              )}
+              aria-label={isExplainModeActive ? "Exit Explain Mode (Press E)" : "Enter Explain Mode (Press E)"}
+            >
+              <div className="flex flex-col items-center">
+                <Eye className={cn("w-6 h-6 text-white", isExplainModeActive && "animate-bounce")} />
+                <span className="text-[9px] text-white mt-0.5 font-semibold">
+                  {isExplainModeActive ? "EXIT" : "EXPLAIN"}
+                </span>
+              </div>
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="left" className="bg-gray-900 border-purple-500/30 text-white">
+            <p className="text-xs font-semibold">
+              {isExplainModeActive 
+                ? "Exit Explain Mode (Press E)" 
+                : "Explain Mode - Click anything to understand it (Press E)"}
+            </p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
 
-      {/* Floating label for Explain button */}
+      {/* Floating instruction banner when Explain Mode is active */}
       {isExplainModeActive && (
-        <div className="fixed bottom-6 right-24 z-[90] px-3 py-1.5 rounded-lg bg-purple-600 text-white text-xs font-semibold shadow-lg">
-          Explain Mode ON - Press E to exit
-        </div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 20 }}
+          className="fixed bottom-24 right-6 z-[90] px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 text-white text-xs font-semibold shadow-lg border border-white/20"
+        >
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-white animate-pulse"></div>
+            <span>Explain Mode Active - Click any widget to understand it</span>
+          </div>
+        </motion.div>
       )}
 
       {/* Explain Co-Pilot Panel */}

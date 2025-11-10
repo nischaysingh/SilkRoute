@@ -1,17 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   X, Pin, Sparkles, TrendingUp, TrendingDown, Minus, ChevronDown, ChevronUp,
-  Zap, Shield, GitBranch, Bell, FlaskConical, Bot, Code
+  Zap, Shield, GitBranch, Bell, FlaskConical, Bot, Code, Loader2
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useExplainMode } from "./ExplainModeContext";
 import { generateExplanation, generateHeuristics } from "./parseWidgetContent";
+import { base44 } from "@/api/base44Client";
 
 export default function ExplainCoPilotPanel() {
   const { 
@@ -24,18 +25,69 @@ export default function ExplainCoPilotPanel() {
   } = useExplainMode();
 
   const [showRawData, setShowRawData] = useState(false);
+  const [aiInsights, setAiInsights] = useState(null);
+  const [loadingAI, setLoadingAI] = useState(false);
+
+  const activeWidget = explainPanelState.widgets.find(w => w.id === explainPanelState.activeTab) || explainPanelState.widgets[0];
+  const activeData = activeWidget?.data;
+
+  // Fetch AI explanation when active widget changes
+  useEffect(() => {
+    if (!activeData) return;
+
+    const fetchAIExplanation = async () => {
+      setLoadingAI(true);
+      setAiInsights(null);
+
+      try {
+        const response = await base44.functions.invoke('explainWidget', {
+          widgetData: {
+            title: activeData.title,
+            metric: activeData.metric,
+            unit: activeData.unit,
+            trend: activeData.trend,
+            delta: activeData.delta,
+            period: activeData.period,
+            dimensions: activeData.dimensions,
+            rawText: activeData.rawText
+          },
+          context: {
+            page: window.location.pathname,
+            tab: document.title
+          }
+        });
+
+        if (response.data.explanation) {
+          setAiInsights(response.data);
+        } else {
+          // Fallback to heuristics
+          setAiInsights({
+            explanation: generateExplanation(activeData),
+            reasoning: generateHeuristics(activeData),
+            suggestions: ['Review related metrics', 'Set up monitoring']
+          });
+        }
+      } catch (error) {
+        console.error('AI explanation error:', error);
+        // Fallback to heuristics
+        setAiInsights({
+          explanation: generateExplanation(activeData),
+          reasoning: generateHeuristics(activeData),
+          suggestions: ['Review related metrics', 'Set up monitoring']
+        });
+      } finally {
+        setLoadingAI(false);
+      }
+    };
+
+    fetchAIExplanation();
+  }, [activeData?.title, activeData?.metric, activeData?.rawText]);
 
   if (!explainPanelState.isOpen || explainPanelState.widgets.length === 0) {
     return null;
   }
 
-  const activeWidget = explainPanelState.widgets.find(w => w.id === explainPanelState.activeTab) || explainPanelState.widgets[0];
-  const activeData = activeWidget?.data;
-
   if (!activeData) return null;
-
-  const explanationBullets = generateExplanation(activeData);
-  const heuristicReasons = generateHeuristics(activeData);
 
   const handleAction = (action) => {
     logActionClick(action, activeData.title);
@@ -111,7 +163,7 @@ export default function ExplainCoPilotPanel() {
         animate={{ x: 0, opacity: 1 }}
         exit={{ x: "100%", opacity: 0 }}
         transition={{ type: "spring", damping: 25, stiffness: 200 }}
-        className="fixed top-20 right-6 w-[420px] max-h-[calc(100vh-120px)] bg-gray-900/98 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl z-[100] overflow-hidden flex flex-col"
+        className="fixed top-20 right-6 w-[420px] max-h-[calc(100vh-120px)] bg-gray-900/98 backdrop-blur-xl border border-purple-500/30 rounded-2xl shadow-2xl shadow-purple-500/20 z-[100] overflow-hidden flex flex-col explain-copilot-panel"
       >
         {/* Header */}
         <div className="p-4 border-b border-white/10 bg-gradient-to-r from-purple-600/20 to-blue-600/20">
@@ -120,7 +172,10 @@ export default function ExplainCoPilotPanel() {
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center">
                 <Sparkles className="w-4 h-4 text-white" />
               </div>
-              <h3 className="text-sm font-bold text-white">Co-Pilot Explain</h3>
+              <div>
+                <h3 className="text-sm font-bold text-white">AI Explain</h3>
+                <div className="text-[10px] text-purple-300">Powered by GPT-4</div>
+              </div>
             </div>
             <div className="flex items-center gap-1">
               <Button
@@ -208,42 +263,80 @@ export default function ExplainCoPilotPanel() {
             )}
           </div>
 
-          {/* What you're seeing */}
-          <Card className="bg-white/5 border-white/10">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm text-white">What you're seeing</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-1">
-              {explanationBullets.map((bullet, idx) => (
-                <div key={idx} className="flex items-start gap-2 text-xs text-gray-300">
-                  <span className="text-blue-400 mt-0.5">•</span>
-                  <span>{bullet}</span>
+          {/* AI Loading State */}
+          {loadingAI && (
+            <Card className="bg-purple-500/10 border-purple-500/30">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <Loader2 className="w-5 h-5 text-purple-400 animate-spin" />
+                  <span className="text-sm text-white">AI analyzing widget...</span>
                 </div>
-              ))}
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          )}
 
-          {/* Why it might look like this */}
-          <Card className="bg-white/5 border-white/10">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm text-white flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-purple-400" />
-                Why it might look like this
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-1">
-              {heuristicReasons.map((reason, idx) => (
-                <div key={idx} className="flex items-start gap-2 text-xs text-gray-300">
-                  <span className="text-purple-400 mt-0.5">•</span>
-                  <span>{reason}</span>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
+          {/* AI-Powered Explanation */}
+          {aiInsights && !loadingAI && (
+            <>
+              <Card className="bg-white/5 border-white/10">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm text-white flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-blue-400" />
+                    What you're seeing
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  {aiInsights.explanation.map((bullet, idx) => (
+                    <div key={idx} className="flex items-start gap-2 text-sm text-gray-300">
+                      <span className="text-blue-400 mt-1">•</span>
+                      <span>{bullet}</span>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+
+              <Card className="bg-white/5 border-white/10">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm text-white flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-purple-400" />
+                    AI Analysis
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  {aiInsights.reasoning.map((reason, idx) => (
+                    <div key={idx} className="flex items-start gap-2 text-sm text-gray-300">
+                      <span className="text-purple-400 mt-1">•</span>
+                      <span>{reason}</span>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+
+              {/* AI Suggestions */}
+              {aiInsights.suggestions && aiInsights.suggestions.length > 0 && (
+                <Card className="bg-gradient-to-br from-purple-500/10 to-blue-500/10 border-purple-500/20">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-sm text-white flex items-center gap-2">
+                      <Zap className="w-4 h-4 text-yellow-400" />
+                      AI Recommendations
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    {aiInsights.suggestions.map((suggestion, idx) => (
+                      <div key={idx} className="flex items-start gap-2 text-sm text-gray-300">
+                        <span className="text-yellow-400 mt-1">→</span>
+                        <span>{suggestion}</span>
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+              )}
+            </>
+          )}
 
           {/* Suggested Actions */}
           <div>
-            <h4 className="text-sm font-semibold text-white mb-3">Suggested Actions</h4>
+            <h4 className="text-sm font-semibold text-white mb-3">Quick Actions</h4>
             <div className="grid grid-cols-2 gap-2">
               {activeData.actions.map((actionKey) => {
                 const config = getActionConfig(actionKey);
@@ -253,9 +346,7 @@ export default function ExplainCoPilotPanel() {
                     size="sm"
                     onClick={() => handleAction(actionKey)}
                     className={cn(
-                      "justify-start h-auto py-2 px-3",
-                      `bg-${config.color}-500/10 border-${config.color}-500/30 text-${config.color}-400`,
-                      `hover:bg-${config.color}-500/20`
+                      "justify-start h-auto py-2 px-3 bg-white/5 border-white/10 text-white hover:bg-white/10"
                     )}
                     variant="outline"
                   >

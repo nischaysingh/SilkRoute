@@ -20,8 +20,12 @@ export function ExplainModeProvider({ children }) {
       logEvent('explain_mode_toggled', { on: newState, page: window.location.pathname });
       
       if (!newState) {
-        // Close panel when exiting Explain Mode
-        setExplainPanelState(prev => ({ ...prev, isOpen: false, widgets: [], activeTab: null }));
+        // Close panel when exiting Explain Mode (unless pinned)
+        setExplainPanelState(prev => 
+          prev.isPinned 
+            ? prev 
+            : { ...prev, isOpen: false, widgets: [], activeTab: null }
+        );
       }
       
       return newState;
@@ -48,6 +52,11 @@ export function ExplainModeProvider({ children }) {
       metric: parsedData.metric,
       trend: parsedData.trend,
       period: parsedData.period
+    });
+
+    logEvent('explain_widget_parsed', {
+      title: parsedData.title,
+      fields_detected: parsedData.parsedFields || []
     });
 
     setExplainPanelState(prev => {
@@ -127,6 +136,68 @@ export function ExplainModeProvider({ children }) {
       page: window.location.pathname
     });
   }, []);
+
+  // Global click handler for ANY element when Explain Mode is active
+  useEffect(() => {
+    if (!isExplainModeActive) return;
+
+    const handleGlobalClick = (e) => {
+      // Don't interfere with buttons, inputs, or the explain panel itself
+      if (
+        e.target.closest('button') ||
+        e.target.closest('input') ||
+        e.target.closest('textarea') ||
+        e.target.closest('[role="dialog"]') ||
+        e.target.closest('.explain-copilot-panel')
+      ) {
+        return;
+      }
+
+      // Find the nearest card, chart container, table, or significant container
+      const explainableElement = 
+        e.target.closest('[data-explainable="true"]') ||
+        e.target.closest('[class*="Card"]') ||
+        e.target.closest('[class*="recharts"]') ||
+        e.target.closest('table') ||
+        e.target.closest('[class*="bg-"][class*="border"]');
+
+      if (explainableElement && !e.target.closest('.explain-copilot-panel')) {
+        e.stopPropagation();
+        
+        // Import parseWidgetContent dynamically
+        import('./parseWidgetContent').then(({ parseWidgetContent }) => {
+          // Generate a unique ID for this element
+          const elementId = explainableElement.id || 
+            `explain-${Math.random().toString(36).substr(2, 9)}`;
+          
+          // Get existing metadata from data attributes if present
+          const metadata = {
+            title: explainableElement.getAttribute('data-explain-title'),
+            metric: explainableElement.getAttribute('data-explain-metric'),
+            unit: explainableElement.getAttribute('data-explain-unit'),
+            trend: explainableElement.getAttribute('data-explain-trend'),
+            delta: explainableElement.getAttribute('data-explain-delta'),
+            period: explainableElement.getAttribute('data-explain-period'),
+            dimensions: explainableElement.getAttribute('data-explain-dimensions') 
+              ? JSON.parse(explainableElement.getAttribute('data-explain-dimensions'))
+              : undefined,
+            actions: explainableElement.getAttribute('data-explain-actions')
+              ? JSON.parse(explainableElement.getAttribute('data-explain-actions'))
+              : undefined
+          };
+
+          const parsedData = parseWidgetContent(explainableElement, metadata);
+          openExplainPanel(elementId, parsedData);
+        });
+      }
+    };
+
+    document.addEventListener('click', handleGlobalClick, true);
+    
+    return () => {
+      document.removeEventListener('click', handleGlobalClick, true);
+    };
+  }, [isExplainModeActive, openExplainPanel]);
 
   // Keyboard shortcut listener
   useEffect(() => {
