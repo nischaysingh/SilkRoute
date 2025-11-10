@@ -2196,7 +2196,7 @@ export default function ToolboxTab() {
                       <div className="p-4 bg-emerald-50 rounded-lg border-2 border-emerald-200">
                         <div className="flex items-center gap-3 mb-3">
                           <Check className="w-6 h-6 text-emerald-600" />
-                          <h4 className="text-lg font-bold text-emerald-900}>Mission Spec Validated</h4>
+                          <h4 className="text-lg font-bold text-emerald-900">Mission Spec Validated</h4>
                         </div>
                         <div className="grid grid-cols-2 gap-3 text-sm">
                           <div>
