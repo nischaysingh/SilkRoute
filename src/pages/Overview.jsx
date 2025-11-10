@@ -5,10 +5,10 @@ import { Badge } from "@/components/ui/badge";
 import { 
   DollarSign, TrendingUp, TrendingDown, Clock, AlertTriangle, CheckCircle, 
   X, CreditCard, Users, FileText, ArrowRight, Info,
-  Send, MessageCircle, Sparkles, TrendingUp as TrendUp, AlertCircle, DollarSign as Dollar
+  Send, MessageCircle, Sparkles, AlertCircle, Activity, Plus
 } from "lucide-react";
 import { 
-  LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
+  LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, AreaChart, Area,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend 
 } from "recharts";
 import { cn } from "@/lib/utils";
@@ -34,6 +34,7 @@ export default function Overview() {
   const [chatMessages, setChatMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState("");
   const [plExpanded, setPlExpanded] = useState(false);
+  const [activeTab, setActiveTab] = useState("overview");
 
   // Mock KPI Data
   const cashOnHand = 245680;
@@ -49,7 +50,9 @@ export default function Overview() {
       positive: true,
       icon: DollarSign,
       tooltip: "Total liquid cash across all bank accounts",
-      color: "from-emerald-500 to-teal-500"
+      color: "from-emerald-500 to-teal-500",
+      iconBg: "bg-emerald-100",
+      iconColor: "text-emerald-600"
     },
     {
       label: "Avg Monthly Burn",
@@ -58,7 +61,9 @@ export default function Overview() {
       positive: true,
       icon: TrendingDown,
       tooltip: "Average net cash outflow per month over last 3 months",
-      color: "from-blue-500 to-cyan-500"
+      color: "from-blue-500 to-cyan-500",
+      iconBg: "bg-blue-100",
+      iconColor: "text-blue-600"
     },
     {
       label: "Runway",
@@ -68,7 +73,9 @@ export default function Overview() {
       icon: Clock,
       tooltip: "Cash on hand ÷ Average monthly burn rate",
       color: runway < 3 ? "from-red-500 to-pink-500" : runway < 6 ? "from-orange-500 to-yellow-500" : "from-purple-500 to-pink-500",
-      warning: runway < 6
+      warning: runway < 6,
+      iconBg: "bg-purple-100",
+      iconColor: "text-purple-600"
     },
     {
       label: "Credit Utilization",
@@ -77,7 +84,9 @@ export default function Overview() {
       positive: false,
       icon: CreditCard,
       tooltip: "Current credit used ÷ Total credit available",
-      color: "from-indigo-500 to-purple-500"
+      color: "from-indigo-500 to-purple-500",
+      iconBg: "bg-indigo-100",
+      iconColor: "text-indigo-600"
     }
   ];
 
@@ -212,9 +221,9 @@ export default function Overview() {
   ];
 
   const insights = [
-    { text: "Stripe fees increased by 1.2% vs 3-month average", severity: "warning", icon: Dollar },
+    { text: "Stripe fees increased by 1.2% vs 3-month average", severity: "warning", icon: DollarSign },
     { text: "Payroll shortfall predicted next week", severity: "critical", icon: AlertCircle },
-    { text: "Sales tax filing due in 12 days", severity: "warning", icon: TrendUp }
+    { text: "Sales tax filing due in 12 days", severity: "warning", icon: TrendingUp }
   ];
 
   const generateAIResponse = (question) => {
@@ -303,15 +312,15 @@ export default function Overview() {
     if (msg.type === "card") {
       return (
         <div key={idx} className="mb-4">
-          <Card className="bg-white/5 border-white/10 rounded-xl">
+          <Card className="bg-white border-slate-200 rounded-xl shadow-sm">
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm text-white flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-purple-400" />
+              <CardTitle className="text-sm text-slate-900 flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-purple-600" />
                 {msg.title}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              <p className="text-xs text-gray-300 leading-relaxed">{msg.content}</p>
+              <p className="text-xs text-slate-700 leading-relaxed">{msg.content}</p>
 
               {msg.chart === "expense_variance" && (
                 <div className="h-24">
@@ -320,67 +329,22 @@ export default function Overview() {
                       { name: "Legal Co", last: 5000, this: 8500 },
                       { name: "AWS", last: 2800, this: 3200 }
                     ]}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" vertical={false} />
-                      <XAxis dataKey="name" tick={{ fontSize: 9, fill: "#9ca3af" }} axisLine={false} tickLine={false} />
-                      <YAxis tick={{ fontSize: 9, fill: "#9ca3af" }} axisLine={false} tickLine={false} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
+                      <XAxis dataKey="name" tick={{ fontSize: 9, fill: "#64748b" }} axisLine={false} tickLine={false} />
+                      <YAxis tick={{ fontSize: 9, fill: "#64748b" }} axisLine={false} tickLine={false} />
                       <Tooltip
                         formatter={(value) => `$${value.toLocaleString()}`}
                         contentStyle={{
-                          backgroundColor: 'rgba(17, 24, 39, 0.95)',
-                          border: '1px solid rgba(255,255,255,0.1)',
+                          backgroundColor: '#fff',
+                          border: '1px solid #e5e7eb',
                           borderRadius: '8px',
-                          backdropFilter: 'blur(12px)',
-                          color: '#fff',
                           fontSize: '11px'
                         }}
                       />
-                      <Legend wrapperStyle={{ color: '#fff', fontSize: '11px' }} />
-                      <Bar dataKey="last" fill="#6b7280" radius={[4, 4, 0, 0]} name="Last Month" />
+                      <Legend wrapperStyle={{ fontSize: '11px' }} />
+                      <Bar dataKey="last" fill="#94a3b8" radius={[4, 4, 0, 0]} name="Last Month" />
                       <Bar dataKey="this" fill="#f59e0b" radius={[4, 4, 0, 0]} name="This Month" />
                     </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              )}
-
-              {msg.chart === "runway_simulation" && (
-                <div className="grid grid-cols-2 gap-2 text-xs">
-                  <div className="bg-white/5 p-2 rounded">
-                    <div className="text-gray-400">Current Runway</div>
-                    <div className="text-emerald-400 font-bold">18 months</div>
-                  </div>
-                  <div className="bg-white/5 p-2 rounded">
-                    <div className="text-gray-400">After Hiring</div>
-                    <div className="text-orange-400 font-bold">7.7 months</div>
-                  </div>
-                </div>
-              )}
-
-              {msg.chart === "cash_trend" && (
-                <div className="h-24">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={cashBalanceData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" vertical={false} />
-                      <XAxis dataKey="month" tick={{ fontSize: 9, fill: "#9ca3af" }} axisLine={false} tickLine={false} />
-                      <YAxis tick={{ fontSize: 9, fill: "#9ca3af" }} axisLine={false} tickLine={false} />
-                      <Tooltip
-                        formatter={(value) => `$${value.toLocaleString()}`}
-                        contentStyle={{
-                          backgroundColor: 'rgba(17, 24, 39, 0.95)',
-                          border: '1px solid rgba(255,255,255,0.1)',
-                          borderRadius: '8px',
-                          backdropFilter: 'blur(12px)',
-                          color: '#fff',
-                          fontSize: '11px'
-                        }}
-                      />
-                      <Line
-                        type="monotone"
-                        dataKey="balance"
-                        stroke="#3b82f6"
-                        strokeWidth={2}
-                        dot={{ r: 2, fill: '#3b82f6', strokeWidth: 1 }}
-                      />
-                    </LineChart>
                   </ResponsiveContainer>
                 </div>
               )}
@@ -404,17 +368,17 @@ export default function Overview() {
     if (msg.type === "list") {
       return (
         <div key={idx} className="mb-4">
-          <Card className="bg-white/5 border-white/10 rounded-xl">
+          <Card className="bg-white border-slate-200 rounded-xl shadow-sm">
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm text-white flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-purple-400" />
+              <CardTitle className="text-sm text-slate-900 flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-purple-600" />
                 {msg.title}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
                 {msg.items.map((item, i) => (
-                  <div key={i} className="text-xs text-gray-300 py-1">
+                  <div key={i} className="text-xs text-slate-700 py-1">
                     {item}
                   </div>
                 ))}
@@ -427,7 +391,7 @@ export default function Overview() {
 
     return (
       <div key={idx} className="mb-3">
-        <div className="bg-white/5 border border-white/10 px-4 py-2 rounded-2xl max-w-[85%] text-sm text-gray-300">
+        <div className="bg-slate-100 border border-slate-200 px-4 py-2 rounded-2xl max-w-[85%] text-sm text-slate-700">
           {msg.content}
         </div>
       </div>
@@ -435,33 +399,50 @@ export default function Overview() {
   };
 
   return (
-    <div className="min-h-screen p-6 relative">
-      {/* AI Assistant Toggle Button */}
-      <Button
-        onClick={() => setAiPanelOpen(!aiPanelOpen)}
-        className="fixed top-20 right-6 z-50 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 shadow-lg rounded-full w-12 h-12 p-0"
-      >
-        <MessageCircle className="w-5 h-5 text-white" />
-      </Button>
-
-      {/* Header - Management Style */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h2 className="text-3xl font-bold text-white">Overview</h2>
-          <p className="text-gray-400 text-sm mt-1">Financial snapshot and key metrics</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" className="bg-white/5 border-white/10 text-white hover:bg-white/10 h-9">
-            <ArrowRight className="w-4 h-4 mr-2" />
-            View Full Reports
-          </Button>
+    <div className="min-h-screen bg-slate-50 p-6">
+      {/* Top Bar - Management Style */}
+      <div className="bg-white rounded-xl border border-slate-200 shadow-sm mb-6 p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-50 border border-emerald-200">
+              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+              <span className="text-xs font-semibold text-slate-700">Last synced: just now</span>
+            </div>
+            <Badge className="bg-blue-100 text-blue-700 border-blue-200 text-xs font-semibold">
+              Live
+            </Badge>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setAiPanelOpen(true)}
+              className="border-slate-300 bg-white hover:bg-slate-50 text-slate-700 h-8 text-xs font-medium"
+            >
+              <Info className="w-3 h-3 mr-1.5" />
+              Explain This View
+            </Button>
+            <Button
+              size="sm"
+              onClick={() => setAiPanelOpen(true)}
+              className="bg-blue-600 hover:bg-blue-700 text-white h-8 text-xs font-medium"
+            >
+              <Sparkles className="w-3 h-3 mr-1.5" />
+              AI Copilot
+            </Button>
+            <Button
+              size="sm"
+              className="bg-slate-900 hover:bg-slate-800 text-white h-8 text-xs font-medium"
+            >
+              <Plus className="w-3 h-3 mr-1.5" />
+              Quick Action
+            </Button>
+          </div>
         </div>
       </div>
 
-      {/* Bento Grid Layout */}
-      <div className="grid grid-cols-12 gap-4">
-        
-        {/* TOP ROW: KPI Cards - 3 columns each with Explain Mode support */}
+      {/* KPI Cards Grid - 4 columns */}
+      <div className="grid grid-cols-4 gap-4 mb-6">
         {kpis.map((kpi, idx) => {
           const { explainableProps } = useExplainableWidget({
             title: kpi.label,
@@ -478,11 +459,10 @@ export default function Overview() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: idx * 0.05 }}
-              className="col-span-3"
             >
               <Card 
                 {...explainableProps}
-                className="bg-white/5 backdrop-blur-xl border-white/10 rounded-xl overflow-hidden group hover:bg-white/10 transition-all shadow-lg"
+                className="bg-white border-slate-200 rounded-xl shadow-sm hover:shadow-md transition-all"
               >
                 <CardContent className="p-5">
                   <div className="flex items-center justify-between mb-3">
@@ -490,28 +470,28 @@ export default function Overview() {
                       <UITooltip>
                         <UITooltipTrigger asChild>
                           <div className="flex items-center gap-1.5 cursor-help">
-                            <span className="text-xs font-semibold text-gray-300">{kpi.label}</span>
-                            <Info className="w-3 h-3 text-gray-500" />
+                            <span className="text-xs font-semibold text-slate-600">{kpi.label}</span>
+                            <Info className="w-3 h-3 text-slate-400" />
                           </div>
                         </UITooltipTrigger>
-                        <UITooltipContent className="bg-gray-900 border-white/20 text-white max-w-xs">
+                        <UITooltipContent className="bg-slate-900 text-white max-w-xs">
                           <p className="text-xs">{kpi.tooltip}</p>
                         </UITooltipContent>
                       </UITooltip>
                     </TooltipProvider>
-                    <div className={`p-2.5 rounded-lg bg-gradient-to-br ${kpi.color} shadow-lg`}>
-                      <kpi.icon className="w-5 h-5 text-white" />
+                    <div className={cn("p-2.5 rounded-lg", kpi.iconBg)}>
+                      <kpi.icon className={cn("w-5 h-5", kpi.iconColor)} />
                     </div>
                   </div>
                   <div>
-                    <div className="text-3xl font-bold text-white mb-2">{kpi.value}</div>
+                    <div className="text-3xl font-bold text-slate-900 mb-2">{kpi.value}</div>
                     <Badge 
                       className={cn(
                         "text-xs font-semibold",
-                        kpi.warning && runway < 3 ? "bg-red-500/20 text-red-400 border-red-500/30" :
-                        kpi.warning && runway < 6 ? "bg-orange-500/20 text-orange-400 border-orange-500/30" :
-                        kpi.positive ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30" : 
-                        "bg-red-500/20 text-red-400 border-red-500/30"
+                        kpi.warning && runway < 3 ? "bg-red-100 text-red-700 border-red-200" :
+                        kpi.warning && runway < 6 ? "bg-orange-100 text-orange-700 border-orange-200" :
+                        kpi.positive ? "bg-emerald-100 text-emerald-700 border-emerald-200" : 
+                        "bg-red-100 text-red-700 border-red-200"
                       )}
                     >
                       {kpi.positive ? <TrendingUp className="w-3 h-3 mr-1 inline" /> : <TrendingDown className="w-3 h-3 mr-1 inline" />}
@@ -523,48 +503,56 @@ export default function Overview() {
             </motion.div>
           );
         })}
+      </div>
 
-        {/* MIDDLE LEFT: Cash Balance Chart - 5 columns */}
-        <Card className="col-span-5 bg-white/5 backdrop-blur-xl border-white/10 rounded-xl shadow-lg hover:shadow-xl transition-all">
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-12 gap-4">
+        
+        {/* Cash Balance Chart - 6 columns */}
+        <Card className="col-span-6 bg-white border-slate-200 rounded-xl shadow-sm hover:shadow-md transition-all">
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-white text-base font-bold">Cash Balance (Last 6 Months)</CardTitle>
+              <CardTitle className="text-slate-900 text-base font-bold">Cash Balance Trend</CardTitle>
               <Button
                 variant={includeCreditLine ? "default" : "outline"}
                 size="sm"
                 onClick={() => setIncludeCreditLine(!includeCreditLine)}
                 className={includeCreditLine ? 
-                  "bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 border-0 rounded-lg text-xs h-8" : 
-                  "bg-white/5 border-white/10 text-white hover:bg-white/10 rounded-lg text-xs h-8"
+                  "bg-blue-600 hover:bg-blue-700 text-white border-0 rounded-lg text-xs h-7 px-3 font-medium" : 
+                  "border-slate-300 bg-white hover:bg-slate-50 text-slate-700 rounded-lg text-xs h-7 px-3 font-medium"
                 }
               >
                 Credit Line
               </Button>
             </div>
           </CardHeader>
-          <CardContent className="pt-0">
-            <ResponsiveContainer width="100%" height={200}>
-              <LineChart data={cashBalanceData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                <XAxis dataKey="month" stroke="#9ca3af" tick={{ fontSize: 11 }} />
-                <YAxis stroke="#9ca3af" tick={{ fontSize: 11 }} />
+          <CardContent className="pt-2">
+            <ResponsiveContainer width="100%" height={220}>
+              <AreaChart data={cashBalanceData}>
+                <defs>
+                  <linearGradient id="colorBalance" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.05}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
+                <XAxis dataKey="month" stroke="#94a3b8" tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
+                <YAxis stroke="#94a3b8" tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
                 <Tooltip 
                   formatter={(value) => `$${value.toLocaleString()}`}
                   contentStyle={{ 
-                    backgroundColor: 'rgba(17, 24, 39, 0.95)', 
-                    border: '1px solid rgba(255,255,255,0.1)',
+                    backgroundColor: '#fff', 
+                    border: '1px solid #e5e7eb',
                     borderRadius: '8px',
-                    backdropFilter: 'blur(12px)',
-                    color: '#fff',
                     fontSize: '11px'
                   }}
                 />
-                <Line 
+                <Area 
                   type="monotone" 
                   dataKey="balance" 
                   stroke="#3b82f6" 
-                  strokeWidth={3}
-                  dot={{ r: 4, fill: '#3b82f6', strokeWidth: 2, stroke: '#1e40af' }}
+                  strokeWidth={2.5}
+                  fill="url(#colorBalance)"
                 />
                 {includeCreditLine && (
                   <Line 
@@ -576,24 +564,24 @@ export default function Overview() {
                     dot={false}
                   />
                 )}
-              </LineChart>
+              </AreaChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
 
-        {/* MIDDLE CENTER: Revenue vs Expenses - 4 columns */}
-        <Card className="col-span-4 bg-white/5 backdrop-blur-xl border-white/10 rounded-xl shadow-lg hover:shadow-xl transition-all">
+        {/* Revenue vs Expenses - 6 columns */}
+        <Card className="col-span-6 bg-white border-slate-200 rounded-xl shadow-sm hover:shadow-md transition-all">
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-white text-base font-bold">Revenue vs Expenses</CardTitle>
+              <CardTitle className="text-slate-900 text-base font-bold">Revenue vs Expenses</CardTitle>
               <div className="flex gap-1">
                 <Button
                   variant={revenueExpenseView === "MTD" ? "default" : "outline"}
                   size="sm"
                   onClick={() => setRevenueExpenseView("MTD")}
                   className={revenueExpenseView === "MTD" ? 
-                    "bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 border-0 rounded-lg text-xs h-7 px-3" : 
-                    "bg-white/5 border-white/10 text-white hover:bg-white/10 rounded-lg text-xs h-7 px-3"
+                    "bg-blue-600 hover:bg-blue-700 text-white border-0 rounded-lg text-xs h-7 px-3 font-medium" : 
+                    "border-slate-300 bg-white hover:bg-slate-50 text-slate-700 rounded-lg text-xs h-7 px-3 font-medium"
                   }
                 >
                   MTD
@@ -603,8 +591,8 @@ export default function Overview() {
                   size="sm"
                   onClick={() => setRevenueExpenseView("YTD")}
                   className={revenueExpenseView === "YTD" ? 
-                    "bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 border-0 rounded-lg text-xs h-7 px-3" : 
-                    "bg-white/5 border-white/10 text-white hover:bg-white/10 rounded-lg text-xs h-7 px-3"
+                    "bg-blue-600 hover:bg-blue-700 text-white border-0 rounded-lg text-xs h-7 px-3 font-medium" : 
+                    "border-slate-300 bg-white hover:bg-slate-50 text-slate-700 rounded-lg text-xs h-7 px-3 font-medium"
                   }
                 >
                   YTD
@@ -612,27 +600,25 @@ export default function Overview() {
               </div>
             </div>
           </CardHeader>
-          <CardContent className="pt-0">
-            <ResponsiveContainer width="100%" height={200}>
+          <CardContent className="pt-2">
+            <ResponsiveContainer width="100%" height={220}>
               <BarChart 
                 data={revenueExpenseView === "MTD" ? revenueExpenseDataMTD : revenueExpenseDataYTD}
                 onClick={(data) => data?.activePayload && handleBarClick(data.activePayload[0].payload)}
               >
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                <XAxis dataKey="month" stroke="#9ca3af" tick={{ fontSize: 11 }} />
-                <YAxis stroke="#9ca3af" tick={{ fontSize: 11 }} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
+                <XAxis dataKey="month" stroke="#94a3b8" tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
+                <YAxis stroke="#94a3b8" tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
                 <Tooltip 
                   formatter={(value) => `$${value.toLocaleString()}`}
                   contentStyle={{ 
-                    backgroundColor: 'rgba(17, 24, 39, 0.95)', 
-                    border: '1px solid rgba(255,255,255,0.1)',
+                    backgroundColor: '#fff', 
+                    border: '1px solid #e5e7eb',
                     borderRadius: '8px',
-                    backdropFilter: 'blur(12px)',
-                    color: '#fff',
                     fontSize: '11px'
                   }}
                 />
-                <Legend wrapperStyle={{ color: '#fff', fontSize: '11px' }} />
+                <Legend wrapperStyle={{ fontSize: '11px' }} />
                 <Bar dataKey="revenue" fill="#10b981" radius={[6, 6, 0, 0]} cursor="pointer" />
                 <Bar dataKey="expenses" fill="#f59e0b" radius={[6, 6, 0, 0]} cursor="pointer" />
               </BarChart>
@@ -640,21 +626,21 @@ export default function Overview() {
           </CardContent>
         </Card>
 
-        {/* MIDDLE RIGHT: Revenue Mix - 3 columns */}
-        <Card className="col-span-3 bg-white/5 backdrop-blur-xl border-white/10 rounded-xl shadow-lg hover:shadow-xl transition-all">
+        {/* Revenue Mix - 3 columns */}
+        <Card className="col-span-3 bg-white border-slate-200 rounded-xl shadow-sm hover:shadow-md transition-all">
           <CardHeader className="pb-2">
-            <CardTitle className="text-white text-base font-bold">Revenue Mix</CardTitle>
+            <CardTitle className="text-slate-900 text-base font-bold">Revenue Mix</CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
-            <ResponsiveContainer width="100%" height={120}>
+            <ResponsiveContainer width="100%" height={140}>
               <PieChart>
                 <Pie
                   data={revenueMixData}
                   cx="50%"
                   cy="50%"
-                  innerRadius={30}
-                  outerRadius={50}
-                  paddingAngle={3}
+                  innerRadius={35}
+                  outerRadius={60}
+                  paddingAngle={2}
                   dataKey="value"
                 >
                   {revenueMixData.map((entry, index) => (
@@ -664,27 +650,26 @@ export default function Overview() {
                 <Tooltip 
                   formatter={(value, name, props) => [`${value}% ($${props.payload.amount.toLocaleString()})`, name]}
                   contentStyle={{ 
-                    backgroundColor: 'rgba(17, 24, 39, 0.95)', 
-                    border: '1px solid rgba(255,255,255,0.1)',
+                    backgroundColor: '#fff', 
+                    border: '1px solid #e5e7eb',
                     borderRadius: '8px',
-                    color: '#fff',
                     fontSize: '11px'
                   }}
                 />
               </PieChart>
             </ResponsiveContainer>
-            <div className="flex flex-wrap gap-1 mt-2">
+            <div className="flex flex-wrap gap-1.5 mt-3">
               {revenueMixData.map((source, idx) => (
                 <button
                   key={source.name}
                   onClick={() => handleSourceClick(source.name)}
-                  className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-white/5 border border-white/10 hover:bg-white/10 transition-all text-xs text-white"
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-50 border border-slate-200 hover:bg-slate-100 hover:border-slate-300 transition-all text-xs text-slate-700 font-medium"
                 >
-                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: COLORS[idx] }}></div>
+                  <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: COLORS[idx] }}></div>
                   <span>{source.name}</span>
-                  <span className="text-gray-400">{source.value}%</span>
+                  <span className="text-slate-500">{source.value}%</span>
                   {source.change < -15 && (
-                    <AlertTriangle className="w-3 h-3 text-amber-400" />
+                    <AlertTriangle className="w-3 h-3 text-amber-500" />
                   )}
                 </button>
               ))}
@@ -692,20 +677,19 @@ export default function Overview() {
           </CardContent>
         </Card>
 
-        {/* BOTTOM LEFT: Top Vendors - 4 columns */}
-        <Card className="col-span-4 bg-white/5 backdrop-blur-xl border-white/10 rounded-xl shadow-lg hover:shadow-xl transition-all">
+        {/* Top Vendors - 3 columns */}
+        <Card className="col-span-3 bg-white border-slate-200 rounded-xl shadow-sm hover:shadow-md transition-all">
           <CardHeader className="pb-2">
-            <CardTitle className="text-white text-base font-bold">Top Vendors by Spend Variance</CardTitle>
+            <CardTitle className="text-slate-900 text-base font-bold">Top Vendors</CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
-                  <TableRow className="border-white/10 hover:bg-transparent">
-                    <TableHead className="text-gray-400 text-xs h-8 font-semibold">Vendor</TableHead>
-                    <TableHead className="text-gray-400 text-xs h-8 font-semibold">This Month</TableHead>
-                    <TableHead className="text-gray-400 text-xs h-8 font-semibold">Last Month</TableHead>
-                    <TableHead className="text-gray-400 text-xs h-8 font-semibold">Variance</TableHead>
+                  <TableRow className="border-slate-200 hover:bg-transparent">
+                    <TableHead className="text-slate-600 text-xs h-8 font-semibold">Vendor</TableHead>
+                    <TableHead className="text-slate-600 text-xs h-8 font-semibold text-right">This Mo</TableHead>
+                    <TableHead className="text-slate-600 text-xs h-8 font-semibold text-right">Δ</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -715,18 +699,17 @@ export default function Overview() {
                     return (
                       <TableRow 
                         key={idx} 
-                        className="cursor-pointer hover:bg-white/5 border-white/10 transition-all h-10"
+                        className="cursor-pointer hover:bg-slate-50 border-slate-200 transition-all h-10"
                         onClick={() => handleVendorClick(vendor.vendor)}
                       >
-                        <TableCell className="font-semibold text-white text-sm">{vendor.vendor}</TableCell>
-                        <TableCell className="text-white text-sm font-medium">${vendor.thisMonth.toLocaleString()}</TableCell>
-                        <TableCell className="text-gray-400 text-sm">${vendor.lastMonth.toLocaleString()}</TableCell>
-                        <TableCell>
+                        <TableCell className="font-semibold text-slate-900 text-sm">{vendor.vendor}</TableCell>
+                        <TableCell className="text-slate-900 text-sm font-medium text-right">${vendor.thisMonth.toLocaleString()}</TableCell>
+                        <TableCell className="text-right">
                           <Badge className={cn(
                             "text-xs font-semibold",
-                            varianceNum > 40 ? "bg-red-500/20 text-red-400 border-red-500/30" :
-                            varianceNum > 20 ? "bg-amber-500/20 text-amber-400 border-amber-500/30" :
-                            "bg-gray-500/20 text-gray-400 border-gray-500/30"
+                            varianceNum > 40 ? "bg-red-100 text-red-700 border-red-200" :
+                            varianceNum > 20 ? "bg-amber-100 text-amber-700 border-amber-200" :
+                            "bg-slate-100 text-slate-700 border-slate-200"
                           )}>
                             {varianceNum > 0 ? '+' : ''}{variance}%
                           </Badge>
@@ -740,39 +723,42 @@ export default function Overview() {
           </CardContent>
         </Card>
 
-        {/* BOTTOM CENTER: Risk & Alerts - 3 columns */}
-        <Card className="col-span-3 bg-white/5 backdrop-blur-xl border-white/10 rounded-xl shadow-lg hover:shadow-xl transition-all">
+        {/* Risk & Alerts - 3 columns */}
+        <Card className="col-span-3 bg-white border-slate-200 rounded-xl shadow-sm hover:shadow-md transition-all">
           <CardHeader className="pb-2">
-            <CardTitle className="text-white text-base font-bold">Risk & Alerts</CardTitle>
+            <CardTitle className="text-slate-900 text-base font-bold flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-amber-600" />
+              Alerts
+            </CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
             <div className="space-y-2">
               {activeAlerts.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-6 text-gray-400">
-                  <CheckCircle className="w-8 h-8 mb-2 text-emerald-400" />
-                  <p className="text-xs font-medium">All clear!</p>
+                <div className="flex flex-col items-center justify-center py-6 text-slate-400">
+                  <CheckCircle className="w-8 h-8 mb-2 text-emerald-500" />
+                  <p className="text-xs font-medium text-slate-600">All clear!</p>
                 </div>
               ) : (
                 activeAlerts.map((alert) => (
                   <div 
                     key={alert.id}
                     className={cn(
-                      "flex items-center justify-between p-3 rounded-lg border-2 cursor-pointer hover:bg-white/5 transition-all",
-                      alert.severity === "critical" ? "bg-red-500/10 border-red-500/30 hover:border-red-500/50" : "bg-amber-500/10 border-amber-500/30 hover:border-amber-500/50"
+                      "flex items-center justify-between p-3 rounded-lg border-2 cursor-pointer hover:shadow-sm transition-all",
+                      alert.severity === "critical" ? "bg-red-50 border-red-200 hover:border-red-300" : "bg-amber-50 border-amber-200 hover:border-amber-300"
                     )}
                     onClick={() => navigate(createPageUrl(alert.page))}
                   >
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2.5">
                       <div className={cn(
-                        "p-2 rounded-md",
-                        alert.severity === "critical" ? "bg-red-500/20" : "bg-amber-500/20"
+                        "p-2 rounded-lg",
+                        alert.severity === "critical" ? "bg-red-100" : "bg-amber-100"
                       )}>
                         <alert.icon className={cn(
                           "w-4 h-4",
-                          alert.severity === "critical" ? "text-red-400" : "text-amber-400"
+                          alert.severity === "critical" ? "text-red-600" : "text-amber-600"
                         )} />
                       </div>
-                      <p className="text-white font-semibold text-sm">{alert.title}</p>
+                      <p className="text-slate-900 font-semibold text-sm">{alert.title}</p>
                     </div>
                     <Button
                       variant="ghost"
@@ -781,7 +767,7 @@ export default function Overview() {
                         e.stopPropagation();
                         dismissAlert(alert.id);
                       }}
-                      className="text-gray-400 hover:text-white hover:bg-white/10 h-6 w-6"
+                      className="text-slate-400 hover:text-slate-700 hover:bg-slate-100 h-6 w-6"
                     >
                       <X className="w-3 h-3" />
                     </Button>
@@ -792,69 +778,16 @@ export default function Overview() {
           </CardContent>
         </Card>
 
-        {/* BOTTOM CENTER-RIGHT: Payroll Coverage - 3 columns - HERO CARD STYLE */}
-        <Card className={cn(
-          "col-span-3 backdrop-blur-xl border-2 rounded-xl shadow-2xl transition-all",
-          shortfall < 0 ? "bg-gradient-to-br from-red-600 to-orange-600 border-red-500/50 text-white" : "bg-gradient-to-br from-blue-600 to-purple-600 border-blue-500/50 text-white"
-        )}>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h3 className="text-lg font-bold text-white mb-1">Payroll Coverage</h3>
-                <p className="text-white/80 text-xs">{payrollCoverage.nextPayDate}</p>
-              </div>
-              <div className={cn(
-                "px-3 py-1 rounded-full text-xs font-bold",
-                shortfall < 0 ? "bg-white/20 text-white" : "bg-white/20 text-white"
-              )}>
-                {shortfall < 0 ? 'At Risk' : 'Covered'}
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3">
-                <div className="text-xs text-white/70 mb-1">Gross Due</div>
-                <div className="text-xl font-bold text-white">${payrollCoverage.grossDue.toLocaleString()}</div>
-              </div>
-              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3">
-                <div className="text-xs text-white/70 mb-1">Projected Cash</div>
-                <div className="text-xl font-bold text-white">${payrollCoverage.projectedCash.toLocaleString()}</div>
-              </div>
-              <div className="col-span-2 bg-white/10 backdrop-blur-sm rounded-lg p-3">
-                <div className="text-xs text-white/70 mb-1">Shortfall</div>
-                <div className={cn(
-                  "text-2xl font-bold",
-                  shortfall < 0 ? "text-white" : "text-white"
-                )}>
-                  {shortfall < 0 ? '-' : '+'}${Math.abs(shortfall).toLocaleString()}
-                </div>
-              </div>
-            </div>
-
-            {shortfall < 0 && (
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full mt-4 bg-white text-red-600 hover:bg-white/90 border-0 font-semibold"
-                onClick={() => navigate(createPageUrl("MoneyOut") + "?suggestedDelay=true")}
-              >
-                View Suggested Bills
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* BOTTOM RIGHT: Collections - 2 columns */}
-        <Card className="col-span-2 bg-white/5 backdrop-blur-xl border-white/10 rounded-xl shadow-lg hover:shadow-xl transition-all">
+        {/* Collections - 3 columns */}
+        <Card className="col-span-3 bg-white border-slate-200 rounded-xl shadow-sm hover:shadow-md transition-all">
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-white text-sm font-bold">Collections</CardTitle>
+              <CardTitle className="text-slate-900 text-sm font-bold">Collections</CardTitle>
               <Badge className={cn(
                 "text-xs font-semibold",
-                totalOverdue > 50000 ? "bg-red-500/20 text-red-400 border-red-500/30" :
-                totalOverdue > 10000 ? "bg-amber-500/20 text-amber-400 border-amber-500/30" :
-                "bg-emerald-500/20 text-emerald-400 border-emerald-500/30"
+                totalOverdue > 50000 ? "bg-red-100 text-red-700 border-red-200" :
+                totalOverdue > 10000 ? "bg-amber-100 text-amber-700 border-amber-200" :
+                "bg-emerald-100 text-emerald-700 border-emerald-200"
               )}>
                 ${totalOverdue.toLocaleString()}
               </Badge>
@@ -863,16 +796,16 @@ export default function Overview() {
           <CardContent className="pt-0">
             <div className="space-y-2">
               {collections.map((item, idx) => (
-                <div key={idx} className="flex items-center justify-between p-2.5 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-all">
+                <div key={idx} className="flex items-center justify-between p-2.5 rounded-lg bg-slate-50 border border-slate-200 hover:bg-slate-100 hover:border-slate-300 transition-all cursor-pointer">
                   <div className="flex-1">
-                    <div className="text-sm font-semibold text-white">{item.customer}</div>
-                    <div className="text-xs text-gray-400">${item.amount.toLocaleString()}</div>
+                    <div className="text-sm font-semibold text-slate-900">{item.customer}</div>
+                    <div className="text-xs text-slate-600">${item.amount.toLocaleString()}</div>
                   </div>
                   <Badge className={cn(
                     "text-xs font-semibold",
-                    item.daysPastDue > 30 ? "bg-red-500/20 text-red-400 border-red-500/30" :
-                    item.daysPastDue > 15 ? "bg-amber-500/20 text-amber-400 border-amber-500/30" :
-                    "bg-gray-500/20 text-gray-400 border-gray-500/30"
+                    item.daysPastDue > 30 ? "bg-red-100 text-red-700 border-red-200" :
+                    item.daysPastDue > 15 ? "bg-amber-100 text-amber-700 border-amber-200" :
+                    "bg-slate-100 text-slate-700 border-slate-200"
                   )}>
                     {item.daysPastDue}d
                   </Badge>
@@ -882,41 +815,39 @@ export default function Overview() {
           </CardContent>
         </Card>
 
-        {/* NEW WIDGETS ROW */}
-
-        {/* Financial Feed - 3 columns */}
-        <Card className="col-span-3 bg-white/5 backdrop-blur-xl border-white/10 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all">
+        {/* Financial Feed - 4 columns */}
+        <Card className="col-span-4 bg-white border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all">
           <CardHeader className="pb-2">
-            <CardTitle className="text-white text-base font-bold flex items-center gap-2">
-              <Clock className="w-4 h-4" />
-              Financial Feed
+            <CardTitle className="text-slate-900 text-base font-bold flex items-center gap-2">
+              <Activity className="w-4 h-4 text-slate-600" />
+              Recent Activity
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
-            <div className="space-y-2 max-h-[300px] overflow-y-auto">
+            <div className="space-y-2 max-h-[240px] overflow-y-auto">
               {financialFeed.map((item, idx) => (
-                <div key={idx} className="flex items-start gap-3 p-2.5 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-all cursor-pointer">
+                <div key={idx} className="flex items-start gap-3 p-2.5 rounded-lg bg-slate-50 border border-slate-200 hover:bg-slate-100 hover:border-slate-300 transition-all cursor-pointer">
                   <div className={cn(
                     "p-2 rounded-lg",
-                    item.color === "emerald" && "bg-emerald-500/20",
-                    item.color === "orange" && "bg-orange-500/20",
-                    item.color === "blue" && "bg-blue-500/20",
-                    item.color === "red" && "bg-red-500/20"
+                    item.color === "emerald" && "bg-emerald-100",
+                    item.color === "orange" && "bg-orange-100",
+                    item.color === "blue" && "bg-blue-100",
+                    item.color === "red" && "bg-red-100"
                   )}>
                     <item.icon className={cn(
                       "w-4 h-4",
-                      item.color === "emerald" && "text-emerald-400",
-                      item.color === "orange" && "text-orange-400",
-                      item.color === "blue" && "text-blue-400",
-                      item.color === "red" && "text-red-400"
+                      item.color === "emerald" && "text-emerald-600",
+                      item.color === "orange" && "text-orange-600",
+                      item.color === "blue" && "text-blue-600",
+                      item.color === "red" && "text-red-600"
                     )} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="text-xs font-semibold text-white truncate">{item.title}</div>
+                    <div className="text-xs font-semibold text-slate-900 truncate">{item.title}</div>
                     <div className="flex items-center justify-between mt-1">
-                      <span className="text-xs text-gray-500">{item.time}</span>
+                      <span className="text-xs text-slate-500">{item.time}</span>
                       {item.amount > 0 && (
-                        <span className="text-xs font-semibold text-white">${item.amount.toLocaleString()}</span>
+                        <span className="text-xs font-semibold text-slate-900">${item.amount.toLocaleString()}</span>
                       )}
                     </div>
                   </div>
@@ -926,60 +857,56 @@ export default function Overview() {
           </CardContent>
         </Card>
 
-        {/* Anomaly Widget - 3 columns */}
-        <Card className="col-span-3 bg-white/5 backdrop-blur-xl border-white/10 rounded-xl shadow-lg hover:shadow-xl transition-all">
+        {/* Anomaly Widget - 4 columns */}
+        <Card className="col-span-4 bg-white border-slate-200 rounded-xl shadow-sm hover:shadow-md transition-all">
           <CardHeader className="pb-2">
-            <CardTitle className="text-white text-base font-bold flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 text-amber-400" />
+            <CardTitle className="text-slate-900 text-base font-bold flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 text-amber-600" />
               Unusual Activity
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
-            <div className="space-y-3">
+            <div className="space-y-2.5">
               {anomalies.map((anomaly, idx) => (
-                <div key={idx} className="p-3 rounded-lg bg-white/5 border-2 border-white/10 hover:bg-white/10 hover:border-white/20 transition-all cursor-pointer">
+                <div key={idx} className="p-3 rounded-lg bg-slate-50 border border-slate-200 hover:bg-slate-100 hover:border-slate-300 hover:shadow-sm transition-all cursor-pointer">
                   <div className="flex items-start justify-between mb-2">
-                    <p className="text-xs text-white font-semibold flex-1">{anomaly.title}</p>
+                    <p className="text-xs text-slate-900 font-semibold flex-1">{anomaly.title}</p>
                     {anomaly.trend === "up" ? (
-                      <TrendingUp className="w-4 h-4 text-orange-400 flex-shrink-0 ml-2" />
+                      <TrendingUp className="w-4 h-4 text-orange-500 flex-shrink-0 ml-2" />
                     ) : (
-                      <TrendingDown className="w-4 h-4 text-blue-400 flex-shrink-0 ml-2" />
+                      <TrendingDown className="w-4 h-4 text-blue-500 flex-shrink-0 ml-2" />
                     )}
                   </div>
                   <div className="flex items-center justify-between">
                     <Badge className={cn(
                       "text-xs font-semibold",
-                      anomaly.severity === "warning" ? "bg-amber-500/20 text-amber-400 border-amber-500/30" : "bg-blue-500/20 text-blue-400 border-blue-500/30"
+                      anomaly.severity === "warning" ? "bg-amber-100 text-amber-700 border-amber-200" : "bg-blue-100 text-blue-700 border-blue-200"
                     )}>
                       {anomaly.severity === "warning" ? "Warning" : "Info"}
                     </Badge>
                     <span className={cn(
                       "text-sm font-bold",
-                      anomaly.trend === "up" ? "text-orange-400" : "text-blue-400"
+                      anomaly.trend === "up" ? "text-orange-600" : "text-blue-600"
                     )}>
                       {anomaly.value}
                     </span>
                   </div>
                 </div>
               ))}
-              <Button variant="outline" size="sm" className="w-full bg-white/5 border-white/10 text-white hover:bg-white/10 text-xs h-8 font-medium">
-                View All Anomalies
-                <ArrowRight className="w-3 h-3 ml-1" />
-              </Button>
             </div>
           </CardContent>
         </Card>
 
-        {/* Mini P&L Snapshot - 3 columns */}
-        <Card className="col-span-3 bg-white/5 backdrop-blur-xl border-white/10 rounded-xl shadow-lg hover:shadow-xl transition-all">
+        {/* Mini P&L Snapshot - 4 columns */}
+        <Card className="col-span-4 bg-white border-slate-200 rounded-xl shadow-sm hover:shadow-md transition-all">
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-white text-base font-bold">P&L Snapshot (MTD)</CardTitle>
+              <CardTitle className="text-slate-900 text-base font-bold">P&L Snapshot (MTD)</CardTitle>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setPlExpanded(!plExpanded)}
-                className="text-gray-400 hover:text-white hover:bg-white/10 h-6 px-2"
+                className="text-slate-600 hover:text-slate-900 hover:bg-slate-100 h-6 px-2 text-xs"
               >
                 {plExpanded ? "Collapse" : "Expand"}
               </Button>
@@ -988,50 +915,50 @@ export default function Overview() {
           <CardContent className="pt-0">
             <div className="space-y-3">
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-400 font-medium">Revenue</span>
-                <span className="text-lg font-bold text-emerald-400">${plData.revenue.toLocaleString()}</span>
+                <span className="text-sm text-slate-600 font-medium">Revenue</span>
+                <span className="text-lg font-bold text-emerald-600">${plData.revenue.toLocaleString()}</span>
               </div>
               
               {plExpanded && (
                 <>
-                  <div className="flex justify-between items-center pl-3 border-l-2 border-white/10">
-                    <span className="text-sm text-gray-400 font-medium">COGS</span>
-                    <span className="text-base font-semibold text-red-400">-${plData.cogs.toLocaleString()}</span>
+                  <div className="flex justify-between items-center pl-3 border-l-2 border-slate-200">
+                    <span className="text-sm text-slate-600 font-medium">COGS</span>
+                    <span className="text-base font-semibold text-red-600">-${plData.cogs.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between items-center font-semibold">
-                    <span className="text-sm text-white">Gross Profit</span>
-                    <span className="text-base font-bold text-white">${plData.grossProfit.toLocaleString()}</span>
+                    <span className="text-sm text-slate-900">Gross Profit</span>
+                    <span className="text-base font-bold text-slate-900">${plData.grossProfit.toLocaleString()}</span>
                   </div>
-                  <div className="h-px bg-white/10"></div>
+                  <div className="h-px bg-slate-200"></div>
                 </>
               )}
 
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-400 font-medium">Operating Expenses</span>
-                <span className="text-base font-semibold text-orange-400">-${plData.opex.toLocaleString()}</span>
+                <span className="text-sm text-slate-600 font-medium">Operating Expenses</span>
+                <span className="text-base font-semibold text-orange-600">-${plData.opex.toLocaleString()}</span>
               </div>
 
-              <div className="h-px bg-white/10"></div>
+              <div className="h-px bg-slate-200"></div>
 
               <div className="flex justify-between items-center pt-2">
-                <span className="text-base font-bold text-white">Net Income</span>
+                <span className="text-base font-bold text-slate-900">Net Income</span>
                 <span className={cn(
                   "text-2xl font-bold",
-                  plData.net > 0 ? "text-emerald-400" : "text-red-400"
+                  plData.net > 0 ? "text-emerald-600" : "text-red-600"
                 )}>
                   ${plData.net.toLocaleString()}
                 </span>
               </div>
 
               <div className="pt-2">
-                <div className="text-xs text-gray-500 mb-1 font-medium">Net Margin</div>
-                <div className="w-full bg-white/10 rounded-full h-2.5 overflow-hidden">
+                <div className="text-xs text-slate-500 mb-1.5 font-medium">Net Margin</div>
+                <div className="w-full bg-slate-200 rounded-full h-2.5 overflow-hidden">
                   <div 
                     className="h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full"
                     style={{ width: `${((plData.net / plData.revenue) * 100).toFixed(0)}%` }}
                   ></div>
                 </div>
-                <div className="text-xs text-gray-400 mt-1 font-semibold">
+                <div className="text-xs text-slate-600 mt-1.5 font-semibold">
                   {((plData.net / plData.revenue) * 100).toFixed(1)}%
                 </div>
               </div>
@@ -1039,8 +966,58 @@ export default function Overview() {
           </CardContent>
         </Card>
 
-        {/* Next Best Action - 3 columns - HERO CARD STYLE */}
-        <Card className="col-span-3 bg-gradient-to-br from-purple-600 to-blue-600 backdrop-blur-xl border-2 border-purple-500/50 rounded-xl shadow-2xl text-white">
+        {/* Payroll Coverage - 6 columns - HERO CARD */}
+        <Card className={cn(
+          "col-span-6 border-2 rounded-xl shadow-lg transition-all",
+          shortfall < 0 ? "bg-gradient-to-br from-red-500 to-orange-500 border-red-300 text-white" : "bg-gradient-to-br from-blue-500 to-purple-500 border-blue-300 text-white"
+        )}>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-5">
+              <div>
+                <h3 className="text-xl font-bold text-white mb-1">Payroll Coverage</h3>
+                <p className="text-white/90 text-sm font-medium">{payrollCoverage.nextPayDate}</p>
+              </div>
+              <div className={cn(
+                "px-3 py-1.5 rounded-full text-xs font-bold",
+                shortfall < 0 ? "bg-white/20 text-white" : "bg-white/20 text-white"
+              )}>
+                {shortfall < 0 ? 'At Risk' : 'Covered'}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-4 mb-5">
+              <div className="bg-white/15 backdrop-blur-sm rounded-xl p-4">
+                <div className="text-xs text-white/80 mb-1 font-medium">Gross Due</div>
+                <div className="text-2xl font-bold text-white">${payrollCoverage.grossDue.toLocaleString()}</div>
+              </div>
+              <div className="bg-white/15 backdrop-blur-sm rounded-xl p-4">
+                <div className="text-xs text-white/80 mb-1 font-medium">Projected Cash</div>
+                <div className="text-2xl font-bold text-white">${payrollCoverage.projectedCash.toLocaleString()}</div>
+              </div>
+              <div className="bg-white/15 backdrop-blur-sm rounded-xl p-4">
+                <div className="text-xs text-white/80 mb-1 font-medium">Shortfall</div>
+                <div className="text-2xl font-bold text-white">
+                  {shortfall < 0 ? '-' : '+'}${Math.abs(shortfall).toLocaleString()}
+                </div>
+              </div>
+            </div>
+
+            {shortfall < 0 && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full bg-white text-red-600 hover:bg-white/90 border-0 font-semibold h-10 shadow-md"
+                onClick={() => navigate(createPageUrl("MoneyOut") + "?suggestedDelay=true")}
+              >
+                View Suggested Bills to Delay
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Next Best Action - 6 columns - HERO CARD */}
+        <Card className="col-span-6 bg-gradient-to-br from-purple-500 to-blue-500 border-2 border-purple-300 rounded-xl shadow-lg text-white">
           <CardContent className="p-6">
             <div className="space-y-4">
               <div>
@@ -1048,23 +1025,23 @@ export default function Overview() {
                   <Sparkles className="w-5 h-5 text-yellow-300" />
                   <Badge className={cn(
                     "text-xs font-bold",
-                    nextBestAction.priority === "high" ? "bg-red-500/30 text-white border-red-300/50" : "bg-amber-500/30 text-white border-amber-300/50"
+                    nextBestAction.priority === "high" ? "bg-white/25 text-white border-white/40" : "bg-white/20 text-white border-white/30"
                   )}>
                     {nextBestAction.priority === "high" ? "High Priority" : "Medium Priority"}
                   </Badge>
                 </div>
                 <h4 className="text-xl font-bold text-white mb-2">{nextBestAction.title}</h4>
-                <p className="text-sm text-white/90 leading-relaxed">{nextBestAction.description}</p>
+                <p className="text-sm text-white/95 leading-relaxed">{nextBestAction.description}</p>
               </div>
 
-              <div className="flex flex-col gap-2">
+              <div className="flex gap-3">
                 {nextBestAction.actions.map((action, idx) => (
                   <Button
                     key={idx}
                     variant="outline"
                     size="sm"
                     onClick={() => navigate(createPageUrl(action.link))}
-                    className="w-full bg-white/10 backdrop-blur-sm border-white/30 text-white hover:bg-white/20 text-sm h-9 justify-between font-medium"
+                    className="flex-1 bg-white/15 backdrop-blur-sm border-white/30 text-white hover:bg-white/25 text-sm h-10 justify-between font-semibold shadow-md"
                   >
                     {action.label}
                     <ArrowRight className="w-4 h-4" />
@@ -1072,8 +1049,8 @@ export default function Overview() {
                 ))}
               </div>
 
-              <div className="pt-3 border-t border-white/20">
-                <p className="text-xs text-white/70">
+              <div className="pt-3 border-t border-white/30">
+                <p className="text-xs text-white/80 font-medium">
                   💡 AI-powered recommendation based on your current financial position
                 </p>
               </div>
@@ -1093,7 +1070,7 @@ export default function Overview() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setAiPanelOpen(false)}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
+              className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
             />
 
             {/* Panel */}
@@ -1102,22 +1079,22 @@ export default function Overview() {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="fixed top-0 right-0 h-full w-[30%] min-w-[400px] bg-gray-900/95 backdrop-blur-xl border-l border-white/10 z-50 flex flex-col shadow-2xl"
+              className="fixed top-0 right-0 h-full w-[30%] min-w-[400px] bg-white border-l border-slate-200 z-50 flex flex-col shadow-2xl"
             >
               {/* Header */}
-              <div className="p-6 border-b border-white/10">
+              <div className="p-6 border-b border-slate-200">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
                     <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center">
                       <Sparkles className="w-4 h-4 text-white" />
                     </div>
-                    <h3 className="text-lg font-bold text-white">Silkroute Copilot</h3>
+                    <h3 className="text-lg font-bold text-slate-900">AI Copilot</h3>
                   </div>
                   <Button
                     variant="ghost"
                     size="icon"
                     onClick={() => setAiPanelOpen(false)}
-                    className="text-gray-400 hover:text-white hover:bg-white/10"
+                    className="text-slate-400 hover:text-slate-700 hover:bg-slate-100"
                   >
                     <X className="w-5 h-5" />
                   </Button>
@@ -1126,15 +1103,15 @@ export default function Overview() {
                 {/* Insights Strip */}
                 <div className="space-y-2">
                   {insights.map((insight, idx) => (
-                    <div key={idx} className="flex items-center justify-between p-2 rounded-lg bg-white/5 border border-white/10">
+                    <div key={idx} className="flex items-center justify-between p-2.5 rounded-lg bg-slate-50 border border-slate-200">
                       <div className="flex items-center gap-2 flex-1">
                         <insight.icon className={cn(
-                          "w-3 h-3",
-                          insight.severity === "critical" ? "text-red-400" : "text-amber-400"
+                          "w-3.5 h-3.5",
+                          insight.severity === "critical" ? "text-red-600" : "text-amber-600"
                         )} />
-                        <span className="text-xs text-gray-300">{insight.text}</span>
+                        <span className="text-xs text-slate-700 font-medium">{insight.text}</span>
                       </div>
-                      <Button size="sm" variant="ghost" className="text-blue-400 hover:text-blue-300 h-6 text-xs px-2">
+                      <Button size="sm" variant="ghost" className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 h-6 text-xs px-2">
                         View
                       </Button>
                     </div>
@@ -1143,14 +1120,14 @@ export default function Overview() {
               </div>
 
               {/* Chat Messages */}
-              <div className="flex-1 overflow-y-auto p-6 space-y-3">
+              <div className="flex-1 overflow-y-auto p-6 space-y-3 bg-slate-50">
                 {chatMessages.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-full text-center">
-                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500/20 to-blue-500/20 flex items-center justify-center mb-4">
-                      <Sparkles className="w-8 h-8 text-purple-400" />
+                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-100 to-blue-100 flex items-center justify-center mb-4">
+                      <Sparkles className="w-8 h-8 text-purple-600" />
                     </div>
-                    <h4 className="text-white font-semibold mb-2">Ask Silkroute anything</h4>
-                    <p className="text-gray-400 text-sm mb-4 max-w-xs">
+                    <h4 className="text-slate-900 font-bold mb-2">Ask AI anything</h4>
+                    <p className="text-slate-600 text-sm mb-4 max-w-xs">
                       Get insights about your finances, cash flow, expenses, and more.
                     </p>
                   </div>
@@ -1160,8 +1137,8 @@ export default function Overview() {
               </div>
 
               {/* Quick Prompts */}
-              <div className="px-6 pb-3 space-y-2">
-                <div className="text-xs text-gray-400 mb-2">Quick prompts:</div>
+              <div className="px-6 pb-3 bg-white border-t border-slate-200">
+                <div className="text-xs text-slate-600 mb-2 font-medium">Quick prompts:</div>
                 <div className="flex flex-wrap gap-2">
                   {quickPrompts.map((prompt, idx) => (
                     <Button
@@ -1169,7 +1146,7 @@ export default function Overview() {
                       size="sm"
                       variant="outline"
                       onClick={() => handleQuickPrompt(prompt)}
-                      className="bg-white/5 border-white/10 text-gray-300 hover:bg-white/10 hover:text-white text-xs h-7"
+                      className="border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs h-7 font-medium"
                     >
                       {prompt}
                     </Button>
@@ -1178,14 +1155,14 @@ export default function Overview() {
               </div>
 
               {/* Input Area */}
-              <div className="p-6 border-t border-white/10">
+              <div className="p-6 border-t border-slate-200 bg-white">
                 <div className="flex gap-2">
                   <Input
                     value={inputMessage}
                     onChange={(e) => setInputMessage(e.target.value)}
                     onKeyPress={(e) => e.key === "Enter" && handleSendMessage(inputMessage)}
-                    placeholder="Ask Silkroute anything..."
-                    className="flex-1 bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-blue-500"
+                    placeholder="Ask AI anything..."
+                    className="flex-1 border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-blue-500"
                   />
                   <Button
                     onClick={() => handleSendMessage(inputMessage)}
