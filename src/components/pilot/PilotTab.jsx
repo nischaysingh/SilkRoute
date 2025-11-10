@@ -388,10 +388,26 @@ export default function PilotTab() {
   // Handlers
   const handleLaunch = (mission) => {
     setMissions(prev => prev.map(m =>
-      m.id === mission.id ? { ...m, state: "running" } : m
+      m.id === mission.id ? { 
+        ...m, 
+        state: "running",
+        lastRun: "Just now",
+        successRate: Math.min(m.successRate + Math.random() * 2, 99),
+        lastRuns: [...(m.lastRuns || []), { success: 1 }]
+      } : m
     ));
     toast.success(`Mission launched: ${mission.name}`);
     addFusionLogEntry(`Launched ${mission.name}`, "pilot", "completed");
+    addActivity(`Launched ${mission.name}`, "pilot", "launch");
+    addImpact({
+      id: Date.now(),
+      timestamp: new Date().toISOString(),
+      message: `${mission.name} successfully launched`,
+      improvement: "Active",
+      actor: "pilot",
+      type: "launch"
+    });
+    setSystemConfidence(prev => Math.min(prev + 1, 99));
   };
 
   const handlePause = (mission) => {
@@ -400,6 +416,8 @@ export default function PilotTab() {
     ));
     toast.warning(`Mission paused: ${mission.name}`);
     addFusionLogEntry(`Paused ${mission.name}`, "pilot", "completed");
+    addActivity(`Paused ${mission.name}`, "pilot", "pause");
+    setSystemConfidence(prev => Math.max(prev - 1, 80));
   };
 
   const handleAbort = (mission) => {
@@ -408,6 +426,8 @@ export default function PilotTab() {
     ));
     toast.error(`Mission aborted: ${mission.name}`);
     addFusionLogEntry(`Aborted ${mission.name}`, "pilot", "completed");
+    addActivity(`Aborted ${mission.name}`, "pilot", "abort");
+    setSystemConfidence(prev => Math.max(prev - 2, 75));
   };
 
   const handleReroute = (mission) => {
@@ -419,20 +439,27 @@ export default function PilotTab() {
 
     setTimeout(() => {
       setMissions(prev => prev.map(m =>
-        m.id === mission.id ? { ...m, route: newRoute } : m
+        m.id === mission.id ? { 
+          ...m, 
+          route: newRoute,
+          avgLatency: Math.max(m.avgLatency - 50, 300),
+          successRate: Math.min(m.successRate + 1, 99)
+        } : m
       ));
       toast.success(`Rerouted to ${newRoute}`);
       addFusionLogEntry(`Rerouted ${mission.name} to ${newRoute}`, "copilot", "completed");
+      addActivity(`Rerouted ${mission.name} to ${newRoute}`, "copilot", "reroute");
       addImpact({
         id: Date.now(),
         timestamp: new Date().toISOString(),
         message: `${mission.name} rerouted to ${newRoute}`,
-        improvement: "Optimized",
+        improvement: "-50ms latency",
         actor: newRoute,
         type: "reroute"
       });
-      setHandoffAnimation(null); // Clear animation after completion
-    }, 2000); // Duration matches HandoffAnimation
+      setSystemConfidence(prev => Math.min(prev + 1, 99));
+      setHandoffAnimation(null);
+    }, 2000);
   };
 
   const handleExplain = (mission) => {
@@ -448,34 +475,105 @@ export default function PilotTab() {
     toast.success("Flight plan inserted", {
       description: "You can now review and edit the plan"
     });
+    addActivity("Flight plan template inserted", "pilot", "plan");
   };
 
   const handleApplySuggestion = (suggestion) => {
+    // Apply the suggestion to the mission
+    const improvement = suggestion.impact.costReduction ? `-$${suggestion.impact.costReduction.toFixed(3)}` : `+${suggestion.impact.successImprovement}%`;
+    
+    if (suggestion.impact.costReduction && selectedMission) {
+      setMissions(prev => prev.map(m =>
+        m.id === selectedMission.id ? {
+          ...m,
+          spendPerRun: (parseFloat(m.spendPerRun) - suggestion.impact.costReduction).toFixed(3)
+        } : m
+      ));
+    }
+    
+    if (suggestion.impact.successImprovement && selectedMission) {
+      setMissions(prev => prev.map(m =>
+        m.id === selectedMission.id ? {
+          ...m,
+          successRate: Math.min(m.successRate + suggestion.impact.successImprovement, 99)
+        } : m
+      ));
+    }
+
+    toast.success("Optimization applied", {
+      description: suggestion.title
+    });
+    
     addImpact({
       id: Date.now(),
       timestamp: new Date().toISOString(),
       message: suggestion.title,
-      improvement: suggestion.impact.costReduction ? `-$${suggestion.impact.costReduction.toFixed(3)}` : `+${suggestion.impact.successImprovement}%`,
+      improvement,
       actor: "autopilot",
       type: "optimization"
     });
+    addFusionLogEntry(`Applied suggestion: ${suggestion.title}`, "autopilot", "completed");
+    setSystemConfidence(prev => Math.min(prev + 1, 99));
   };
 
   const handleApplyOptimization = (mission, optimization) => {
+    // Update mission metrics based on optimization
+    setMissions(prev => prev.map(m => {
+      if (m.id === mission.id) {
+        const updates = {};
+        if (optimization.estimatedSavings) {
+          const savingsMatch = optimization.estimatedSavings.match(/\$?([\d.]+)/);
+          if (savingsMatch) {
+            updates.spendPerRun = Math.max(parseFloat(m.spendPerRun) - parseFloat(savingsMatch[1]), 0.001).toFixed(3);
+          }
+        }
+        if (optimization.latencyReduction) {
+          updates.avgLatency = Math.max(m.avgLatency - optimization.latencyReduction, 200);
+        }
+        return { ...m, ...updates };
+      }
+      return m;
+    }));
+    
+    toast.success("Optimization applied", {
+      description: optimization.title
+    });
+    
     addImpact({
       id: Date.now(),
       timestamp: new Date().toISOString(),
       message: optimization.title,
-      improvement: optimization.estimatedSavings,
+      improvement: optimization.estimatedSavings || "Optimized",
       actor: mission.route,
       type: "optimization"
     });
+    addFusionLogEntry(`Applied optimization: ${optimization.title}`, mission.route, "completed");
+    setSystemConfidence(prev => Math.min(prev + 1, 99));
   };
 
   const handleCoPilotHintApprove = () => {
+    const targetMission = missions.find(m => m.name === "batch_pick_opt_v2");
+    if (targetMission) {
+      setMissions(prev => prev.map(m =>
+        m.name === "batch_pick_opt_v2" ? {
+          ...m,
+          avgLatency: Math.max(m.avgLatency - 200, 300),
+          successRate: Math.min(m.successRate + 3, 99)
+        } : m
+      ));
+      addImpact({
+        id: Date.now(),
+        timestamp: new Date().toISOString(),
+        message: "Optimized batch_pick_opt_v2 for parallel processing",
+        improvement: "-200ms, +3% success",
+        actor: "copilot",
+        type: "optimization"
+      });
+    }
     setCoPilotHint(null);
-    toast.success("Co-Pilot optimization approved");
+    toast.success("Co-Pilot optimization approved and applied");
     addFusionLogEntry("Optimized batch_pick_opt_v2 for parallel processing", "copilot", "completed");
+    setSystemConfidence(prev => Math.min(prev + 2, 99));
   };
 
   const handleCoPilotHintDismiss = () => {
@@ -491,37 +589,93 @@ export default function PilotTab() {
       timestamp: new Date().toISOString()
     }]);
 
-    // Added for Fusion Mode logging
     if (fusionMode) {
       addFusionLogEntry(message, "user");
     }
 
-    // Simulate Co-Pilot response
+    // Simulate Co-Pilot response with more specific answers
     setTimeout(() => {
+      const responses = [
+        "I've analyzed the mission data. The batch_pick_opt_v2 latency can be reduced by 18% through parallel processing.",
+        "Based on current patterns, I recommend increasing the concurrency limit for invoice_chase_v1.",
+        "I've detected an opportunity to optimize cost by switching the model for ar_collection_push.",
+        "The system is running efficiently. All missions are within optimal parameters."
+      ];
+      
       setCoPilotMessages(prev => [...prev, {
         id: prev.length + 1,
         from: "copilot",
-        text: "Analyzing your request...",
+        text: responses[Math.floor(Math.random() * responses.length)],
         timestamp: new Date().toISOString()
       }]);
-      // Added for Fusion Mode logging
+      
       if (fusionMode) {
-        addFusionLogEntry("Analyzing request...", "copilot", "pending");
+        addFusionLogEntry("Co-Pilot analysis complete", "copilot", "completed");
       }
-    }, 500);
+    }, 1000);
   };
 
   const handleAutoOptimize = (mode) => {
     addFusionLogEntry(`Auto-optimization initiated (${mode} mode)`, "pilot", "pending");
+    
+    // Actually optimize missions
+    setTimeout(() => {
+      setMissions(prev => prev.map(m => ({
+        ...m,
+        avgLatency: Math.max(m.avgLatency - Math.floor(Math.random() * 100), 300),
+        spendPerRun: Math.max(parseFloat(m.spendPerRun) - 0.002, 0.01).toFixed(3),
+        successRate: Math.min(m.successRate + Math.random() * 2, 99)
+      })));
+      
+      addImpact({
+        id: Date.now(),
+        timestamp: new Date().toISOString(),
+        message: `Auto-optimization complete (${mode} mode)`,
+        improvement: "All missions optimized",
+        actor: "autopilot",
+        type: "optimization"
+      });
+      addFusionLogEntry(`Auto-optimization complete (${mode} mode)`, "autopilot", "completed");
+      toast.success("Auto-optimization complete", {
+        description: `${missions.length} missions optimized`
+      });
+      setSystemConfidence(prev => Math.min(prev + 3, 99));
+    }, 2000);
   };
 
   const handleBalanceLoad = () => {
-    addFusionLogEntry("Load balancing: 2 missions shifted to Autopilot", "pilot", "completed");
+    // Actually rebalance missions
+    const autopilotMissions = missions.filter(m => m.route === "autopilot").length;
+    const pilotMissions = missions.filter(m => m.route === "pilot").length;
+    
+    if (pilotMissions > autopilotMissions + 1) {
+      const missionToMove = missions.find(m => m.route === "pilot" && m.state === "running");
+      if (missionToMove) {
+        setMissions(prev => prev.map(m =>
+          m.id === missionToMove.id ? { ...m, route: "autopilot" } : m
+        ));
+        addImpact({
+          id: Date.now(),
+          timestamp: new Date().toISOString(),
+          message: `${missionToMove.name} moved to Autopilot for load balancing`,
+          improvement: "Balanced",
+          actor: "pilot",
+          type: "rebalance"
+        });
+      }
+    }
+    
+    addFusionLogEntry("Load balancing: missions redistributed for optimal throughput", "pilot", "completed");
+    toast.success("Load balanced", {
+      description: "Missions redistributed across agents"
+    });
+    setSystemConfidence(prev => Math.min(prev + 1, 99));
   };
 
   const handleCommandExecute = (command) => {
     toast.success(`Executed: ${command}`);
     addFusionLogEntry(`Command executed: ${command}`, "user", "completed");
+    addActivity(`Command: ${command}`, "user", "command");
   };
 
   const handleInvestigateAnomaly = (anomaly) => {
@@ -534,6 +688,7 @@ export default function PilotTab() {
       description: "Anomaly resolved automatically"
     });
     addFusionLogEntry(`Auto-mitigated: ${anomaly.title}`, "pilot", "completed");
+    setSystemConfidence(prev => Math.min(prev + 2, 99));
   };
 
   const handleIgnoreAnomaly = (anomaly) => {
@@ -549,6 +704,7 @@ export default function PilotTab() {
     if (fusionMode) {
       addFusionLogEntry("Conversation converted to workflow automation", "copilot", "completed");
     }
+    addActivity("Workflow created from conversation", "copilot", "workflow");
   };
 
   const handleApplyHandoff = (recommendation) => {
@@ -558,6 +714,7 @@ export default function PilotTab() {
     if (fusionMode) {
       addFusionLogEntry(recommendation.action, "pilot", "completed");
     }
+    addActivity(recommendation.action, "pilot", "handoff");
   };
 
   // New Handlers for Phase 4
@@ -565,6 +722,13 @@ export default function PilotTab() {
     toast.info("Running alternative simulation...", {
       description: `Testing with different AI agent`
     });
+    
+    setTimeout(() => {
+      toast.success("Simulation complete", {
+        description: "Alternative approach shows +5% improvement"
+      });
+      addActivity(`Replayed: ${event.action}`, "autopilot", "simulation");
+    }, 2000);
   };
 
   const handleLockConfiguration = (config) => {
@@ -572,12 +736,31 @@ export default function PilotTab() {
       description: `${config.name} is now permanent`
     });
     addFusionLogEntry(`Locked configuration: ${config.name}`, "pilot", "completed");
+    addActivity(`Locked: ${config.name}`, "pilot", "lock");
   };
 
   // New handlers for Proactive Mitigation (Phase 4.5)
   const handleApplyMitigation = (anomaly, strategy) => {
     setAnomalies(prev => prev.filter(a => a.id !== anomaly.id));
+    
+    // Update affected mission metrics
+    const affectedMission = missions.find(m => anomaly.title.includes(m.name));
+    if (affectedMission) {
+      setMissions(prev => prev.map(m =>
+        m.id === affectedMission.id ? {
+          ...m,
+          avgLatency: strategy.estimatedImpact.latencyReduction 
+            ? Math.max(m.avgLatency - strategy.estimatedImpact.latencyReduction, 300)
+            : m.avgLatency,
+          successRate: strategy.estimatedImpact.errorReduction
+            ? Math.min(m.successRate + (strategy.estimatedImpact.errorReduction / 10), 99)
+            : m.successRate
+        } : m
+      ));
+    }
+    
     addFusionLogEntry(`Applied mitigation: ${strategy.name} for ${anomaly.title}`, "autopilot", "completed");
+    addActivity(`Mitigated: ${anomaly.title}`, "autopilot", "mitigation");
     addImpact({
       id: Date.now(),
       timestamp: new Date().toISOString(),
@@ -587,8 +770,9 @@ export default function PilotTab() {
       type: "mitigation"
     });
     toast.success("Proactive mitigation applied", {
-      description: `Strategy '${strategy.name}' applied to '${anomaly.title}'`
+      description: `Strategy '${strategy.name}' applied successfully`
     });
+    setSystemConfidence(prev => Math.min(prev + 2, 99));
   };
 
   // Phase 5 - New Handlers
@@ -598,7 +782,16 @@ export default function PilotTab() {
   };
 
   const handleOptimizationApplied = (data) => {
+    // Apply optimizations to missions
+    setMissions(prev => prev.map(m => ({
+      ...m,
+      successRate: Math.min(m.successRate + (data.totalImpact.success || 0), 99),
+      avgLatency: Math.max(m.avgLatency + (data.totalImpact.latency || 0), 200),
+      spendPerRun: Math.max(parseFloat(m.spendPerRun) + (data.totalImpact.cost || 0), 0.01).toFixed(3)
+    })));
+    
     addFusionLogEntry(`Self-optimization: ${data.rules[0].rule}`, "autopilot", "completed");
+    addActivity(data.rules[0].rule, "autopilot", "self-optimization");
     addImpact({
       id: Date.now(),
       timestamp: new Date().toISOString(),
@@ -607,6 +800,7 @@ export default function PilotTab() {
       actor: "autopilot",
       type: "optimization"
     });
+    setSystemConfidence(prev => Math.min(prev + 2, 99));
   };
 
   const handleApplyScenario = (scenario) => {
@@ -619,7 +813,8 @@ export default function PilotTab() {
         "Historical data supports this optimization approach",
         "Risk level is acceptable for current operational state"
       ],
-      impact: scenario.impact || { success: "+6%", cost: "-8%", latency: "-150ms" }
+      impact: scenario.impact || { success: "+6%", cost: "-8%", latency: "-150ms" },
+      scenario
     });
     setExplainApproveOpen(true);
   };
@@ -630,7 +825,8 @@ export default function PilotTab() {
       description: insight.recommendation,
       confidence: 89,
       reasoning: insight.evidence || [],
-      impact: { change: insight.change }
+      impact: { change: insight.change },
+      insight
     });
     setExplainApproveOpen(true);
   };
@@ -640,18 +836,75 @@ export default function PilotTab() {
       description: `All missions will align to: ${objective.goal}`
     });
     addFusionLogEntry(`New objective: ${objective.goal}`, "pilot", "completed");
+    addActivity(`Objective set: ${objective.goal}`, "pilot", "objective");
   };
 
   const handleApproveAction = (action) => {
+    // Actually apply the action to missions
+    if (action.scenario) {
+      setMissions(prev => prev.map(m => {
+        const updates = {};
+        if (action.scenario.impact.success) {
+          // Assume success is a string like "+6%"
+          const successChange = parseFloat(action.scenario.impact.success.replace('%', ''));
+          updates.successRate = Math.min(m.successRate + successChange, 99);
+        }
+        if (action.scenario.impact.cost) {
+          // Assume cost is a string like "-8%"
+          const costChange = parseFloat(action.scenario.impact.cost.replace('%', ''));
+          updates.spendPerRun = Math.max(parseFloat(m.spendPerRun) * (1 + costChange / 100), 0.001).toFixed(3);
+        }
+        if (action.scenario.impact.latency) {
+          // Assume latency is a string like "-150ms"
+          const latencyChange = parseFloat(action.scenario.impact.latency.replace('ms', ''));
+          updates.avgLatency = Math.max(m.avgLatency + latencyChange, 200);
+        }
+        return { ...m, ...updates };
+      }));
+      
+      addImpact({
+        id: Date.now(),
+        timestamp: new Date().toISOString(),
+        message: action.title,
+        improvement: action.scenario.impact.success || action.scenario.impact.cost || "Applied",
+        actor: "user",
+        type: "approval"
+      });
+    } else if (action.insight) {
+      // Logic for applying insights, e.g., if insight suggests a direct change
+      setMissions(prev => prev.map(m => {
+        const updates = {};
+        if (action.insight.metric === "latency" && action.insight.change) {
+          updates.avgLatency = Math.max(m.avgLatency + action.insight.change, 200);
+        }
+        if (action.insight.metric === "cost" && action.insight.change) {
+          updates.spendPerRun = Math.max(parseFloat(m.spendPerRun) + action.insight.change, 0.001).toFixed(3);
+        }
+        return { ...m, ...updates };
+      }));
+      
+      addImpact({
+        id: Date.now(),
+        timestamp: new Date().toISOString(),
+        message: action.title,
+        improvement: `Changed ${action.insight.metric} by ${action.insight.change}`,
+        actor: "user",
+        type: "approval"
+      });
+    }
+    
     toast.success("Action approved and executed");
     addFusionLogEntry(`Approved: ${action.title}`, "user", "completed");
+    addActivity(action.title, "user", "approval");
     setExplainApproveOpen(false);
     setPendingAction(null);
+    setSystemConfidence(prev => Math.min(prev + 1, 99));
   };
 
   const handleRejectAction = (action) => {
     toast.info("Action rejected");
     addFusionLogEntry(`Rejected: ${action.title}`, "user", "completed");
+    addActivity(`Rejected: ${action.title}`, "user", "rejection");
     setExplainApproveOpen(false);
     setPendingAction(null);
   };
@@ -659,22 +912,23 @@ export default function PilotTab() {
   const handleUndoAction = (action) => {
     toast.success("Action reverted");
     addFusionLogEntry(`Reverted: ${action.title}`, "user", "completed");
+    addActivity(`Reverted: ${action.title}`, "user", "undo");
     // In a real scenario, this would trigger an actual undo operation
   };
 
   const addActivity = (message, actor, type) => {
     const newActivity = {
-      id: Date.now(),
+      id: Date.now() + Math.random(),
       timestamp: new Date().toISOString(),
       message,
       actor,
       type
     };
-    setRecentActivity(prev => [newActivity, ...prev.slice(0, 4)]);
+    setRecentActivity(prev => [newActivity, ...prev.slice(0, 9)]);
   };
 
   const addImpact = (impact) => {
-    setImpacts(prev => [impact, ...prev.slice(0, 3)]);
+    setImpacts(prev => [impact, ...prev.slice(0, 9)]);
   };
 
   const addCollabAction = (action) => {
@@ -690,7 +944,7 @@ export default function PilotTab() {
       status,
       timestamp: new Date().toISOString()
     };
-    setFusionFlightLog(prev => [entry, ...prev.slice(0, 19)]);
+    setFusionFlightLog(prev => [entry, ...prev.slice(0, 29)]);
   };
 
   // Keyboard shortcuts
