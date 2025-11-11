@@ -17,7 +17,7 @@ export function ExplainModeProvider({ children }) {
   const toggleExplainMode = useCallback(() => {
     setIsExplainModeActive(prev => {
       const newState = !prev;
-      console.log('[Explain Mode] Toggled:', newState);
+      logEvent('explain_mode_toggled', { on: newState, page: window.location.pathname });
       
       if (!newState) {
         // Close panel when exiting Explain Mode (unless pinned)
@@ -46,7 +46,18 @@ export function ExplainModeProvider({ children }) {
 
   // Open explain panel for a widget
   const openExplainPanel = useCallback((widgetId, parsedData) => {
-    console.log('[Explain Mode] Opening panel for widget:', widgetId, parsedData);
+    logEvent('explain_widget_opened', {
+      page: window.location.pathname,
+      title: parsedData.title,
+      metric: parsedData.metric,
+      trend: parsedData.trend,
+      period: parsedData.period
+    });
+
+    logEvent('explain_widget_parsed', {
+      title: parsedData.title,
+      fields_detected: parsedData.parsedFields || []
+    });
 
     setExplainPanelState(prev => {
       // Check if this widget is already in the panel
@@ -114,74 +125,16 @@ export function ExplainModeProvider({ children }) {
   // Log analytics event
   const logEvent = useCallback((eventName, data) => {
     console.log(`[Explain Mode Analytics] ${eventName}:`, data);
+    // In production, send to analytics service
   }, []);
 
   // Log action click
   const logActionClick = useCallback((action, widgetTitle) => {
-    console.log('[Explain Mode] Action clicked:', action, widgetTitle);
-  }, []);
-
-  // Parse widget content inline (no dynamic import)
-  const parseWidgetContent = useCallback((element, metadata = {}) => {
-    if (!element) return null;
-
-    const extractTitle = (el) => {
-      const titleSelectors = ['[class*="CardTitle"]', 'h2', 'h3', 'h4', '[class*="font-bold"]'];
-      for (const selector of titleSelectors) {
-        const titleEl = el.querySelector(selector);
-        if (titleEl?.innerText?.trim()) return titleEl.innerText.trim();
-      }
-      return 'Widget';
-    };
-
-    const extractMetric = (el) => {
-      const text = el.innerText;
-      const currencyPattern = /[\$€£₹]\s*(\d+(?:,\d{3})*(?:\.\d+)?)\s*([KMB])?/gi;
-      const matches = [...text.matchAll(currencyPattern)];
-      if (matches.length > 0) return matches[0][0];
-      
-      const percentPattern = /(\d+(?:\.\d+)?)\s*%/g;
-      const percentMatches = [...text.matchAll(percentPattern)];
-      if (percentMatches.length > 0) return percentMatches[0][0];
-      
-      return null;
-    };
-
-    const extractTrend = (el) => {
-      const hasUpArrow = el.querySelector('[class*="TrendingUp"]') || el.querySelector('[class*="ArrowUp"]');
-      const hasDownArrow = el.querySelector('[class*="TrendingDown"]') || el.querySelector('[class*="ArrowDown"]');
-      if (hasUpArrow) return 'up';
-      if (hasDownArrow) return 'down';
-      return null;
-    };
-
-    const extractDelta = (el) => {
-      const text = el.innerText;
-      const deltaPattern = /([+-]\s*\d+(?:\.\d+)?)\s*%/g;
-      const matches = [...text.matchAll(deltaPattern)];
-      return matches.length > 0 ? matches[0][0] : null;
-    };
-
-    const parsed = {
-      title: metadata.title || extractTitle(element),
-      metric: metadata.metric || extractMetric(element),
-      unit: metadata.unit || (element.innerText.includes('$') ? '$' : element.innerText.includes('%') ? '%' : null),
-      trend: metadata.trend || extractTrend(element),
-      delta: metadata.delta || extractDelta(element),
-      period: metadata.period || null,
-      dimensions: metadata.dimensions || [],
-      actions: metadata.actions || ['simulate', 'alert', 'create_policy'],
-      rawText: element.innerText,
-      parsedFields: []
-    };
-
-    Object.keys(parsed).forEach(key => {
-      if (parsed[key] && key !== 'rawText' && key !== 'parsedFields') {
-        parsed.parsedFields.push(key);
-      }
+    logEvent('explain_widget_action', {
+      action,
+      title: widgetTitle,
+      page: window.location.pathname
     });
-
-    return parsed;
   }, []);
 
   // Global click handler for ANY element when Explain Mode is active
@@ -211,29 +164,31 @@ export function ExplainModeProvider({ children }) {
       if (explainableElement && !e.target.closest('.explain-copilot-panel')) {
         e.stopPropagation();
         
-        // Generate a unique ID for this element
-        const elementId = explainableElement.id || 
-          `explain-${Math.random().toString(36).substr(2, 9)}`;
-        
-        // Get existing metadata from data attributes if present
-        const metadata = {
-          title: explainableElement.getAttribute('data-explain-title'),
-          metric: explainableElement.getAttribute('data-explain-metric'),
-          unit: explainableElement.getAttribute('data-explain-unit'),
-          trend: explainableElement.getAttribute('data-explain-trend'),
-          delta: explainableElement.getAttribute('data-explain-delta'),
-          period: explainableElement.getAttribute('data-explain-period'),
-          dimensions: explainableElement.getAttribute('data-explain-dimensions') 
-            ? JSON.parse(explainableElement.getAttribute('data-explain-dimensions'))
-            : undefined,
-          actions: explainableElement.getAttribute('data-explain-actions')
-            ? JSON.parse(explainableElement.getAttribute('data-explain-actions'))
-            : undefined
-        };
+        // Import parseWidgetContent dynamically
+        import('./parseWidgetContent').then(({ parseWidgetContent }) => {
+          // Generate a unique ID for this element
+          const elementId = explainableElement.id || 
+            `explain-${Math.random().toString(36).substr(2, 9)}`;
+          
+          // Get existing metadata from data attributes if present
+          const metadata = {
+            title: explainableElement.getAttribute('data-explain-title'),
+            metric: explainableElement.getAttribute('data-explain-metric'),
+            unit: explainableElement.getAttribute('data-explain-unit'),
+            trend: explainableElement.getAttribute('data-explain-trend'),
+            delta: explainableElement.getAttribute('data-explain-delta'),
+            period: explainableElement.getAttribute('data-explain-period'),
+            dimensions: explainableElement.getAttribute('data-explain-dimensions') 
+              ? JSON.parse(explainableElement.getAttribute('data-explain-dimensions'))
+              : undefined,
+            actions: explainableElement.getAttribute('data-explain-actions')
+              ? JSON.parse(explainableElement.getAttribute('data-explain-actions'))
+              : undefined
+          };
 
-        const parsedData = parseWidgetContent(explainableElement, metadata);
-        console.log('[Explain Mode] Parsed widget:', parsedData);
-        openExplainPanel(elementId, parsedData);
+          const parsedData = parseWidgetContent(explainableElement, metadata);
+          openExplainPanel(elementId, parsedData);
+        });
       }
     };
 
@@ -242,7 +197,7 @@ export function ExplainModeProvider({ children }) {
     return () => {
       document.removeEventListener('click', handleGlobalClick, true);
     };
-  }, [isExplainModeActive, openExplainPanel, parseWidgetContent]);
+  }, [isExplainModeActive, openExplainPanel]);
 
   // Keyboard shortcut listener
   useEffect(() => {

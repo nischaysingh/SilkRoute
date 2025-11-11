@@ -7,76 +7,12 @@ import {
   X, Pin, Sparkles, TrendingUp, TrendingDown, Minus, ChevronDown, ChevronUp,
   Zap, Shield, GitBranch, Bell, FlaskConical, Bot, Code, Loader2
 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useExplainMode } from "./ExplainModeContext";
+import { generateExplanation, generateHeuristics } from "./parseWidgetContent";
 import { base44 } from "@/api/base44Client";
-
-// Inline explanation generators
-function generateExplanation(parsedData) {
-  const bullets = [];
-
-  if (parsedData.metric) {
-    bullets.push(`Current value: ${parsedData.metric}${parsedData.unit || ''}`);
-  }
-
-  if (parsedData.delta) {
-    const direction = parsedData.trend === 'up' ? 'increased' : parsedData.trend === 'down' ? 'decreased' : 'changed';
-    bullets.push(`This ${direction} by ${parsedData.delta}${parsedData.period ? ` over ${parsedData.period}` : ''}`);
-  } else if (parsedData.trend) {
-    const direction = parsedData.trend === 'up' ? 'trending upward' : parsedData.trend === 'down' ? 'trending downward' : 'stable';
-    bullets.push(`Currently ${direction}${parsedData.period ? ` for ${parsedData.period}` : ''}`);
-  }
-
-  if (parsedData.period && bullets.length === 1) {
-    bullets.push(`Period: ${parsedData.period}`);
-  }
-
-  if (bullets.length === 0) {
-    bullets.push('Showing key metrics and trends');
-  }
-
-  return bullets;
-}
-
-function generateHeuristics(parsedData) {
-  const reasons = [];
-
-  if (parsedData.trend === 'up' && parsedData.delta) {
-    const deltaNum = parseFloat(parsedData.delta.replace(/[^0-9.-]/g, ''));
-    if (deltaNum > 15) {
-      reasons.push('Significant increase detected - may indicate operational changes or seasonal effects');
-    } else if (deltaNum > 5) {
-      reasons.push('Moderate growth - consistent with expected patterns');
-    } else {
-      reasons.push('Slight uptick - within normal variance range');
-    }
-  } else if (parsedData.trend === 'down' && parsedData.delta) {
-    const deltaNum = Math.abs(parseFloat(parsedData.delta.replace(/[^0-9.-]/g, '')));
-    if (deltaNum > 15) {
-      reasons.push('Sharp decline - recommend investigation into root causes');
-    } else if (deltaNum > 5) {
-      reasons.push('Noticeable decrease - may require attention');
-    } else {
-      reasons.push('Minor decrease - likely within acceptable variance');
-    }
-  }
-
-  if (parsedData.period) {
-    if (parsedData.period.toLowerCase().includes('ytd')) {
-      reasons.push('Year-to-date view provides cumulative perspective');
-    } else if (parsedData.period.toLowerCase().includes('last')) {
-      reasons.push('Historical view helps identify patterns and anomalies');
-    }
-  }
-
-  if (reasons.length === 0) {
-    reasons.push('Multiple factors may influence this metric');
-    reasons.push('Consider cross-referencing with related data points');
-  }
-
-  return reasons;
-}
 
 export default function ExplainCoPilotPanel() {
   const { 
@@ -124,6 +60,7 @@ export default function ExplainCoPilotPanel() {
         if (response.data.explanation) {
           setAiInsights(response.data);
         } else {
+          // Fallback to heuristics
           setAiInsights({
             explanation: generateExplanation(activeData),
             reasoning: generateHeuristics(activeData),
@@ -132,6 +69,7 @@ export default function ExplainCoPilotPanel() {
         }
       } catch (error) {
         console.error('AI explanation error:', error);
+        // Fallback to heuristics
         setAiInsights({
           explanation: generateExplanation(activeData),
           reasoning: generateHeuristics(activeData),
@@ -213,251 +151,268 @@ export default function ExplainCoPilotPanel() {
   };
 
   const getTrendIcon = () => {
-    if (activeData.trend === 'up') return <TrendingUp className="w-4 h-4 text-emerald-500" />;
-    if (activeData.trend === 'down') return <TrendingDown className="w-4 h-4 text-red-500" />;
-    return <Minus className="w-4 h-4 text-slate-400" />;
+    if (activeData.trend === 'up') return <TrendingUp className="w-4 h-4 text-emerald-400" />;
+    if (activeData.trend === 'down') return <TrendingDown className="w-4 h-4 text-red-400" />;
+    return <Minus className="w-4 h-4 text-gray-400" />;
   };
 
   return (
-    <div className="fixed top-20 right-6 w-[420px] max-h-[calc(100vh-120px)] bg-white border border-slate-200 rounded-2xl shadow-2xl z-[100] overflow-hidden flex flex-col explain-copilot-panel">
-      {/* Header */}
-      <div className="p-4 border-b border-slate-200 bg-gradient-to-r from-blue-50 to-indigo-50">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center">
-              <Sparkles className="w-4 h-4 text-white" />
+    <AnimatePresence>
+      <motion.div
+        initial={{ x: "100%", opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        exit={{ x: "100%", opacity: 0 }}
+        transition={{ type: "spring", damping: 25, stiffness: 200 }}
+        className="fixed top-20 right-6 w-[420px] max-h-[calc(100vh-120px)] bg-gray-900/98 backdrop-blur-xl border border-purple-500/30 rounded-2xl shadow-2xl shadow-purple-500/20 z-[100] overflow-hidden flex flex-col explain-copilot-panel"
+      >
+        {/* Header */}
+        <div className="p-4 border-b border-white/10 bg-gradient-to-r from-purple-600/20 to-blue-600/20">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center">
+                <Sparkles className="w-4 h-4 text-white" />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-white">AI Explain</h3>
+                <div className="text-[10px] text-purple-300">Powered by GPT-4</div>
+              </div>
             </div>
-            <div>
-              <h3 className="text-sm font-bold text-slate-900">AI Explain</h3>
-              <div className="text-[10px] text-blue-600 font-medium">Powered by GPT-4</div>
+            <div className="flex items-center gap-1">
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={togglePin}
+                className={cn(
+                  "h-7 w-7 p-0",
+                  explainPanelState.isPinned ? "text-purple-400" : "text-gray-400 hover:text-white"
+                )}
+              >
+                <Pin className={cn("w-4 h-4", explainPanelState.isPinned && "fill-current")} />
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={closeExplainPanel}
+                className="text-gray-400 hover:text-white h-7 w-7 p-0"
+              >
+                <X className="w-4 h-4" />
+              </Button>
             </div>
           </div>
-          <div className="flex items-center gap-1">
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={togglePin}
-              className={cn(
-                "h-7 w-7 p-0",
-                explainPanelState.isPinned ? "text-blue-600" : "text-slate-400 hover:text-slate-900"
-              )}
-            >
-              <Pin className={cn("w-4 h-4", explainPanelState.isPinned && "fill-current")} />
-            </Button>
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={closeExplainPanel}
-              className="text-slate-400 hover:text-slate-900 h-7 w-7 p-0"
-            >
-              <X className="w-4 h-4" />
-            </Button>
-          </div>
+
+          {/* Multi-widget tabs */}
+          {explainPanelState.widgets.length > 1 && (
+            <Tabs value={explainPanelState.activeTab} onValueChange={setActiveTab}>
+              <TabsList className="bg-white/5 border border-white/10 h-8 w-full justify-start overflow-x-auto">
+                {explainPanelState.widgets.map((widget) => (
+                  <TabsTrigger 
+                    key={widget.id} 
+                    value={widget.id}
+                    className="text-xs h-6 relative pr-6"
+                  >
+                    {widget.data.title}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removeWidgetFromPanel(widget.id);
+                      }}
+                      className="absolute right-1 top-1/2 -translate-y-1/2 hover:bg-white/10 rounded p-0.5"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+            </Tabs>
+          )}
         </div>
 
-        {/* Multi-widget tabs */}
-        {explainPanelState.widgets.length > 1 && (
-          <Tabs value={explainPanelState.activeTab} onValueChange={setActiveTab}>
-            <TabsList className="bg-white border border-slate-200 h-8 w-full justify-start overflow-x-auto">
-              {explainPanelState.widgets.map((widget) => (
-                <TabsTrigger 
-                  key={widget.id} 
-                  value={widget.id}
-                  className="text-xs h-6 relative pr-6"
-                >
-                  {widget.data.title}
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      removeWidgetFromPanel(widget.id);
-                    }}
-                    className="absolute right-1 top-1/2 -translate-y-1/2 hover:bg-slate-100 rounded p-0.5"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </Tabs>
-        )}
-      </div>
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          {/* Widget Title & Trend */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-lg font-bold text-white">{activeData.title}</h3>
+              {activeData.trend && (
+                <Badge className={cn(
+                  "text-xs",
+                  activeData.trend === 'up' && "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
+                  activeData.trend === 'down' && "bg-red-500/20 text-red-400 border-red-500/30",
+                  activeData.trend === 'flat' && "bg-gray-500/20 text-gray-400 border-gray-500/30"
+                )}>
+                  {getTrendIcon()}
+                  <span className="ml-1 capitalize">{activeData.trend}</span>
+                </Badge>
+              )}
+            </div>
 
-      {/* Content */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50">
-        {/* Widget Title & Trend */}
-        <div>
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-lg font-bold text-slate-900">{activeData.title}</h3>
-            {activeData.trend && (
+            {activeData.metric && (
+              <div className="text-3xl font-bold text-white mb-1">
+                {activeData.metric}
+              </div>
+            )}
+
+            {activeData.delta && (
               <Badge className={cn(
                 "text-xs",
-                activeData.trend === 'up' && "bg-emerald-100 text-emerald-700 border-emerald-200",
-                activeData.trend === 'down' && "bg-red-100 text-red-700 border-red-200",
-                activeData.trend === 'flat' && "bg-slate-100 text-slate-700 border-slate-200"
+                activeData.trend === 'up' && "bg-emerald-500/20 text-emerald-400",
+                activeData.trend === 'down' && "bg-red-500/20 text-red-400"
               )}>
-                {getTrendIcon()}
-                <span className="ml-1 capitalize">{activeData.trend}</span>
+                {activeData.delta}
               </Badge>
             )}
           </div>
 
-          {activeData.metric && (
-            <div className="text-3xl font-bold text-slate-900 mb-1">
-              {activeData.metric}
-            </div>
-          )}
-
-          {activeData.delta && (
-            <Badge className={cn(
-              "text-xs",
-              activeData.trend === 'up' && "bg-emerald-100 text-emerald-700 border-emerald-200",
-              activeData.trend === 'down' && "bg-red-100 text-red-700 border-red-200"
-            )}>
-              {activeData.delta}
-            </Badge>
-          )}
-        </div>
-
-        {/* AI Loading State */}
-        {loadingAI && (
-          <Card className="bg-blue-50 border-blue-200">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <Loader2 className="w-5 h-5 text-blue-600 animate-spin" />
-                <span className="text-sm text-slate-900">AI analyzing...</span>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* AI-Powered Explanation */}
-        {aiInsights && !loadingAI && (
-          <>
-            <Card className="bg-white border-slate-200">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm text-slate-900 flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-blue-600" />
-                  What you're seeing
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                {aiInsights.explanation.map((bullet, idx) => (
-                  <div key={idx} className="flex items-start gap-2 text-sm text-slate-700">
-                    <span className="text-blue-600 mt-1">•</span>
-                    <span>{bullet}</span>
-                  </div>
-                ))}
+          {/* AI Loading State */}
+          {loadingAI && (
+            <Card className="bg-purple-500/10 border-purple-500/30">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <Loader2 className="w-5 h-5 text-purple-400 animate-spin" />
+                  <span className="text-sm text-white">AI analyzing widget...</span>
+                </div>
               </CardContent>
             </Card>
+          )}
 
-            <Card className="bg-white border-slate-200">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm text-slate-900 flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-indigo-600" />
-                  AI Analysis
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                {aiInsights.reasoning.map((reason, idx) => (
-                  <div key={idx} className="flex items-start gap-2 text-sm text-slate-700">
-                    <span className="text-indigo-600 mt-1">•</span>
-                    <span>{reason}</span>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-
-            {/* AI Suggestions */}
-            {aiInsights.suggestions && aiInsights.suggestions.length > 0 && (
-              <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
+          {/* AI-Powered Explanation */}
+          {aiInsights && !loadingAI && (
+            <>
+              <Card className="bg-white/5 border-white/10">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-sm text-slate-900 flex items-center gap-2">
-                    <Zap className="w-4 h-4 text-amber-600" />
-                    AI Recommendations
+                  <CardTitle className="text-sm text-white flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-blue-400" />
+                    What you're seeing
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2">
-                  {aiInsights.suggestions.map((suggestion, idx) => (
-                    <div key={idx} className="flex items-start gap-2 text-sm text-slate-700">
-                      <span className="text-amber-600 mt-1">→</span>
-                      <span>{suggestion}</span>
+                  {aiInsights.explanation.map((bullet, idx) => (
+                    <div key={idx} className="flex items-start gap-2 text-sm text-gray-300">
+                      <span className="text-blue-400 mt-1">•</span>
+                      <span>{bullet}</span>
                     </div>
                   ))}
                 </CardContent>
               </Card>
-            )}
-          </>
-        )}
 
-        {/* Suggested Actions */}
-        <div>
-          <h4 className="text-sm font-semibold text-slate-900 mb-3">Quick Actions</h4>
-          <div className="grid grid-cols-2 gap-2">
-            {activeData.actions.map((actionKey) => {
-              const config = getActionConfig(actionKey);
-              return (
-                <Button
-                  key={actionKey}
-                  size="sm"
-                  onClick={() => handleAction(actionKey)}
-                  className={cn(
-                    "justify-start h-auto py-2 px-3 bg-white border-slate-200 text-slate-900 hover:bg-slate-50"
-                  )}
-                  variant="outline"
-                >
-                  <config.icon className="w-4 h-4 mr-2 flex-shrink-0" />
-                  <span className="text-xs">{config.label}</span>
-                </Button>
-              );
-            })}
-          </div>
-        </div>
+              <Card className="bg-white/5 border-white/10">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm text-white flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-purple-400" />
+                    AI Analysis
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  {aiInsights.reasoning.map((reason, idx) => (
+                    <div key={idx} className="flex items-start gap-2 text-sm text-gray-300">
+                      <span className="text-purple-400 mt-1">•</span>
+                      <span>{reason}</span>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
 
-        {/* Raw Parsed Data (Expandable) */}
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setShowRawData(!showRawData)}
-          className="w-full justify-between text-slate-600 hover:text-slate-900 hover:bg-slate-100 h-8"
-        >
-          <span className="text-xs">Raw Parsed Values</span>
-          {showRawData ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-        </Button>
-
-        {showRawData && (
-          <Card className="bg-slate-900 border-slate-700">
-            <CardContent className="p-3">
-              <pre className="text-xs text-slate-300 overflow-x-auto">
-                {JSON.stringify({
-                  title: activeData.title,
-                  metric: activeData.metric,
-                  unit: activeData.unit,
-                  trend: activeData.trend,
-                  delta: activeData.delta,
-                  period: activeData.period,
-                  dimensions: activeData.dimensions,
-                  parsedFields: activeData.parsedFields
-                }, null, 2)}
-              </pre>
-            </CardContent>
-          </Card>
-        )}
-      </div>
-
-      {/* Footer */}
-      <div className="p-3 border-t border-slate-200 bg-white">
-        <div className="flex items-center justify-between text-xs text-slate-600">
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
-            <span>AI-powered analysis</span>
-          </div>
-          {explainPanelState.isPinned && (
-            <Badge className="bg-blue-100 text-blue-700 border-blue-200 text-[10px]">
-              Pinned
-            </Badge>
+              {/* AI Suggestions */}
+              {aiInsights.suggestions && aiInsights.suggestions.length > 0 && (
+                <Card className="bg-gradient-to-br from-purple-500/10 to-blue-500/10 border-purple-500/20">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-sm text-white flex items-center gap-2">
+                      <Zap className="w-4 h-4 text-yellow-400" />
+                      AI Recommendations
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    {aiInsights.suggestions.map((suggestion, idx) => (
+                      <div key={idx} className="flex items-start gap-2 text-sm text-gray-300">
+                        <span className="text-yellow-400 mt-1">→</span>
+                        <span>{suggestion}</span>
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+              )}
+            </>
           )}
+
+          {/* Suggested Actions */}
+          <div>
+            <h4 className="text-sm font-semibold text-white mb-3">Quick Actions</h4>
+            <div className="grid grid-cols-2 gap-2">
+              {activeData.actions.map((actionKey) => {
+                const config = getActionConfig(actionKey);
+                return (
+                  <Button
+                    key={actionKey}
+                    size="sm"
+                    onClick={() => handleAction(actionKey)}
+                    className={cn(
+                      "justify-start h-auto py-2 px-3 bg-white/5 border-white/10 text-white hover:bg-white/10"
+                    )}
+                    variant="outline"
+                  >
+                    <config.icon className="w-4 h-4 mr-2 flex-shrink-0" />
+                    <span className="text-xs">{config.label}</span>
+                  </Button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Raw Parsed Data (Expandable) */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowRawData(!showRawData)}
+            className="w-full justify-between text-gray-400 hover:text-white hover:bg-white/5 h-8"
+          >
+            <span className="text-xs">Raw Parsed Values</span>
+            {showRawData ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+          </Button>
+
+          <AnimatePresence>
+            {showRawData && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <Card className="bg-slate-950/80 border-white/10">
+                  <CardContent className="p-3">
+                    <pre className="text-xs text-gray-300 overflow-x-auto">
+                      {JSON.stringify({
+                        title: activeData.title,
+                        metric: activeData.metric,
+                        unit: activeData.unit,
+                        trend: activeData.trend,
+                        delta: activeData.delta,
+                        period: activeData.period,
+                        dimensions: activeData.dimensions,
+                        parsedFields: activeData.parsedFields
+                      }, null, 2)}
+                    </pre>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
-      </div>
-    </div>
+
+        {/* Footer */}
+        <div className="p-3 border-t border-white/10 bg-white/5">
+          <div className="flex items-center justify-between text-xs text-gray-400">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+              <span>AI-powered analysis</span>
+            </div>
+            {explainPanelState.isPinned && (
+              <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30 text-[10px]">
+                Pinned
+              </Badge>
+            )}
+          </div>
+        </div>
+      </motion.div>
+    </AnimatePresence>
   );
 }
