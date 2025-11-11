@@ -151,9 +151,9 @@ export default function ExplainCoPilotPanel() {
   };
 
   const getTrendIcon = () => {
-    if (activeData.trend === 'up') return <TrendingUp className="w-4 h-4 text-emerald-400" />;
-    if (activeData.trend === 'down') return <TrendingDown className="w-4 h-4 text-red-400" />;
-    return <Minus className="w-4 h-4 text-gray-400" />;
+    if (activeData.trend === 'up') return <TrendingUp className="w-4 h-4 text-emerald-500" />;
+    if (activeData.trend === 'down') return <TrendingDown className="w-4 h-4 text-red-500" />;
+    return <Minus className="w-4 h-4 text-slate-400" />;
   };
 
   return (
@@ -163,18 +163,18 @@ export default function ExplainCoPilotPanel() {
         animate={{ x: 0, opacity: 1 }}
         exit={{ x: "100%", opacity: 0 }}
         transition={{ type: "spring", damping: 25, stiffness: 200 }}
-        className="fixed top-20 right-6 w-[420px] max-h-[calc(100vh-120px)] bg-gray-900/98 backdrop-blur-xl border border-purple-500/30 rounded-2xl shadow-2xl shadow-purple-500/20 z-[100] overflow-hidden flex flex-col explain-copilot-panel"
+        className="fixed top-20 right-6 w-[420px] max-h-[calc(100vh-120px)] bg-white border border-slate-200 rounded-2xl shadow-2xl z-[100] overflow-hidden flex flex-col explain-copilot-panel"
       >
         {/* Header */}
-        <div className="p-4 border-b border-white/10 bg-gradient-to-r from-purple-600/20 to-blue-600/20">
+        <div className="p-4 border-b border-slate-200 bg-gradient-to-r from-blue-50 to-indigo-50">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center">
                 <Sparkles className="w-4 h-4 text-white" />
               </div>
               <div>
-                <h3 className="text-sm font-bold text-white">AI Explain</h3>
-                <div className="text-[10px] text-purple-300">Powered by GPT-4</div>
+                <h3 className="text-sm font-bold text-slate-900">AI Explain</h3>
+                <div className="text-[10px] text-blue-600 font-medium">Powered by GPT-4</div>
               </div>
             </div>
             <div className="flex items-center gap-1">
@@ -184,7 +184,7 @@ export default function ExplainCoPilotPanel() {
                 onClick={togglePin}
                 className={cn(
                   "h-7 w-7 p-0",
-                  explainPanelState.isPinned ? "text-purple-400" : "text-gray-400 hover:text-white"
+                  explainPanelState.isPinned ? "text-blue-600" : "text-slate-400 hover:text-slate-900"
                 )}
               >
                 <Pin className={cn("w-4 h-4", explainPanelState.isPinned && "fill-current")} />
@@ -193,7 +193,7 @@ export default function ExplainCoPilotPanel() {
                 size="sm"
                 variant="ghost"
                 onClick={closeExplainPanel}
-                className="text-gray-400 hover:text-white h-7 w-7 p-0"
+                className="text-slate-400 hover:text-slate-900 h-7 w-7 p-0"
               >
                 <X className="w-4 h-4" />
               </Button>
@@ -203,7 +203,7 @@ export default function ExplainCoPilotPanel() {
           {/* Multi-widget tabs */}
           {explainPanelState.widgets.length > 1 && (
             <Tabs value={explainPanelState.activeTab} onValueChange={setActiveTab}>
-              <TabsList className="bg-white/5 border border-white/10 h-8 w-full justify-start overflow-x-auto">
+              <TabsList className="bg-white border border-slate-200 h-8 w-full justify-start overflow-x-auto">
                 {explainPanelState.widgets.map((widget) => (
                   <TabsTrigger 
                     key={widget.id} 
@@ -216,7 +216,7 @@ export default function ExplainCoPilotPanel() {
                         e.stopPropagation();
                         removeWidgetFromPanel(widget.id);
                       }}
-                      className="absolute right-1 top-1/2 -translate-y-1/2 hover:bg-white/10 rounded p-0.5"
+                      className="absolute right-1 top-1/2 -translate-y-1/2 hover:bg-slate-100 rounded p-0.5"
                     >
                       <X className="w-3 h-3" />
                     </button>
@@ -228,17 +228,17 @@ export default function ExplainCoPilotPanel() {
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50">
           {/* Widget Title & Trend */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <h3 className="text-lg font-bold text-white">{activeData.title}</h3>
+              <h3 className="text-lg font-bold text-slate-900">{activeData.title}</h3>
               {activeData.trend && (
                 <Badge className={cn(
                   "text-xs",
-                  activeData.trend === 'up' && "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
-                  activeData.trend === 'down' && "bg-red-500/20 text-red-400 border-red-500/30",
-                  activeData.trend === 'flat' && "bg-gray-500/20 text-gray-400 border-gray-500/30"
+                  activeData.trend === 'up' && "bg-emerald-100 text-emerald-700 border-emerald-200",
+                  activeData.trend === 'down' && "bg-red-100 text-red-700 border-red-200",
+                  activeData.trend === 'flat' && "bg-slate-100 text-slate-700 border-slate-200"
                 )}>
                   {getTrendIcon()}
                   <span className="ml-1 capitalize">{activeData.trend}</span>
@@ -247,7 +247,7 @@ export default function ExplainCoPilotPanel() {
             </div>
 
             {activeData.metric && (
-              <div className="text-3xl font-bold text-white mb-1">
+              <div className="text-3xl font-bold text-slate-900 mb-1">
                 {activeData.metric}
               </div>
             )}
@@ -255,8 +255,8 @@ export default function ExplainCoPilotPanel() {
             {activeData.delta && (
               <Badge className={cn(
                 "text-xs",
-                activeData.trend === 'up' && "bg-emerald-500/20 text-emerald-400",
-                activeData.trend === 'down' && "bg-red-500/20 text-red-400"
+                activeData.trend === 'up' && "bg-emerald-100 text-emerald-700 border-emerald-200",
+                activeData.trend === 'down' && "bg-red-100 text-red-700 border-red-200"
               )}>
                 {activeData.delta}
               </Badge>
@@ -265,11 +265,11 @@ export default function ExplainCoPilotPanel() {
 
           {/* AI Loading State */}
           {loadingAI && (
-            <Card className="bg-purple-500/10 border-purple-500/30">
+            <Card className="bg-blue-50 border-blue-200">
               <CardContent className="p-4">
                 <div className="flex items-center gap-3">
-                  <Loader2 className="w-5 h-5 text-purple-400 animate-spin" />
-                  <span className="text-sm text-white">AI analyzing widget...</span>
+                  <Loader2 className="w-5 h-5 text-blue-600 animate-spin" />
+                  <span className="text-sm text-slate-900">AI analyzing widget...</span>
                 </div>
               </CardContent>
             </Card>
@@ -278,34 +278,34 @@ export default function ExplainCoPilotPanel() {
           {/* AI-Powered Explanation */}
           {aiInsights && !loadingAI && (
             <>
-              <Card className="bg-white/5 border-white/10">
+              <Card className="bg-white border-slate-200">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-sm text-white flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-blue-400" />
+                  <CardTitle className="text-sm text-slate-900 flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-blue-600" />
                     What you're seeing
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2">
                   {aiInsights.explanation.map((bullet, idx) => (
-                    <div key={idx} className="flex items-start gap-2 text-sm text-gray-300">
-                      <span className="text-blue-400 mt-1">•</span>
+                    <div key={idx} className="flex items-start gap-2 text-sm text-slate-700">
+                      <span className="text-blue-600 mt-1">•</span>
                       <span>{bullet}</span>
                     </div>
                   ))}
                 </CardContent>
               </Card>
 
-              <Card className="bg-white/5 border-white/10">
+              <Card className="bg-white border-slate-200">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-sm text-white flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-purple-400" />
+                  <CardTitle className="text-sm text-slate-900 flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-indigo-600" />
                     AI Analysis
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2">
                   {aiInsights.reasoning.map((reason, idx) => (
-                    <div key={idx} className="flex items-start gap-2 text-sm text-gray-300">
-                      <span className="text-purple-400 mt-1">•</span>
+                    <div key={idx} className="flex items-start gap-2 text-sm text-slate-700">
+                      <span className="text-indigo-600 mt-1">•</span>
                       <span>{reason}</span>
                     </div>
                   ))}
@@ -314,17 +314,17 @@ export default function ExplainCoPilotPanel() {
 
               {/* AI Suggestions */}
               {aiInsights.suggestions && aiInsights.suggestions.length > 0 && (
-                <Card className="bg-gradient-to-br from-purple-500/10 to-blue-500/10 border-purple-500/20">
+                <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
                   <CardHeader className="pb-3">
-                    <CardTitle className="text-sm text-white flex items-center gap-2">
-                      <Zap className="w-4 h-4 text-yellow-400" />
+                    <CardTitle className="text-sm text-slate-900 flex items-center gap-2">
+                      <Zap className="w-4 h-4 text-amber-600" />
                       AI Recommendations
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-2">
                     {aiInsights.suggestions.map((suggestion, idx) => (
-                      <div key={idx} className="flex items-start gap-2 text-sm text-gray-300">
-                        <span className="text-yellow-400 mt-1">→</span>
+                      <div key={idx} className="flex items-start gap-2 text-sm text-slate-700">
+                        <span className="text-amber-600 mt-1">→</span>
                         <span>{suggestion}</span>
                       </div>
                     ))}
@@ -336,7 +336,7 @@ export default function ExplainCoPilotPanel() {
 
           {/* Suggested Actions */}
           <div>
-            <h4 className="text-sm font-semibold text-white mb-3">Quick Actions</h4>
+            <h4 className="text-sm font-semibold text-slate-900 mb-3">Quick Actions</h4>
             <div className="grid grid-cols-2 gap-2">
               {activeData.actions.map((actionKey) => {
                 const config = getActionConfig(actionKey);
@@ -346,7 +346,7 @@ export default function ExplainCoPilotPanel() {
                     size="sm"
                     onClick={() => handleAction(actionKey)}
                     className={cn(
-                      "justify-start h-auto py-2 px-3 bg-white/5 border-white/10 text-white hover:bg-white/10"
+                      "justify-start h-auto py-2 px-3 bg-white border-slate-200 text-slate-900 hover:bg-slate-50"
                     )}
                     variant="outline"
                   >
@@ -363,7 +363,7 @@ export default function ExplainCoPilotPanel() {
             variant="ghost"
             size="sm"
             onClick={() => setShowRawData(!showRawData)}
-            className="w-full justify-between text-gray-400 hover:text-white hover:bg-white/5 h-8"
+            className="w-full justify-between text-slate-600 hover:text-slate-900 hover:bg-slate-100 h-8"
           >
             <span className="text-xs">Raw Parsed Values</span>
             {showRawData ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
@@ -377,9 +377,9 @@ export default function ExplainCoPilotPanel() {
                 exit={{ height: 0, opacity: 0 }}
                 transition={{ duration: 0.2 }}
               >
-                <Card className="bg-slate-950/80 border-white/10">
+                <Card className="bg-slate-900 border-slate-700">
                   <CardContent className="p-3">
-                    <pre className="text-xs text-gray-300 overflow-x-auto">
+                    <pre className="text-xs text-slate-300 overflow-x-auto">
                       {JSON.stringify({
                         title: activeData.title,
                         metric: activeData.metric,
@@ -398,15 +398,15 @@ export default function ExplainCoPilotPanel() {
           </AnimatePresence>
         </div>
 
-        {/* Footer */}
-        <div className="p-3 border-t border-white/10 bg-white/5">
-          <div className="flex items-center justify-between text-xs text-gray-400">
+        {/* Footer - Simplified */}
+        <div className="p-3 border-t border-slate-200 bg-white">
+          <div className="flex items-center justify-between text-xs text-slate-600">
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+              <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
               <span>AI-powered analysis</span>
             </div>
             {explainPanelState.isPinned && (
-              <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30 text-[10px]">
+              <Badge className="bg-blue-100 text-blue-700 border-blue-200 text-[10px]">
                 Pinned
               </Badge>
             )}
