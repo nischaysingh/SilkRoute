@@ -479,7 +479,7 @@ export default function ToolboxTab() {
     spendEfficiency: { current: -12, target: -15, trend: [-8, -10, -11, -12], unit: "%" },
     humanApprovalLoad: { current: -35, target: -40, trend: [-20, -28, -32, -35], unit: "%" },
     meanTimeToOptimization: { current: 18, target: 24, trend: [28, 24, 21, 18], unit: "hours" }
-  ]);
+  });
 
   // NEW: Phase 4 - Enterprise Governance & Federated Intelligence State
 
@@ -852,7 +852,7 @@ export default function ToolboxTab() {
     { id: "decide", name: "Decide", icon: GitBranch, category: "logic", description: "Branch based on condition" },
     { id: "generate", name: "Generate", icon: Sparkles, category: "ai", description: "AI content generation" },
     { id: "update_record", name: "Update Record", icon: Edit, category: "output", description: "Update database record" },
-    { id: "send_email", name: "Send Email", icon: MessageSquare, category: "output", description: "Post to Slack channel" },
+    { id: "send_email", name: "Send Email", icon: MessageSquare, category: "output", description: "Send email notification" },
     { id: "send_slack", name: "Send Slack", icon: MessageSquare, category: "output", description: "Post to Slack channel" },
     { id: "schedule", name: "Schedule", icon: Target, category: "control", description: "Schedule future execution" },
     { id: "wait", name: "Wait", icon: Target, category: "control", description: "Pause execution" },
@@ -4099,120 +4099,121 @@ export default function ToolboxTab() {
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="7-days">Last 7 days</SelectItem>
-                      <SelectItem value="30-days">Last 30 days</SelectItem>
-                      <SelectItem value="90-days">Last 90 days</SelectItem>
-                    </SelectContent>
-                  </Select>
+                      <SelectContent>
+                        <SelectItem value="7-days">Last 7 days</SelectItem>
+                        <SelectItem value="30-days">Last 30 days</SelectItem>
+                        <SelectItem value="90-days">Last 90 days</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <Button
+                    className="w-full mt-6 bg-cyan-600 hover:bg-cyan-700"
+                    onClick={handleRunSimulation}
+                    disabled={simulationRunning}
+                  >
+                    {simulationRunning ? (
+                      <>
+                        <motion.div
+                          animate={{ rotate: 360 }}
+                          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                          className="mr-2"
+                        >
+                          <Wind className="w-4 h-4" />
+                        </motion.div>
+                        Running Simulation...
+                      </>
+                    ) : (
+                      <>
+                        <Play className="w-4 h-4 mr-2" />
+                        Run Simulation
+                      </>
+                    )}
+                  </Button>
                 </div>
 
-                <Button
-                  className="w-full mt-6 bg-cyan-600 hover:bg-cyan-700"
-                  onClick={handleRunSimulation}
-                  disabled={simulationRunning}
-                >
-                  {simulationRunning ? (
-                    <>
-                      <motion.div
-                        animate={{ rotate: 360 }}
-                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                        className="mr-2"
-                      >
-                        <Wind className="w-4 h-4" />
-                      </motion.div>
-                      Running Simulation...
-                    </>
+                <div>
+                  {simulationResult ? (
+                    <div className="space-y-3">
+                      <Card className={cn(
+                        "border-2",
+                        simulationResult.safeToExecute ? "border-emerald-300 bg-emerald-50" : "border-red-300 bg-red-50"
+                      )}>
+                        <CardContent className="p-4">
+                          <div className="flex items-center justify-between mb-3">
+                            <h4 className="text-sm font-bold text-slate-900">Simulation Results</h4>
+                            <Badge className={cn(
+                              "text-xs",
+                              simulationResult.safeToExecute ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700"
+                            )}>
+                              {simulationResult.safeToExecute ? "Safe to Execute" : "Not Safe"}
+                            </Badge>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-3 mb-3">
+                            <div className="p-2 bg-white rounded">
+                              <div className="text-xs text-slate-600">Confidence</div>
+                              <div className="text-lg font-bold text-cyan-600">{simulationResult.confidence}%</div>
+                            </div>
+                            <div className="p-2 bg-white rounded">
+                              <div className="text-xs text-slate-600">Risk Score</div>
+                              <div className="text-lg font-bold text-amber-600">{simulationResult.riskScore}</div>
+                            </div>
+                            <div className="p-2 bg-white rounded">
+                              <div className="text-xs text-slate-600">Predicted Cost</div>
+                              <div className="text-sm font-bold text-slate-900">{simulationResult.predictedCost}</div>
+                            </div>
+                            <div className="p-2 bg-white rounded">
+                              <div className="text-xs text-slate-600">Success Rate</div>
+                              <div className="text-sm font-bold text-emerald-600">{simulationResult.predictedSuccessRate}</div>
+                            </div>
+                          </div>
+
+                          <Progress value={simulationResult.confidence} className="h-2" />
+                        </CardContent>
+                      </Card>
+
+                      {simulationResult.warnings.length > 0 && (
+                        <Card className="border-2 border-amber-300 bg-amber-50">
+                          <CardContent className="p-3">
+                            <div className="flex items-center gap-2 mb-2">
+                              <AlertTriangle className="w-4 h-4 text-amber-600" />
+                              <div className="text-xs font-bold text-amber-900">Warnings</div>
+                            </div>
+                            <ul className="space-y-1">
+                              {simulationResult.warnings.map((warning, idx) => (
+                                <li key={idx} className="text-xs text-slate-700">• {warning}</li>
+                              ))}
+                            </ul>
+                          </CardContent>
+                        </Card>
+                      )}
+
+                      {simulationResult.recommendations.length > 0 && (
+                        <Card className="border-2 border-blue-200 bg-blue-50">
+                          <CardContent className="p-3">
+                            <div className="flex items-center gap-2 mb-2">
+                              <Lightbulb className="w-4 h-4 text-blue-600" />
+                              <div className="text-xs font-bold text-blue-900">Recommendations</div>
+                            </div>
+                            <ul className="space-y-1">
+                              {simulationResult.recommendations.map((rec, idx) => (
+                                <li key={idx} className="text-xs text-slate-700">• {rec}</li>
+                              ))}
+                            </ul>
+                          </CardContent>
+                        </Card>
+                      )}
+                    </div>
                   ) : (
-                    <>
-                      <Play className="w-4 h-4 mr-2" />
-                      Run Simulation
-                    </>
+                    <div className="border-2 border-dashed border-cyan-300 rounded-lg p-12 text-center">
+                      <Wind className="w-16 h-16 mx-auto mb-3 text-cyan-400" />
+                      <p className="text-sm text-slate-600">Run simulation to see results</p>
+                    </div>
                   )}
-                </Button>
+                </div>
               </div>
-
-              <div>
-                {simulationResult ? (
-                  <div className="space-y-3">
-                    <Card className={cn(
-                      "border-2",
-                      simulationResult.safeToExecute ? "border-emerald-300 bg-emerald-50" : "border-red-300 bg-red-50"
-                    )}>
-                      <CardContent className="p-4">
-                        <div className="flex items-center justify-between mb-3">
-                          <h4 className="text-sm font-bold text-slate-900">Simulation Results</h4>
-                          <Badge className={cn(
-                            "text-xs",
-                            simulationResult.safeToExecute ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700"
-                          )}>
-                            {simulationResult.safeToExecute ? "Safe to Execute" : "Not Safe"}
-                          </Badge>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-3 mb-3">
-                          <div className="p-2 bg-white rounded">
-                            <div className="text-xs text-slate-600">Confidence</div>
-                            <div className="text-lg font-bold text-cyan-600">{simulationResult.confidence}%</div>
-                          </div>
-                          <div className="p-2 bg-white rounded">
-                            <div className="text-xs text-slate-600">Risk Score</div>
-                            <div className="text-lg font-bold text-amber-600">{simulationResult.riskScore}</div>
-                          </div>
-                          <div className="p-2 bg-white rounded">
-                            <div className="text-xs text-slate-600">Predicted Cost</div>
-                            <div className="text-sm font-bold text-slate-900">{simulationResult.predictedCost}</div>
-                          </div>
-                          <div className="p-2 bg-white rounded">
-                            <div className="text-xs text-slate-600">Success Rate</div>
-                            <div className="text-sm font-bold text-emerald-600">{simulationResult.predictedSuccessRate}</div>
-                          </div>
-                        </div>
-
-                        <Progress value={simulationResult.confidence} className="h-2" />
-                      </CardContent>
-                    </Card>
-
-                    {simulationResult.warnings.length > 0 && (
-                      <Card className="border-2 border-amber-300 bg-amber-50">
-                        <CardContent className="p-3">
-                          <div className="flex items-center gap-2 mb-2">
-                            <AlertTriangle className="w-4 h-4 text-amber-600" />
-                            <div className="text-xs font-bold text-amber-900">Warnings</div>
-                          </div>
-                          <ul className="space-y-1">
-                            {simulationResult.warnings.map((warning, idx) => (
-                              <li key={idx} className="text-xs text-slate-700">• {warning}</li>
-                            ))}
-                          </ul>
-                        </CardContent>
-                      </Card>
-                    )}
-
-                    {simulationResult.recommendations.length > 0 && (
-                      <Card className="border-2 border-blue-200 bg-blue-50">
-                        <CardContent className="p-3">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Lightbulb className="w-4 h-4 text-blue-600" />
-                            <div className="text-xs font-bold text-blue-900">Recommendations</div>
-                          </div>
-                          <ul className="space-y-1">
-                            {simulationResult.recommendations.map((rec, idx) => (
-                              <li key={idx} className="text-xs text-slate-700">• {rec}</li>
-                            ))}
-                          </ul>
-                        </CardContent>
-                      </Card>
-                    )}
-                  </div>
-                ) : (
-                  <div className="border-2 border-dashed border-cyan-300 rounded-lg p-12 text-center">
-                    <Wind className="w-16 h-16 mx-auto mb-3 text-cyan-400" />
-                    <p className="text-sm text-slate-600">Run simulation to see results</p>
-                  </div>
-                )}
-              </div>
-            </div>
+            </CardContent>
           </Card>
         </TabsContent>
 
