@@ -10,8 +10,73 @@ import {
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useExplainMode } from "./ExplainModeContext";
-import { generateExplanation, generateHeuristics } from "./parseWidgetContent";
 import { base44 } from "@/api/base44Client";
+
+// Inline explanation generators
+function generateExplanation(parsedData) {
+  const bullets = [];
+
+  if (parsedData.metric) {
+    bullets.push(`Current value: ${parsedData.metric}${parsedData.unit || ''}`);
+  }
+
+  if (parsedData.delta) {
+    const direction = parsedData.trend === 'up' ? 'increased' : parsedData.trend === 'down' ? 'decreased' : 'changed';
+    bullets.push(`This ${direction} by ${parsedData.delta}${parsedData.period ? ` over ${parsedData.period}` : ''}`);
+  } else if (parsedData.trend) {
+    const direction = parsedData.trend === 'up' ? 'trending upward' : parsedData.trend === 'down' ? 'trending downward' : 'stable';
+    bullets.push(`Currently ${direction}${parsedData.period ? ` for ${parsedData.period}` : ''}`);
+  }
+
+  if (parsedData.period && bullets.length === 1) {
+    bullets.push(`Period: ${parsedData.period}`);
+  }
+
+  if (bullets.length === 0) {
+    bullets.push('Showing key metrics and trends');
+  }
+
+  return bullets;
+}
+
+function generateHeuristics(parsedData) {
+  const reasons = [];
+
+  if (parsedData.trend === 'up' && parsedData.delta) {
+    const deltaNum = parseFloat(parsedData.delta.replace(/[^0-9.-]/g, ''));
+    if (deltaNum > 15) {
+      reasons.push('Significant increase detected - may indicate operational changes or seasonal effects');
+    } else if (deltaNum > 5) {
+      reasons.push('Moderate growth - consistent with expected patterns');
+    } else {
+      reasons.push('Slight uptick - within normal variance range');
+    }
+  } else if (parsedData.trend === 'down' && parsedData.delta) {
+    const deltaNum = Math.abs(parseFloat(parsedData.delta.replace(/[^0-9.-]/g, '')));
+    if (deltaNum > 15) {
+      reasons.push('Sharp decline - recommend investigation into root causes');
+    } else if (deltaNum > 5) {
+      reasons.push('Noticeable decrease - may require attention');
+    } else {
+      reasons.push('Minor decrease - likely within acceptable variance');
+    }
+  }
+
+  if (parsedData.period) {
+    if (parsedData.period.toLowerCase().includes('ytd')) {
+      reasons.push('Year-to-date view provides cumulative perspective');
+    } else if (parsedData.period.toLowerCase().includes('last')) {
+      reasons.push('Historical view helps identify patterns and anomalies');
+    }
+  }
+
+  if (reasons.length === 0) {
+    reasons.push('Multiple factors may influence this metric');
+    reasons.push('Consider cross-referencing with related data points');
+  }
+
+  return reasons;
+}
 
 export default function ExplainCoPilotPanel() {
   const { 
