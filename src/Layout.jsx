@@ -16,6 +16,7 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import { motion, AnimatePresence } from "framer-motion";
 import { ExplainModeProvider, useExplainMode } from "@/components/explain/ExplainModeContext";
 import ExplainCoPilotPanel from "@/components/explain/ExplainCoPilotPanel";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -56,10 +57,10 @@ function LayoutContent({ children, currentPageName }) {
       <style>{`
         /* Explain Mode Highlight Glow for ANY element clicked */
         ${isExplainModeActive ? `
-          [class*="Card"]:hover,
-          [class*="recharts"]:hover,
-          table:hover,
-          [class*="bg-"][class*="border"]:hover {
+          [class*="Card"]:not(.explain-copilot-panel):not(.explain-copilot-panel *):hover,
+          [class*="recharts"]:not(.explain-copilot-panel):not(.explain-copilot-panel *):hover,
+          table:not(.explain-copilot-panel):not(.explain-copilot-panel *):hover,
+          [class*="bg-"][class*="border"]:not(.explain-copilot-panel):not(.explain-copilot-panel *):not(button):not(input):hover {
             outline: 2px solid rgba(147, 51, 234, 0.6) !important;
             outline-offset: 2px !important;
             box-shadow: 0 0 0 4px rgba(147, 51, 234, 0.15), 0 0 20px rgba(147, 51, 234, 0.4) !important;
@@ -67,7 +68,7 @@ function LayoutContent({ children, currentPageName }) {
             transition: all 150ms ease-in-out !important;
           }
 
-          [data-explainable="true"] {
+          [data-explainable="true"]:not(.explain-copilot-panel):not(.explain-copilot-panel *) {
             outline: 2px solid rgba(147, 51, 234, 0.5) !important;
             outline-offset: 2px !important;
             box-shadow: 0 0 0 4px rgba(147, 51, 234, 0.1), 0 0 16px rgba(147, 51, 234, 0.3) !important;
@@ -75,7 +76,7 @@ function LayoutContent({ children, currentPageName }) {
             transition: all 150ms ease-in-out !important;
           }
 
-          [data-explainable="true"]:hover {
+          [data-explainable="true"]:not(.explain-copilot-panel):not(.explain-copilot-panel *):hover {
             outline-color: rgba(147, 51, 234, 0.8) !important;
             box-shadow: 0 0 0 4px rgba(147, 51, 234, 0.2), 0 0 24px rgba(147, 51, 234, 0.5) !important;
           }
@@ -96,7 +97,6 @@ function LayoutContent({ children, currentPageName }) {
       {/* Top Navigation Bar */}
       <div className="bg-black/40 backdrop-blur-xl border-b border-white/10 sticky top-0 z-50">
         <div className="flex items-center justify-between h-16 px-4 md:px-6">
-          {/* Left: Company Switcher */}
           <div className="flex items-center gap-4">
             <Button
               variant="ghost"
@@ -130,14 +130,12 @@ function LayoutContent({ children, currentPageName }) {
             </DropdownMenu>
           </div>
 
-          {/* Center: App Title */}
           <div className="absolute left-1/2 transform -translate-x-1/2">
             <h1 className="text-4xl font-medium text-center bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
               Opsentia
             </h1>
           </div>
 
-          {/* Right: Period Selector, Alert Bell, Avatar */}
           <div className="flex items-center gap-3">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -195,7 +193,6 @@ function LayoutContent({ children, currentPageName }) {
           </div>
         </div>
 
-        {/* Horizontal Navigation Tabs (Desktop) */}
         <div className="bg-slate-50 text-slate-950 mx-6 px-6 rounded-[10px] hidden lg:flex items-center border-t border-white/10">
           {navItems.map((item) => (
             <Link
@@ -213,15 +210,12 @@ function LayoutContent({ children, currentPageName }) {
             </Link>
           ))}
           
-          {/* Status Indicators on the right */}
           <div className="ml-auto flex items-center gap-3">
-            {/* All Systems Online */}
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-50 border border-emerald-200">
               <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
               <span className="text-xs font-medium text-slate-700">All systems online</span>
             </div>
 
-            {/* M.POS Connected */}
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-50 border border-blue-200">
               <Wifi className="w-3.5 h-3.5 text-blue-600" />
               <span className="text-xs font-medium text-slate-700">M.POS connected</span>
@@ -230,7 +224,6 @@ function LayoutContent({ children, currentPageName }) {
         </div>
       </div>
 
-      {/* Mobile Menu Overlay */}
       {mobileMenuOpen && (
         <div
           className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
@@ -238,7 +231,6 @@ function LayoutContent({ children, currentPageName }) {
         />
       )}
 
-      {/* Mobile Sidebar */}
       <div
         className={cn(
           "fixed top-16 left-0 h-[calc(100vh-4rem)] bg-gray-900/95 backdrop-blur-xl border-r border-white/10 w-64 z-40 transform transition-transform duration-300 lg:hidden shadow-2xl",
@@ -265,7 +257,6 @@ function LayoutContent({ children, currentPageName }) {
         </nav>
       </div>
 
-      {/* Main Content with Explain Mode support */}
       <main 
         className={cn(
           "p-4 md:p-6 lg:p-8 max-w-[1600px] mx-auto relative",
@@ -275,7 +266,6 @@ function LayoutContent({ children, currentPageName }) {
         {children}
       </main>
 
-      {/* Sticky Explain Mode Button with Tooltip */}
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
@@ -284,13 +274,13 @@ function LayoutContent({ children, currentPageName }) {
               className={cn(
                 "fixed bottom-6 right-6 z-[90] rounded-full w-16 h-16 shadow-2xl transition-all duration-200 flex items-center justify-center",
                 isExplainModeActive
-                  ? "bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 scale-110 animate-pulse"
+                  ? "bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 scale-110"
                   : "bg-gradient-to-r from-slate-700 to-slate-800 hover:from-slate-600 hover:to-slate-700"
               )}
               aria-label={isExplainModeActive ? "Exit Explain Mode (Press E)" : "Enter Explain Mode (Press E)"}
             >
               <div className="flex flex-col items-center">
-                <Eye className={cn("w-6 h-6 text-white", isExplainModeActive && "animate-bounce")} />
+                <Eye className="w-6 h-6 text-white" />
                 <span className="text-[9px] text-white mt-0.5 font-semibold">
                   {isExplainModeActive ? "EXIT" : "EXPLAIN"}
                 </span>
@@ -307,22 +297,22 @@ function LayoutContent({ children, currentPageName }) {
         </Tooltip>
       </TooltipProvider>
 
-      {/* Floating instruction banner when Explain Mode is active */}
-      {isExplainModeActive && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 20 }}
-          className="fixed bottom-24 right-6 z-[90] px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 text-white text-xs font-semibold shadow-lg border border-white/20"
-        >
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-white animate-pulse"></div>
-            <span>Explain Mode Active - Click any widget to understand it</span>
-          </div>
-        </motion.div>
-      )}
+      <AnimatePresence>
+        {isExplainModeActive && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            className="fixed bottom-24 right-6 z-[90] px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 text-white text-xs font-semibold shadow-lg border border-white/20"
+          >
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-white animate-pulse"></div>
+              <span>Explain Mode Active - Click any widget to understand it</span>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {/* Explain Co-Pilot Panel */}
       <ExplainCoPilotPanel />
     </div>
   );
