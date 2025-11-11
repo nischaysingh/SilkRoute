@@ -479,7 +479,7 @@ export default function ToolboxTab() {
     spendEfficiency: { current: -12, target: -15, trend: [-8, -10, -11, -12], unit: "%" },
     humanApprovalLoad: { current: -35, target: -40, trend: [-20, -28, -32, -35], unit: "%" },
     meanTimeToOptimization: { current: 18, target: 24, trend: [28, 24, 21, 18], unit: "hours" }
-  });
+  ]);
 
   // NEW: Phase 4 - Enterprise Governance & Federated Intelligence State
 
@@ -852,7 +852,7 @@ export default function ToolboxTab() {
     { id: "decide", name: "Decide", icon: GitBranch, category: "logic", description: "Branch based on condition" },
     { id: "generate", name: "Generate", icon: Sparkles, category: "ai", description: "AI content generation" },
     { id: "update_record", name: "Update Record", icon: Edit, category: "output", description: "Update database record" },
-    { id: "send_email", name: "Send Email", icon: MessageSquare, category: "output", description: "Send email notification" },
+    { id: "send_email", name: "Send Email", icon: MessageSquare, category: "output", description: "Post to Slack channel" },
     { id: "send_slack", name: "Send Slack", icon: MessageSquare, category: "output", description: "Post to Slack channel" },
     { id: "schedule", name: "Schedule", icon: Target, category: "control", description: "Schedule future execution" },
     { id: "wait", name: "Wait", icon: Target, category: "control", description: "Pause execution" },
