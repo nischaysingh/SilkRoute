@@ -164,12 +164,19 @@ export default function ATCTab() {
   const [batchModalOpen, setBatchModalOpen] = useState(false);
   const [batchProgress, setBatchProgress] = useState(0);
   const [batchRunning, setBatchRunning] = useState(false);
-  const [batchResults, setBatchResults] = useState(null); // Added this state
+  const [batchResults, setBatchResults] = useState(null); 
   const [profileConfirmOpen, setProfileConfirmOpen] = useState(false);
   const [appliedSuggestions, setAppliedSuggestions] = useState([]);
   const [telemetryPulse, setTelemetryPulse] = useState(false);
   const [auditLogOpen, setAuditLogOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
+
+  // New mission creation state
+  const [newMissionName, setNewMissionName] = useState("");
+  const [newMissionObjective, setNewMissionObjective] = useState("");
+  const [newMissionPriority, setNewMissionPriority] = useState("2"); // Default to P2 (High)
+  const [creatingMission, setCreatingMission] = useState(false);
+  const [missionSimulationResult, setMissionSimulationResult] = useState(null);
 
   // Fetch current user
   useEffect(() => {
@@ -481,7 +488,7 @@ export default function ATCTab() {
   const startBatchOperation = async () => {
     setBatchRunning(true);
     setBatchProgress(0);
-    setBatchResults(null); // Reset results at start
+    setBatchResults(null); 
     
     addActivity(`Batch operation "${selectedRunbook}" started`, "info");
     
@@ -557,20 +564,20 @@ export default function ATCTab() {
           };
           
           const result = results[selectedRunbook] || results["Batch Approve"];
-          setBatchResults(result); // Set the results
+          setBatchResults(result); 
           
           toast.success("Batch operation successful", {
-            description: result.summary // Use result.summary
+            description: result.summary 
           });
           
-          addActivity(`Batch "${selectedRunbook}" completed (${result.items_processed || result.items_analyzed || result.items_scanned} items)`, "success"); // Use result data
+          addActivity(`Batch "${selectedRunbook}" completed (${result.items_processed || result.items_analyzed || result.items_scanned} items)`, "success"); 
           
           logAudit(
             "batch_operation_complete",
-            `Completed batch operation: ${selectedRunbook} - ${result.summary}`, // Use result.summary
+            `Completed batch operation: ${selectedRunbook} - ${result.summary}`, 
             "batch",
             null,
-            result, // Pass the whole result object as metadata
+            result, 
             "medium",
             true
           );
@@ -578,7 +585,7 @@ export default function ATCTab() {
           setLiveEvents(prev => [{
             ts: new Date().toISOString(),
             type: "info",
-            message: `Batch operation ${selectedRunbook} completed - ${result.summary}`, // Use result.summary
+            message: `Batch operation ${selectedRunbook} completed - ${result.summary}`, 
             agent: "autopilot"
           }, ...prev]);
           
@@ -623,7 +630,7 @@ export default function ATCTab() {
         {
           new_profile: selectedProfile,
           new_concurrency: concurrency[0],
-          cost_cap: currentProfile.cost_cap_cents_per_hour // This currentProfile is based on the new selectedProfile
+          cost_cap: currentProfile.cost_cap_cents_per_hour 
         },
         "high",
         true
@@ -752,8 +759,8 @@ export default function ATCTab() {
       "system",
       command.id,
       { command: command.label, category: command.category },
-      "medium", // Default severity, can be overridden by command metadata
-      command.category === "critical" || command.id === "pause-source-webhook" // Example of compliance relevance
+      "medium", 
+      command.category === "critical" || command.id === "pause-source-webhook" 
     );
     
     switch (command.id) {
@@ -830,6 +837,78 @@ export default function ATCTab() {
 
     setTelemetryPulse(true);
     setTimeout(() => setTelemetryPulse(false), 1000);
+  };
+
+  const handleCreateMission = async () => {
+    if (!newMissionName || !newMissionObjective) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+
+    setCreatingMission(true);
+    setMissionSimulationResult(null);
+
+    try {
+      const { generateMissionSimulation } = await import("@/functions/generateMissionSimulation");
+      
+      const response = await generateMissionSimulation({
+        missionName: newMissionName,
+        objective: newMissionObjective,
+        priority: parseInt(newMissionPriority)
+      });
+
+      if (response.data.success) {
+        setMissionSimulationResult(response.data.mission);
+        
+        toast.success("Mission simulated successfully! 🚀", {
+          description: `"${newMissionName}" is ready for deployment`
+        });
+        
+        addActivity(`AI-generated mission: ${newMissionName}`, "success");
+        
+        await logAudit(
+          "mission_create",
+          `Created AI-generated mission: ${newMissionName}`,
+          "mission",
+          response.data.mission.id,
+          {
+            missionName: newMissionName,
+            objective: newMissionObjective,
+            priority: newMissionPriority,
+            aiGenerated: true,
+            simulation: response.data.mission.simulation_metadata
+          },
+          "medium",
+          true
+        );
+        
+        setLiveEvents(prev => [{
+          ts: new Date().toISOString(),
+          type: "info",
+          message: `AI mission created: ${newMissionName}`,
+          agent: "ai-copilot"
+        }, ...prev]);
+        
+        // Reset form but keep dialog open to show results
+      } else {
+        throw new Error(response.data.error || "Failed to create mission");
+      }
+    } catch (error) {
+      console.error('Error creating mission:', error);
+      toast.error("Failed to create mission", {
+        description: error.message || "Please try again"
+      });
+    } finally {
+      setCreatingMission(false);
+    }
+  };
+
+  const handleCloseMissionDialog = () => {
+    setNewMissionOpen(false);
+    setNewMissionName("");
+    setNewMissionObjective("");
+    setNewMissionPriority("2");
+    setMissionSimulationResult(null);
   };
 
   const filteredEvents = eventFilter === "all" ? liveEvents :
@@ -2252,63 +2331,237 @@ export default function ATCTab() {
         </SheetContent>
       </Sheet>
 
-      {/* New Mission Dialog */}
-      <Dialog open={newMissionOpen} onOpenChange={setNewMissionOpen}>
-        <DialogContent className="bg-white border-slate-200">
+      {/* New Mission Dialog - ENHANCED */}
+      <Dialog open={newMissionOpen} onOpenChange={(open) => {
+        if (!open) handleCloseMissionDialog();
+        else setNewMissionOpen(open);
+      }}>
+        <DialogContent className="bg-white border-slate-200 max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-slate-900">Create New Mission</DialogTitle>
+            <DialogTitle className="text-slate-900 flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-purple-600" />
+              {missionSimulationResult ? "Mission Simulation Complete" : "Create New AI Mission"}
+            </DialogTitle>
             <DialogDescription className="text-slate-600">
-              Define a new AI mission with objectives and parameters
+              {missionSimulationResult 
+                ? "AI has generated realistic operational metrics for your mission" 
+                : "Define mission parameters and let AI simulate expected performance"}
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div>
-              <Label className="text-slate-900 text-sm mb-2 block">Mission Name</Label>
-              <Input
-                placeholder="e.g., invoice_chase_v2"
-                className="bg-white border-slate-200 text-slate-900"
-              />
+          
+          {!missionSimulationResult ? (
+            <div className="space-y-4 py-4">
+              <div>
+                <Label className="text-slate-900 text-sm mb-2 block">Mission Name</Label>
+                <Input
+                  value={newMissionName}
+                  onChange={(e) => setNewMissionName(e.target.value)}
+                  placeholder="e.g., invoice_chase_v2"
+                  className="bg-white border-slate-200 text-slate-900"
+                  disabled={creatingMission}
+                />
+              </div>
+              <div>
+                <Label className="text-slate-900 text-sm mb-2 block">Objective</Label>
+                <Textarea
+                  value={newMissionObjective}
+                  onChange={(e) => setNewMissionObjective(e.target.value)}
+                  placeholder="Describe what this mission should accomplish..."
+                  className="bg-white border-slate-200 text-slate-900 min-h-24"
+                  disabled={creatingMission}
+                />
+              </div>
+              <div>
+                <Label className="text-slate-900 text-sm mb-2 block">Priority</Label>
+                <Select value={newMissionPriority} onValueChange={setNewMissionPriority} disabled={creatingMission}>
+                  <SelectTrigger className="bg-white border-slate-200 text-slate-900">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white border-slate-200">
+                    <SelectItem value="1">P1 (Critical)</SelectItem>
+                    <SelectItem value="2">P2 (High)</SelectItem>
+                    <SelectItem value="3">P3 (Medium)</SelectItem>
+                    <SelectItem value="4">P4 (Low)</SelectItem>
+                    <SelectItem value="5">P5 (Background)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  className="flex-1 bg-white border-slate-200 text-slate-900 hover:bg-slate-50"
+                  onClick={handleCloseMissionDialog}
+                  disabled={creatingMission}>
+                  Cancel
+                </Button>
+                <Button
+                  className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+                  onClick={handleCreateMission}
+                  disabled={creatingMission || !newMissionName || !newMissionObjective}>
+                  {creatingMission ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      AI Simulating...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-4 h-4 mr-2" />
+                      Create & Simulate Mission
+                    </>
+                  )}
+                </Button>
+              </div>
             </div>
-            <div>
-              <Label className="text-slate-900 text-sm mb-2 block">Objective</Label>
-              <Textarea
-                placeholder="Describe what this mission should accomplish..."
-                className="bg-white border-slate-200 text-slate-900 min-h-24"
-              />
+          ) : (
+            <div className="space-y-4 py-4">
+              {/* Success Header */}
+              <div className="text-center mb-4">
+                <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center">
+                  <CheckCircle className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-slate-900 mb-1">{missionSimulationResult.name}</h3>
+                <p className="text-sm text-slate-600">{missionSimulationResult.intent}</p>
+              </div>
+
+              {/* AI-Generated Metrics */}
+              <Card className="bg-gradient-to-br from-blue-50 to-purple-50 border-blue-200">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm text-slate-900 flex items-center gap-2">
+                    <Brain className="w-4 h-4 text-purple-600" />
+                    AI-Simulated Performance Metrics
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="grid grid-cols-3 gap-3">
+                  <div className="p-3 bg-white rounded-lg border border-slate-200">
+                    <div className="text-xs text-slate-600 mb-1">Success Rate</div>
+                    <div className="text-2xl font-bold text-emerald-600">
+                      {missionSimulationResult.simulation_metadata.successRate}%
+                    </div>
+                  </div>
+                  <div className="p-3 bg-white rounded-lg border border-slate-200">
+                    <div className="text-xs text-slate-600 mb-1">Avg Latency</div>
+                    <div className="text-2xl font-bold text-blue-600">
+                      {missionSimulationResult.simulation_metadata.avgLatency}ms
+                    </div>
+                  </div>
+                  <div className="p-3 bg-white rounded-lg border border-slate-200">
+                    <div className="text-xs text-slate-600 mb-1">Cost/Run</div>
+                    <div className="text-2xl font-bold text-purple-600">
+                      ${missionSimulationResult.simulation_metadata.spendPerRun}
+                    </div>
+                  </div>
+                  <div className="p-3 bg-white rounded-lg border border-slate-200">
+                    <div className="text-xs text-slate-600 mb-1">Route</div>
+                    <Badge className={cn(
+                      "text-xs",
+                      missionSimulationResult.simulation_metadata.route === "pilot" && "bg-blue-500/20 text-blue-700 border-blue-300",
+                      missionSimulationResult.simulation_metadata.route === "copilot" && "bg-purple-500/20 text-purple-700 border-purple-300",
+                      missionSimulationResult.simulation_metadata.route === "autopilot" && "bg-emerald-500/20 text-emerald-700 border-emerald-300"
+                    )}>
+                      {missionSimulationResult.simulation_metadata.route}
+                    </Badge>
+                  </div>
+                  <div className="p-3 bg-white rounded-lg border border-slate-200">
+                    <div className="text-xs text-slate-600 mb-1">Tokens/Run</div>
+                    <div className="text-2xl font-bold text-slate-900">
+                      {missionSimulationResult.simulation_metadata.tokensPerRun}
+                    </div>
+                  </div>
+                  <div className="p-3 bg-white rounded-lg border border-slate-200">
+                    <div className="text-xs text-slate-600 mb-1">Risk Score</div>
+                    <div className="text-2xl font-bold text-amber-600">
+                      {(missionSimulationResult.risk_score * 100).toFixed(0)}%
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* AI Insights */}
+              {missionSimulationResult.simulation_metadata.estimatedImpact && (
+                <Card className="bg-purple-50 border-purple-200">
+                  <CardContent className="p-4">
+                    <div className="flex items-start gap-2">
+                      <Sparkles className="w-4 h-4 text-purple-600 mt-0.5" />
+                      <div className="flex-1">
+                        <div className="text-xs font-semibold text-purple-900 mb-1">AI Analysis</div>
+                        <p className="text-sm text-slate-700">{missionSimulationResult.simulation_metadata.estimatedImpact}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Simulated Run History */}
+              {missionSimulationResult.simulation_metadata.lastRuns && (
+                <Card className="bg-slate-50 border-slate-200">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-sm text-slate-900">Simulated Run History</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex gap-1">
+                      {missionSimulationResult.simulation_metadata.lastRuns.map((run, idx) => (
+                        <div
+                          key={idx}
+                          className={cn(
+                            "flex-1 h-8 rounded",
+                            run.success === 1 ? "bg-emerald-400" : "bg-red-400"
+                          )}
+                          title={run.success === 1 ? "Success" : "Failure"}
+                        ></div>
+                      ))}
+                    </div>
+                    <div className="flex justify-between text-xs text-slate-600 mt-2">
+                      <span>Last 10 Runs (Simulated)</span>
+                      <span>{missionSimulationResult.simulation_metadata.lastRuns.filter(r => r.success === 1).length}/10 Success</span>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Optimizations */}
+              {missionSimulationResult.simulation_metadata.suggestedOptimizations?.length > 0 && (
+                <Card className="bg-emerald-50 border-emerald-200">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-sm text-slate-900 flex items-center gap-2">
+                      <Target className="w-4 h-4 text-emerald-600" />
+                      Suggested Optimizations
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-2">
+                      {missionSimulationResult.simulation_metadata.suggestedOptimizations.map((opt, idx) => (
+                        <li key={idx} className="flex items-start gap-2 text-sm text-slate-700">
+                          <ChevronRight className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
+                          <span>{opt}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Action Buttons */}
+              <div className="flex gap-2 pt-4 border-t border-slate-200">
+                <Button
+                  variant="outline"
+                  className="flex-1 bg-white border-slate-200 text-slate-900 hover:bg-slate-50"
+                  onClick={handleCloseMissionDialog}>
+                  Close
+                </Button>
+                <Button
+                  className="flex-1 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white"
+                  onClick={() => {
+                    toast.success("Mission deployed to Pilot!", {
+                      description: `${missionSimulationResult.name} is now active`
+                    });
+                    handleCloseMissionDialog();
+                  }}>
+                  <Play className="w-4 h-4 mr-2" />
+                  Deploy to Production
+                </Button>
+              </div>
             </div>
-            <div>
-              <Label className="text-slate-900 text-sm mb-2 block">Priority</Label>
-              <Select defaultValue="2">
-                <SelectTrigger className="bg-white border-slate-200 text-slate-900">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-white border-slate-200">
-                  <SelectItem value="1">P1 (Critical)</SelectItem>
-                  <SelectItem value="2">P2 (High)</SelectItem>
-                  <SelectItem value="3">P3 (Medium)</SelectItem>
-                  <SelectItem value="4">P4 (Low)</SelectItem>
-                  <SelectItem value="5">P5 (Background)</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                className="flex-1 bg-white border-slate-200 text-slate-900 hover:bg-slate-50"
-                onClick={() => setNewMissionOpen(false)}>
-                Cancel
-              </Button>
-              <Button
-                className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
-                onClick={() => {
-                  toast.success("Mission created (demo mode)");
-                  addActivity("New mission created", "success");
-                  setNewMissionOpen(false);
-                }}>
-                Create Mission
-              </Button>
-            </div>
-          </div>
+          )}
         </DialogContent>
       </Dialog>
 
