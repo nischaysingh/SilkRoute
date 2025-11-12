@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { useExplainMode } from "./ExplainModeContext";
 import { generateExplanation, generateHeuristics } from "./parseWidgetContent";
 import { base44 } from "@/api/base44Client";
+import WorkflowComposer from "./WorkflowComposer";
 
 export default function ExplainCoPilotPanel() {
   const { 
@@ -27,6 +28,7 @@ export default function ExplainCoPilotPanel() {
   const [showRawData, setShowRawData] = useState(false);
   const [aiInsights, setAiInsights] = useState(null);
   const [loadingAI, setLoadingAI] = useState(false);
+  const [workflowComposerOpen, setWorkflowComposerOpen] = useState(false);
 
   const activeWidget = explainPanelState.widgets.find(w => w.id === explainPanelState.activeTab) || explainPanelState.widgets[0];
   const activeData = activeWidget?.data;
@@ -103,9 +105,7 @@ export default function ExplainCoPilotPanel() {
         break;
 
       case 'new_workflow':
-        toast.success("Opening Workflow Composer", {
-          description: `Template: Monitor ${activeData.title} and trigger actions`
-        });
+        setWorkflowComposerOpen(true);
         break;
 
       case 'new_agent':
@@ -412,6 +412,13 @@ export default function ExplainCoPilotPanel() {
             )}
           </div>
         </div>
+
+        {/* Workflow Composer Modal */}
+        <WorkflowComposer
+          open={workflowComposerOpen}
+          onClose={() => setWorkflowComposerOpen(false)}
+          widgetContext={activeData}
+        />
       </motion.div>
     </AnimatePresence>
   );
