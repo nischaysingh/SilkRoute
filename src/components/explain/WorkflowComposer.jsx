@@ -212,7 +212,7 @@ Return JSON:
       name: `New ${stepType.name}`,
       config: {}
     };
-    setSteps([...steps, newStep]);
+    setSteps(prev => [...prev, newStep]);
     setSelectedStep(newStep.id);
     toast.success(`Added ${stepType.name} step`);
   };
@@ -346,7 +346,11 @@ Return JSON:
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="workflow-composer-dialog bg-gradient-to-br from-slate-900 via-purple-900/30 to-blue-900/30 backdrop-blur-xl border-2 border-purple-500/50 text-white max-w-6xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl shadow-purple-500/20 z-[200]">
+      <DialogContent 
+        className="workflow-composer-dialog bg-gradient-to-br from-slate-900 via-purple-900/30 to-blue-900/30 backdrop-blur-xl border-2 border-purple-500/50 text-white max-w-6xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl shadow-purple-500/20 z-[200]"
+        onClick={(e) => e.stopPropagation()}
+        onPointerDownCapture={(e) => e.stopPropagation()}
+      >
         <DialogHeader className="border-b border-purple-500/20 pb-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center shadow-lg">
@@ -480,7 +484,7 @@ Return JSON:
                             <SelectTrigger className="bg-white/5 border-white/10 text-white text-xs">
                               <SelectValue />
                             </SelectTrigger>
-                            <SelectContent className="bg-gray-900 border-white/20 text-white">
+                            <SelectContent className="bg-gray-900 border-white/20 text-white z-[250]">
                               <SelectItem value="hourly">Hourly</SelectItem>
                               <SelectItem value="daily">Daily</SelectItem>
                               <SelectItem value="weekly">Weekly</SelectItem>
@@ -628,7 +632,12 @@ Return JSON:
                       {STEP_TYPES.map(stepType => (
                         <Button
                           key={stepType.id}
-                          onClick={() => addStep(stepType)}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            addStep(stepType);
+                          }}
+                          type="button"
                           className={cn(
                             "w-full justify-start h-auto py-3 px-3 border-2 transition-all group",
                             stepType.color === 'blue' && "bg-blue-500/10 border-blue-500/30 hover:bg-blue-500/20 hover:border-blue-500/50 hover:shadow-lg hover:shadow-blue-500/20",
@@ -802,7 +811,7 @@ Return JSON:
                                   <SelectTrigger className="bg-white/10 border-purple-500/30 text-white mt-1 text-xs">
                                     <SelectValue />
                                   </SelectTrigger>
-                                  <SelectContent className="bg-slate-900 border-purple-500/30 text-white">
+                                  <SelectContent className="bg-slate-900 border-purple-500/30 text-white z-[250]">
                                     <SelectItem value=">">{'>'} Greater than</SelectItem>
                                     <SelectItem value="<">{'<'} Less than</SelectItem>
                                     <SelectItem value=">=">{'≥'} Greater or equal</SelectItem>
@@ -892,7 +901,7 @@ Return JSON:
                                   <SelectTrigger className="bg-white/10 border-purple-500/30 text-white mt-1 hover:bg-white/15">
                                     <SelectValue />
                                   </SelectTrigger>
-                                  <SelectContent className="bg-slate-900 border-purple-500/30 text-white backdrop-blur-xl">
+                                  <SelectContent className="bg-slate-900 border-purple-500/30 text-white backdrop-blur-xl z-[250]">
                                     <SelectItem value="seconds">Seconds</SelectItem>
                                     <SelectItem value="minutes">Minutes</SelectItem>
                                     <SelectItem value="hours">Hours</SelectItem>
@@ -1308,9 +1317,14 @@ Return JSON:
                     </div>
 
                     <Button
-                      onClick={testWorkflow}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        testWorkflow();
+                      }}
+                      type="button"
                       disabled={!workflowName || steps.length === 0}
-                      className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 h-12 text-base font-bold"
+                      className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 h-12 text-base font-bold disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <Play className="w-5 h-5 mr-2" />
                       Run Test Simulation
@@ -1458,7 +1472,12 @@ Return JSON:
             <div className="flex items-center gap-2">
               <Button
                 variant="outline"
-                onClick={testWorkflow}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  testWorkflow();
+                }}
+                type="button"
                 disabled={!workflowName || steps.length === 0}
                 className="bg-gradient-to-r from-cyan-500/20 to-blue-500/20 border-cyan-500/40 text-white hover:bg-cyan-500/30"
               >
@@ -1467,10 +1486,13 @@ Return JSON:
               </Button>
               <Button
                 variant="outline"
-                onClick={() => {
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
                   onClose();
                   toast.info("Workflow composer closed");
                 }}
+                type="button"
                 className="bg-white/5 border-white/20 text-gray-300 hover:bg-white/10 hover:text-white"
               >
                 Cancel
@@ -1481,9 +1503,14 @@ Return JSON:
                 {steps.length} steps
               </Badge>
               <Button
-                onClick={saveWorkflow}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  saveWorkflow();
+                }}
+                type="button"
                 disabled={!workflowName || steps.length === 0}
-                className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 shadow-lg shadow-purple-500/30 font-bold"
+                className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 shadow-lg shadow-purple-500/30 font-bold disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Save className="w-4 h-4 mr-2" />
                 Save Workflow
