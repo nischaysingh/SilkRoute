@@ -71,6 +71,10 @@ export default function SilkRouteAI() {
           <AutopilotTab />
         </TabsContent>
 
+        <TabsContent value="management" className="mt-6">
+          <ManagementTab />
+        </TabsContent>
+
         <TabsContent value="toolbox" className="mt-6">
           <ToolboxTab />
         </TabsContent>
