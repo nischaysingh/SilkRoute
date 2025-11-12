@@ -290,31 +290,45 @@ Return JSON:
       return;
     }
 
-    const workflow = {
-      name: workflowName,
-      description: workflowDescription,
-      trigger,
-      steps,
-      sourceWidget: widgetContext?.title,
-      createdAt: new Date().toISOString(),
-      status: 'draft'
-    };
-
     try {
-      // Save to AuditLog for tracking
+      const user = await base44.auth.me();
+      
+      // Save to Workflow entity
+      const workflow = await base44.entities.Workflow.create({
+        name: workflowName,
+        description: workflowDescription,
+        trigger,
+        steps,
+        status: 'draft',
+        version: 1,
+        version_history: [{
+          version: 1,
+          steps,
+          trigger,
+          description: workflowDescription,
+          changes_summary: 'Initial version',
+          created_at: new Date().toISOString(),
+          created_by: user.email
+        }],
+        widget_context: widgetContext
+      });
+
+      // Also log to AuditLog for tracking
       await base44.entities.AuditLog.create({
         timestamp: new Date().toISOString(),
-        user_email: (await base44.auth.me()).email,
-        user_name: (await base44.auth.me()).full_name,
+        user_email: user.email,
+        user_name: user.full_name,
         action_type: 'config_change',
         action_description: `Created workflow: ${workflowName}`,
         resource_type: 'workflow',
-        resource_id: `workflow-${Date.now()}`,
+        resource_id: workflow.id,
         metadata: {
-          workflow,
-          sourceWidget: widgetContext?.title,
-          stepCount: steps.length,
-          triggerType: trigger?.type
+          workflow_id: workflow.id,
+          workflow_name: workflowName,
+          workflow_description: workflowDescription,
+          trigger,
+          steps,
+          widget_context: widgetContext
         },
         status: 'success',
         severity: 'low'
@@ -323,7 +337,7 @@ Return JSON:
       console.log('Workflow saved:', workflow);
       
       toast.success("Workflow saved successfully! 🎉", {
-        description: `"${workflowName}" created with ${steps.length} steps`
+        description: `"${workflowName}" created with ${steps.length} steps. View it in the Management tab.`
       });
       
       // Reset and close
@@ -333,7 +347,7 @@ Return JSON:
     } catch (error) {
       console.error('Error saving workflow:', error);
       toast.error("Failed to save workflow", {
-        description: "Please try again"
+        description: error.message || "Please try again"
       });
     }
   };

@@ -5,6 +5,7 @@ import PilotTab from "../components/pilot/PilotTab";
 import CoPilot from "./CoPilot";
 import AutopilotTab from "../components/autopilot/AutopilotTab";
 import ToolboxTab from "../components/toolbox/ToolboxTab";
+import ManagementTab from "../components/silkroute/ManagementTab";
 import GlobalAIAssistant from "../components/ai/GlobalAIAssistant";
 
 export default function SilkRouteAI() {
@@ -46,6 +47,12 @@ export default function SilkRouteAI() {
             className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white text-slate-700 rounded-lg"
           >
             Autopilot
+          </TabsTrigger>
+          <TabsTrigger 
+            value="management" 
+            className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white text-slate-700 rounded-lg"
+          >
+            Management
           </TabsTrigger>
           <TabsTrigger 
             value="toolbox" 
