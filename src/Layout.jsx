@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import {
   LayoutDashboard, DollarSign, CreditCard, Users, PiggyBank,
-  BarChart, CheckCircle, Settings, Bell, ChevronDown, Menu, X, Package, Radar, Wifi, Eye
+  BarChart, CheckCircle, Settings, Bell, ChevronDown, Menu, X, Package, Radar, Wifi, Eye, GitBranch
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { base44 } from "@/api/base44Client";
@@ -41,6 +41,7 @@ function LayoutContent({ children, currentPageName }) {
     { name: "Taxes", path: createPageUrl("Taxes"), icon: PiggyBank },
     { name: "FP&A", path: createPageUrl("FPA"), icon: BarChart },
     { name: "Management", path: createPageUrl("Management"), icon: Package },
+    { name: "Workflows", path: createPageUrl("Workflows"), icon: GitBranch },
     { name: "SilkRouteAI", path: createPageUrl("SilkRouteAI"), icon: Radar },
     { name: "Integrations", path: createPageUrl("Integrations"), icon: CheckCircle },
     { name: "Settings", path: createPageUrl("Settings"), icon: Settings }
