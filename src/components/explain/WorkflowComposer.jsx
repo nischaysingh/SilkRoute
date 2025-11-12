@@ -346,7 +346,7 @@ Return JSON:
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="bg-gradient-to-br from-slate-900 via-purple-900/30 to-blue-900/30 backdrop-blur-xl border-2 border-purple-500/50 text-white max-w-6xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl shadow-purple-500/20 z-[200]">
+      <DialogContent className="workflow-composer-dialog bg-gradient-to-br from-slate-900 via-purple-900/30 to-blue-900/30 backdrop-blur-xl border-2 border-purple-500/50 text-white max-w-6xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl shadow-purple-500/20 z-[200]">
         <DialogHeader className="border-b border-purple-500/20 pb-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center shadow-lg">

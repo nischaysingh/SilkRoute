@@ -142,13 +142,15 @@ export function ExplainModeProvider({ children }) {
     if (!isExplainModeActive) return;
 
     const handleGlobalClick = (e) => {
-      // Don't interfere with buttons, inputs, or the explain panel itself
+      // Don't interfere with buttons, inputs, dialogs, or the explain panel itself
       if (
         e.target.closest('button') ||
         e.target.closest('input') ||
         e.target.closest('textarea') ||
+        e.target.closest('select') ||
         e.target.closest('[role="dialog"]') ||
-        e.target.closest('.explain-copilot-panel')
+        e.target.closest('.explain-copilot-panel') ||
+        e.target.closest('.workflow-composer-dialog')
       ) {
         return;
       }
