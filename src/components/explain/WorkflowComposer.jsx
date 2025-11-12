@@ -289,15 +289,24 @@ Return JSON:
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="bg-gray-900/98 backdrop-blur-xl border-purple-500/30 text-white max-w-6xl max-h-[90vh] overflow-hidden flex flex-col">
-        <DialogHeader>
-          <DialogTitle className="text-white flex items-center gap-2">
-            <GitBranch className="w-5 h-5 text-purple-400" />
-            Workflow Composer
-          </DialogTitle>
-          <DialogDescription className="text-gray-400">
-            Visual workflow designer with AI-powered draft generation
-          </DialogDescription>
+      <DialogContent className="bg-gradient-to-br from-slate-900 via-purple-900/30 to-blue-900/30 backdrop-blur-xl border-2 border-purple-500/50 text-white max-w-6xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl shadow-purple-500/20 z-[200]">
+        <DialogHeader className="border-b border-purple-500/20 pb-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center shadow-lg">
+              <GitBranch className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <DialogTitle className="text-white text-xl font-bold flex items-center gap-2">
+                Workflow Composer
+                <Badge className="bg-purple-500/20 text-purple-300 border-purple-500/30 text-xs">
+                  AI-Powered
+                </Badge>
+              </DialogTitle>
+              <DialogDescription className="text-purple-300 text-sm">
+                Visual workflow designer with intelligent draft generation
+              </DialogDescription>
+            </div>
+          </div>
         </DialogHeader>
 
         {loadingDraft ? (
@@ -310,11 +319,11 @@ Return JSON:
           </div>
         ) : (
           <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden">
-            <TabsList className="bg-white/5 border border-white/10">
-              <TabsTrigger value="builder">Builder</TabsTrigger>
-              <TabsTrigger value="config">Configuration</TabsTrigger>
-              <TabsTrigger value="test">Test & Preview</TabsTrigger>
-              <TabsTrigger value="code">Code View</TabsTrigger>
+            <TabsList className="bg-gradient-to-r from-purple-500/20 to-blue-500/20 border border-purple-500/30 backdrop-blur-sm">
+              <TabsTrigger value="builder" className="data-[state=active]:bg-purple-500/30 data-[state=active]:text-white">Builder</TabsTrigger>
+              <TabsTrigger value="config" className="data-[state=active]:bg-purple-500/30 data-[state=active]:text-white">Configuration</TabsTrigger>
+              <TabsTrigger value="test" className="data-[state=active]:bg-purple-500/30 data-[state=active]:text-white">Test & Preview</TabsTrigger>
+              <TabsTrigger value="code" className="data-[state=active]:bg-purple-500/30 data-[state=active]:text-white">Code View</TabsTrigger>
             </TabsList>
 
             <TabsContent value="builder" className="flex-1 overflow-y-auto space-y-4 mt-4">
@@ -322,25 +331,25 @@ Return JSON:
                 {/* Left: Workflow Canvas */}
                 <div className="col-span-8 space-y-4">
                   {/* Workflow Header */}
-                  <Card className="bg-white/5 border-white/10">
+                  <Card className="bg-gradient-to-br from-purple-500/10 to-blue-500/10 border-purple-500/30 shadow-lg">
                     <CardContent className="p-4">
                       <div className="space-y-3">
                         <div>
-                          <Label className="text-gray-400 text-xs">Workflow Name</Label>
+                          <Label className="text-purple-300 text-xs font-semibold">Workflow Name</Label>
                           <Input
                             value={workflowName}
                             onChange={(e) => setWorkflowName(e.target.value)}
                             placeholder="e.g., AR Collection Automation"
-                            className="bg-white/5 border-white/10 text-white mt-1"
+                            className="bg-white/10 border-purple-500/30 text-white mt-1 focus:border-purple-500 focus:ring-purple-500/20"
                           />
                         </div>
                         <div>
-                          <Label className="text-gray-400 text-xs">Description</Label>
+                          <Label className="text-purple-300 text-xs font-semibold">Description</Label>
                           <Textarea
                             value={workflowDescription}
                             onChange={(e) => setWorkflowDescription(e.target.value)}
                             placeholder="Describe what this workflow does..."
-                            className="bg-white/5 border-white/10 text-white mt-1 h-20"
+                            className="bg-white/10 border-purple-500/30 text-white mt-1 h-20 focus:border-purple-500 focus:ring-purple-500/20"
                           />
                         </div>
                       </div>
@@ -348,19 +357,21 @@ Return JSON:
                   </Card>
 
                   {/* Trigger */}
-                  <Card className="bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border-blue-500/30">
+                  <Card className="bg-gradient-to-br from-cyan-500/20 to-blue-500/20 border-cyan-500/40 shadow-lg shadow-cyan-500/10">
                     <CardHeader className="pb-3">
-                      <CardTitle className="text-sm text-white flex items-center gap-2">
-                        <Zap className="w-4 h-4 text-blue-400" />
+                      <CardTitle className="text-sm text-white flex items-center gap-2 font-bold">
+                        <div className="w-6 h-6 rounded-lg bg-cyan-500/30 flex items-center justify-center">
+                          <Zap className="w-3 h-3 text-cyan-300" />
+                        </div>
                         Trigger
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3">
                       <Select value={trigger?.type} onValueChange={(value) => setTrigger({ ...trigger, type: value })}>
-                        <SelectTrigger className="bg-white/5 border-white/10 text-white">
+                        <SelectTrigger className="bg-white/10 border-cyan-500/30 text-white hover:bg-white/15">
                           <SelectValue placeholder="Select trigger type" />
                         </SelectTrigger>
-                        <SelectContent className="bg-gray-900 border-white/20 text-white">
+                        <SelectContent className="bg-slate-900 border-cyan-500/30 text-white backdrop-blur-xl">
                           {TRIGGER_TYPES.map(t => (
                             <SelectItem key={t.id} value={t.id}>
                               <div>
@@ -384,13 +395,13 @@ Return JSON:
                             <Input
                               placeholder="Metric"
                               defaultValue={widgetContext?.title}
-                              className="bg-white/5 border-white/10 text-white text-xs"
+                              className="bg-cyan-500/10 border-cyan-500/30 text-white text-xs"
                             />
                             <Select defaultValue=">">
-                              <SelectTrigger className="bg-white/5 border-white/10 text-white text-xs">
+                              <SelectTrigger className="bg-cyan-500/10 border-cyan-500/30 text-white text-xs hover:bg-cyan-500/15">
                                 <SelectValue />
                               </SelectTrigger>
-                              <SelectContent className="bg-gray-900 border-white/20 text-white">
+                              <SelectContent className="bg-slate-900 border-cyan-500/30 text-white backdrop-blur-xl">
                                 <SelectItem value=">">Greater than</SelectItem>
                                 <SelectItem value="<">Less than</SelectItem>
                                 <SelectItem value="=">Equal to</SelectItem>
@@ -400,7 +411,7 @@ Return JSON:
                             <Input
                               placeholder="Threshold"
                               defaultValue={widgetContext?.metric}
-                              className="bg-white/5 border-white/10 text-white text-xs"
+                              className="bg-cyan-500/10 border-cyan-500/30 text-white text-xs"
                             />
                           </div>
                         </div>
@@ -451,8 +462,8 @@ Return JSON:
                           >
                             <Card 
                               className={cn(
-                                "bg-white/5 border-white/10 cursor-pointer hover:bg-white/10 transition-all",
-                                selectedStep === step.id && "border-purple-500/50 bg-purple-500/10"
+                                "bg-gradient-to-r from-slate-800/50 to-slate-800/30 border-slate-700/50 cursor-pointer hover:border-purple-500/50 hover:shadow-lg hover:shadow-purple-500/10 transition-all",
+                                selectedStep === step.id && "border-purple-500 bg-gradient-to-r from-purple-500/20 to-blue-500/20 shadow-lg shadow-purple-500/30"
                               )}
                               onClick={() => setSelectedStep(step.id)}
                             >
@@ -461,28 +472,45 @@ Return JSON:
                                   <div className="flex items-start gap-3 flex-1">
                                     <div className="flex flex-col items-center gap-2">
                                       <div className={cn(
-                                        "w-8 h-8 rounded-lg flex items-center justify-center",
-                                        `bg-${stepConfig.color}-500/20`
+                                        "w-10 h-10 rounded-xl flex items-center justify-center shadow-lg",
+                                        stepConfig.color === 'blue' && "bg-gradient-to-br from-blue-500 to-blue-600",
+                                        stepConfig.color === 'red' && "bg-gradient-to-br from-red-500 to-pink-600",
+                                        stepConfig.color === 'amber' && "bg-gradient-to-br from-amber-500 to-orange-600",
+                                        stepConfig.color === 'purple' && "bg-gradient-to-br from-purple-500 to-purple-600",
+                                        stepConfig.color === 'cyan' && "bg-gradient-to-br from-cyan-500 to-blue-500",
+                                        stepConfig.color === 'pink' && "bg-gradient-to-br from-pink-500 to-purple-600",
+                                        stepConfig.color === 'emerald' && "bg-gradient-to-br from-emerald-500 to-teal-600"
                                       )}>
-                                        <stepConfig.icon className={cn("w-4 h-4", `text-${stepConfig.color}-400`)} />
+                                        <stepConfig.icon className="w-5 h-5 text-white" />
                                       </div>
                                       {idx < steps.length - 1 && (
-                                        <div className="w-0.5 h-6 bg-white/20"></div>
+                                        <div className="w-0.5 h-8 bg-gradient-to-b from-purple-500 to-blue-500 opacity-50"></div>
                                       )}
                                     </div>
                                     <div className="flex-1">
-                                      <div className="flex items-center gap-2 mb-1">
-                                        <span className="text-xs text-gray-500">Step {idx + 1}</span>
-                                        <Badge className={cn("text-xs", `bg-${stepConfig.color}-500/20 text-${stepConfig.color}-400`)}>
+                                      <div className="flex items-center gap-2 mb-2">
+                                        <div className="px-2 py-0.5 rounded-full bg-white/10 text-white text-[10px] font-bold">
+                                          Step {idx + 1}
+                                        </div>
+                                        <Badge className={cn(
+                                          "text-xs font-semibold",
+                                          stepConfig.color === 'blue' && "bg-blue-500/20 text-blue-300 border-blue-500/40",
+                                          stepConfig.color === 'red' && "bg-red-500/20 text-red-300 border-red-500/40",
+                                          stepConfig.color === 'amber' && "bg-amber-500/20 text-amber-300 border-amber-500/40",
+                                          stepConfig.color === 'purple' && "bg-purple-500/20 text-purple-300 border-purple-500/40",
+                                          stepConfig.color === 'cyan' && "bg-cyan-500/20 text-cyan-300 border-cyan-500/40",
+                                          stepConfig.color === 'pink' && "bg-pink-500/20 text-pink-300 border-pink-500/40",
+                                          stepConfig.color === 'emerald' && "bg-emerald-500/20 text-emerald-300 border-emerald-500/40"
+                                        )}>
                                           {stepConfig.name}
                                         </Badge>
                                       </div>
-                                      <h4 className="text-sm font-semibold text-white mb-1">{step.name}</h4>
-                                      <p className="text-xs text-gray-400">{stepConfig.description}</p>
+                                      <h4 className="text-base font-bold text-white mb-1">{step.name}</h4>
+                                      <p className="text-xs text-purple-300">{stepConfig.description}</p>
                                       
                                       {/* Quick config preview */}
                                       {step.config && Object.keys(step.config).length > 0 && (
-                                        <div className="mt-2 p-2 bg-white/5 rounded text-xs text-gray-300">
+                                        <div className="mt-3 p-3 bg-black/30 rounded-lg border border-white/10 text-xs text-gray-300">
                                           {Object.entries(step.config).slice(0, 2).map(([key, value]) => (
                                             <div key={key} className="flex justify-between">
                                               <span className="text-gray-500">{key}:</span>
@@ -516,10 +544,13 @@ Return JSON:
                     </AnimatePresence>
 
                     {steps.length === 0 && (
-                      <Card className="bg-white/5 border-white/10 border-dashed">
-                        <CardContent className="p-8 text-center">
-                          <GitBranch className="w-12 h-12 text-gray-500 mx-auto mb-3" />
-                          <p className="text-sm text-gray-400">No steps yet. Add steps from the panel →</p>
+                      <Card className="bg-gradient-to-br from-purple-500/5 to-blue-500/5 border-purple-500/20 border-2 border-dashed">
+                        <CardContent className="p-10 text-center">
+                          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500/20 to-blue-500/20 flex items-center justify-center mx-auto mb-4">
+                            <GitBranch className="w-8 h-8 text-purple-400" />
+                          </div>
+                          <p className="text-sm text-purple-300 font-semibold mb-1">No steps yet</p>
+                          <p className="text-xs text-gray-400">Add steps from the panel to build your workflow →</p>
                         </CardContent>
                       </Card>
                     )}
@@ -529,23 +560,55 @@ Return JSON:
                 {/* Right: Step Library & Configuration */}
                 <div className="col-span-4 space-y-4">
                   {/* Step Library */}
-                  <Card className="bg-white/5 border-white/10">
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-sm text-white">Add Step</CardTitle>
+                  <Card className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 border-purple-500/30 shadow-lg">
+                    <CardHeader className="pb-3 bg-gradient-to-r from-purple-500/10 to-blue-500/10">
+                      <CardTitle className="text-sm text-white font-bold flex items-center gap-2">
+                        <Plus className="w-4 h-4 text-purple-400" />
+                        Add Step
+                      </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-2">
                       {STEP_TYPES.map(stepType => (
                         <Button
                           key={stepType.id}
                           onClick={() => addStep(stepType)}
-                          variant="outline"
-                          className="w-full justify-start bg-white/5 border-white/10 text-white hover:bg-white/10 h-auto py-2"
+                          className={cn(
+                            "w-full justify-start h-auto py-3 px-3 border-2 transition-all group",
+                            stepType.color === 'blue' && "bg-blue-500/10 border-blue-500/30 hover:bg-blue-500/20 hover:border-blue-500/50 hover:shadow-lg hover:shadow-blue-500/20",
+                            stepType.color === 'red' && "bg-red-500/10 border-red-500/30 hover:bg-red-500/20 hover:border-red-500/50 hover:shadow-lg hover:shadow-red-500/20",
+                            stepType.color === 'amber' && "bg-amber-500/10 border-amber-500/30 hover:bg-amber-500/20 hover:border-amber-500/50 hover:shadow-lg hover:shadow-amber-500/20",
+                            stepType.color === 'purple' && "bg-purple-500/10 border-purple-500/30 hover:bg-purple-500/20 hover:border-purple-500/50 hover:shadow-lg hover:shadow-purple-500/20",
+                            stepType.color === 'cyan' && "bg-cyan-500/10 border-cyan-500/30 hover:bg-cyan-500/20 hover:border-cyan-500/50 hover:shadow-lg hover:shadow-cyan-500/20",
+                            stepType.color === 'pink' && "bg-pink-500/10 border-pink-500/30 hover:bg-pink-500/20 hover:border-pink-500/50 hover:shadow-lg hover:shadow-pink-500/20",
+                            stepType.color === 'emerald' && "bg-emerald-500/10 border-emerald-500/30 hover:bg-emerald-500/20 hover:border-emerald-500/50 hover:shadow-lg hover:shadow-emerald-500/20"
+                          )}
                         >
-                          <stepType.icon className={cn("w-4 h-4 mr-2", `text-${stepType.color}-400`)} />
-                          <div className="text-left">
-                            <div className="text-xs font-semibold">{stepType.name}</div>
+                          <div className={cn(
+                            "w-8 h-8 rounded-lg flex items-center justify-center mr-3 transition-all",
+                            stepType.color === 'blue' && "bg-blue-500/20 group-hover:bg-blue-500/30",
+                            stepType.color === 'red' && "bg-red-500/20 group-hover:bg-red-500/30",
+                            stepType.color === 'amber' && "bg-amber-500/20 group-hover:bg-amber-500/30",
+                            stepType.color === 'purple' && "bg-purple-500/20 group-hover:bg-purple-500/30",
+                            stepType.color === 'cyan' && "bg-cyan-500/20 group-hover:bg-cyan-500/30",
+                            stepType.color === 'pink' && "bg-pink-500/20 group-hover:bg-pink-500/30",
+                            stepType.color === 'emerald' && "bg-emerald-500/20 group-hover:bg-emerald-500/30"
+                          )}>
+                            <stepType.icon className={cn(
+                              "w-4 h-4",
+                              stepType.color === 'blue' && "text-blue-400",
+                              stepType.color === 'red' && "text-red-400",
+                              stepType.color === 'amber' && "text-amber-400",
+                              stepType.color === 'purple' && "text-purple-400",
+                              stepType.color === 'cyan' && "text-cyan-400",
+                              stepType.color === 'pink' && "text-pink-400",
+                              stepType.color === 'emerald' && "text-emerald-400"
+                            )} />
+                          </div>
+                          <div className="text-left flex-1">
+                            <div className="text-sm font-bold text-white mb-0.5">{stepType.name}</div>
                             <div className="text-[10px] text-gray-400">{stepType.description}</div>
                           </div>
+                          <ChevronRight className="w-4 h-4 text-gray-500 group-hover:text-white transition-colors" />
                         </Button>
                       ))}
                     </CardContent>
@@ -553,10 +616,12 @@ Return JSON:
 
                   {/* Step Configuration */}
                   {selectedStepData && (
-                    <Card className="bg-purple-500/10 border-purple-500/30">
-                      <CardHeader className="pb-3">
-                        <CardTitle className="text-sm text-white flex items-center gap-2">
-                          <Settings className="w-4 h-4" />
+                    <Card className="bg-gradient-to-br from-purple-500/20 to-blue-500/20 border-2 border-purple-500/40 shadow-xl shadow-purple-500/20">
+                      <CardHeader className="pb-3 bg-gradient-to-r from-purple-500/10 to-blue-500/10">
+                        <CardTitle className="text-sm text-white font-bold flex items-center gap-2">
+                          <div className="w-6 h-6 rounded-lg bg-purple-500/30 flex items-center justify-center">
+                            <Settings className="w-3 h-3 text-purple-300" />
+                          </div>
                           Configure Step
                         </CardTitle>
                       </CardHeader>
@@ -668,21 +733,36 @@ Return JSON:
                   )}
 
                   {/* Widget Connection */}
-                  <Card className="bg-white/5 border-white/10">
+                  <Card className="bg-gradient-to-br from-cyan-500/20 to-teal-500/20 border-2 border-cyan-500/40 shadow-lg shadow-cyan-500/10">
                     <CardHeader className="pb-3">
-                      <CardTitle className="text-sm text-white flex items-center gap-2">
-                        <LinkIcon className="w-4 h-4 text-cyan-400" />
+                      <CardTitle className="text-sm text-white font-bold flex items-center gap-2">
+                        <div className="w-6 h-6 rounded-lg bg-cyan-500/30 flex items-center justify-center">
+                          <LinkIcon className="w-3 h-3 text-cyan-300" />
+                        </div>
                         Connected Widget
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <div className="p-3 rounded-lg bg-cyan-500/10 border border-cyan-500/30">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Eye className="w-4 h-4 text-cyan-400" />
-                          <span className="text-sm font-semibold text-white">{widgetContext?.title}</span>
+                      <div className="p-4 rounded-xl bg-gradient-to-r from-cyan-500/20 to-blue-500/20 border-2 border-cyan-500/40">
+                        <div className="flex items-center gap-3 mb-2">
+                          <div className="w-8 h-8 rounded-lg bg-cyan-500/30 flex items-center justify-center">
+                            <Eye className="w-4 h-4 text-cyan-300" />
+                          </div>
+                          <span className="text-sm font-bold text-white">{widgetContext?.title}</span>
                         </div>
-                        <div className="text-xs text-gray-400">
-                          Monitoring: {widgetContext?.metric || 'N/A'}
+                        <div className="flex items-center gap-2">
+                          <Badge className="bg-cyan-500/20 text-cyan-300 border-cyan-500/40 text-xs">
+                            Monitoring: {widgetContext?.metric || 'N/A'}
+                          </Badge>
+                          {widgetContext?.trend && (
+                            <Badge className={cn(
+                              "text-xs",
+                              widgetContext.trend === 'up' && "bg-emerald-500/20 text-emerald-300 border-emerald-500/40",
+                              widgetContext.trend === 'down' && "bg-red-500/20 text-red-300 border-red-500/40"
+                            )}>
+                              {widgetContext.trend === 'up' ? '↑' : '↓'} {widgetContext.delta || ''}
+                            </Badge>
+                          )}
                         </div>
                       </div>
                     </CardContent>
@@ -824,7 +904,7 @@ Return JSON:
 
         {/* Footer Actions */}
         {!loadingDraft && (
-          <div className="flex items-center justify-between p-4 border-t border-white/10 bg-white/5">
+          <div className="flex items-center justify-between p-4 border-t border-purple-500/20 bg-gradient-to-r from-purple-500/10 to-blue-500/10 backdrop-blur-sm">
             <div className="flex items-center gap-2">
               <Button
                 variant="outline"

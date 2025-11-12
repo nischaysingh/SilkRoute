@@ -163,18 +163,18 @@ export default function ExplainCoPilotPanel() {
         animate={{ x: 0, opacity: 1 }}
         exit={{ x: "100%", opacity: 0 }}
         transition={{ type: "spring", damping: 25, stiffness: 200 }}
-        className="fixed top-20 right-6 w-[420px] max-h-[calc(100vh-120px)] bg-gray-900/98 backdrop-blur-xl border border-purple-500/30 rounded-2xl shadow-2xl shadow-purple-500/20 z-[100] overflow-hidden flex flex-col explain-copilot-panel"
+        className="fixed top-20 right-6 w-[420px] max-h-[calc(100vh-120px)] bg-gradient-to-br from-slate-900 via-purple-900/40 to-blue-900/40 backdrop-blur-xl border-2 border-purple-500/50 rounded-2xl shadow-2xl shadow-purple-500/30 z-[100] overflow-hidden flex flex-col explain-copilot-panel"
       >
         {/* Header */}
-        <div className="p-4 border-b border-white/10 bg-gradient-to-r from-purple-600/20 to-blue-600/20">
+        <div className="p-4 border-b border-purple-500/30 bg-gradient-to-r from-purple-600/30 to-blue-600/30 backdrop-blur-sm">
           <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center">
-                <Sparkles className="w-4 h-4 text-white" />
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center shadow-lg shadow-purple-500/50">
+                <Sparkles className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h3 className="text-sm font-bold text-white">AI Explain</h3>
-                <div className="text-[10px] text-purple-300">Powered by GPT-4</div>
+                <h3 className="text-base font-bold text-white">AI Explain</h3>
+                <div className="text-[10px] text-purple-300 font-semibold">Powered by GPT-4</div>
               </div>
             </div>
             <div className="flex items-center gap-1">
@@ -278,10 +278,12 @@ export default function ExplainCoPilotPanel() {
           {/* AI-Powered Explanation */}
           {aiInsights && !loadingAI && (
             <>
-              <Card className="bg-white/5 border-white/10">
+              <Card className="bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border-blue-500/30 shadow-lg">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-sm text-white flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-blue-400" />
+                  <CardTitle className="text-sm text-white font-bold flex items-center gap-2">
+                    <div className="w-6 h-6 rounded-lg bg-blue-500/30 flex items-center justify-center">
+                      <Sparkles className="w-3 h-3 text-blue-300" />
+                    </div>
                     What you're seeing
                   </CardTitle>
                 </CardHeader>
@@ -295,10 +297,12 @@ export default function ExplainCoPilotPanel() {
                 </CardContent>
               </Card>
 
-              <Card className="bg-white/5 border-white/10">
+              <Card className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 border-purple-500/30 shadow-lg">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-sm text-white flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-purple-400" />
+                  <CardTitle className="text-sm text-white font-bold flex items-center gap-2">
+                    <div className="w-6 h-6 rounded-lg bg-purple-500/30 flex items-center justify-center">
+                      <Sparkles className="w-3 h-3 text-purple-300" />
+                    </div>
                     AI Analysis
                   </CardTitle>
                 </CardHeader>
@@ -314,10 +318,12 @@ export default function ExplainCoPilotPanel() {
 
               {/* AI Suggestions */}
               {aiInsights.suggestions && aiInsights.suggestions.length > 0 && (
-                <Card className="bg-gradient-to-br from-purple-500/10 to-blue-500/10 border-purple-500/20">
+                <Card className="bg-gradient-to-br from-amber-500/20 to-orange-500/20 border-amber-500/40 shadow-lg shadow-amber-500/10">
                   <CardHeader className="pb-3">
-                    <CardTitle className="text-sm text-white flex items-center gap-2">
-                      <Zap className="w-4 h-4 text-yellow-400" />
+                    <CardTitle className="text-sm text-white font-bold flex items-center gap-2">
+                      <div className="w-6 h-6 rounded-lg bg-amber-500/30 flex items-center justify-center">
+                        <Zap className="w-3 h-3 text-amber-300" />
+                      </div>
                       AI Recommendations
                     </CardTitle>
                   </CardHeader>
@@ -413,14 +419,15 @@ export default function ExplainCoPilotPanel() {
         </div>
 
         {/* Footer */}
-        <div className="p-3 border-t border-white/10 bg-white/5">
-          <div className="flex items-center justify-between text-xs text-gray-400">
+        <div className="p-3 border-t border-purple-500/30 bg-gradient-to-r from-purple-500/20 to-blue-500/20 backdrop-blur-sm">
+          <div className="flex items-center justify-between text-xs text-purple-200">
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-              <span>AI-powered analysis</span>
+              <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-lg shadow-emerald-400/50"></div>
+              <span className="font-semibold">AI-powered analysis</span>
             </div>
             {explainPanelState.isPinned && (
-              <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30 text-[10px]">
+              <Badge className="bg-purple-500/30 text-purple-300 border-purple-500/40 text-[10px] font-bold">
+                <Pin className="w-2 h-2 mr-1 fill-current" />
                 Pinned
               </Badge>
             )}
