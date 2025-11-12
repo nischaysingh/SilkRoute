@@ -432,7 +432,7 @@ Return JSON:
                         <SelectTrigger className="bg-white/10 border-cyan-500/30 text-white hover:bg-white/15">
                           <SelectValue placeholder="Select trigger type" />
                         </SelectTrigger>
-                        <SelectContent className="bg-slate-900 border-cyan-500/30 text-white backdrop-blur-xl">
+                        <SelectContent className="bg-slate-900 border-cyan-500/30 text-white backdrop-blur-xl z-[250]">
                           {TRIGGER_TYPES.map(t => (
                             <SelectItem key={t.id} value={t.id}>
                               <div>
@@ -462,7 +462,7 @@ Return JSON:
                               <SelectTrigger className="bg-cyan-500/10 border-cyan-500/30 text-white text-xs hover:bg-cyan-500/15">
                                 <SelectValue />
                               </SelectTrigger>
-                              <SelectContent className="bg-slate-900 border-cyan-500/30 text-white backdrop-blur-xl">
+                              <SelectContent className="bg-slate-900 border-cyan-500/30 text-white backdrop-blur-xl z-[250]">
                                 <SelectItem value=">">Greater than</SelectItem>
                                 <SelectItem value="<">Less than</SelectItem>
                                 <SelectItem value="=">Equal to</SelectItem>
@@ -484,7 +484,7 @@ Return JSON:
                             <SelectTrigger className="bg-white/5 border-white/10 text-white text-xs">
                               <SelectValue />
                             </SelectTrigger>
-                            <SelectContent className="bg-gray-900 border-white/20 text-white z-[250]">
+                            <SelectContent className="bg-gray-900 border-white/20 text-white z-[250]" container={document.querySelector('.workflow-composer-dialog')}>
                               <SelectItem value="hourly">Hourly</SelectItem>
                               <SelectItem value="daily">Daily</SelectItem>
                               <SelectItem value="weekly">Weekly</SelectItem>
