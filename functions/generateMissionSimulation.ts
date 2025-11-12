@@ -1,9 +1,4 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.4';
-import OpenAI from 'npm:openai@4.20.1';
-
-const openai = new OpenAI({
-    apiKey: Deno.env.get("OPENAI_API_KEY"),
-});
 
 Deno.serve(async (req) => {
     try {
@@ -22,60 +17,78 @@ Deno.serve(async (req) => {
         }
 
         // Generate realistic mission simulation data via AI
-        const response = await openai.chat.completions.create({
-            model: "gpt-4o-mini",
-            messages: [
-                {
-                    role: "system",
-                    content: `You are an AI mission simulation generator for SilkRoute ATC. Generate realistic operational data for AI missions based on user input. Be creative but realistic with metrics.`
-                },
-                {
-                    role: "user",
-                    content: `Generate a realistic AI mission simulation for:
+        const aiResponse = await base44.integrations.Core.InvokeLLM({
+            prompt: `Generate a realistic AI mission simulation in JSON format for:
+
 Mission Name: ${missionName}
 Objective: ${objective}
 Priority: ${priority || 2}
 
-Create realistic operational metrics including:
-- Initial status (should be "draft" or "armed")
-- Suggested route (pilot/copilot/autopilot based on complexity)
-- Expected success rate (85-99%)
-- Average latency in ms (300-2000ms)
-- Tokens per run (500-2000)
-- Spend per run in dollars (0.01-0.10)
-- Risk score (0.0-1.0, where higher = riskier)
-- Last 10 runs simulation (array of success 0 or 1)
+Create realistic operational metrics. Return ONLY a JSON object with these exact fields:
+{
+  "status": "draft" or "armed",
+  "route": "pilot" or "copilot" or "autopilot" (based on complexity - simple tasks go to autopilot, complex to pilot),
+  "successRate": number between 85-99,
+  "avgLatency": number in milliseconds between 300-2000,
+  "tokensPerRun": number between 500-2000,
+  "spendPerRun": string like "0.025" (dollars, between 0.01-0.10),
+  "risk_score": number between 0.0-1.0 (higher = riskier),
+  "confidence": number between 85-95,
+  "estimatedImpact": string describing expected business impact,
+  "suggestedOptimizations": array of 2-3 optimization suggestions as strings,
+  "lastRuns": array of exactly 10 objects like {"success": 1} or {"success": 0}
+}
 
-Make it feel like a real mission that's been analyzed and ready to deploy.`
+Be creative but realistic. Higher complexity objectives should have higher latency and cost.`,
+            response_json_schema: {
+                type: "object",
+                properties: {
+                    status: { type: "string" },
+                    route: { type: "string" },
+                    successRate: { type: "number" },
+                    avgLatency: { type: "number" },
+                    tokensPerRun: { type: "number" },
+                    spendPerRun: { type: "string" },
+                    risk_score: { type: "number" },
+                    confidence: { type: "number" },
+                    estimatedImpact: { type: "string" },
+                    suggestedOptimizations: { 
+                        type: "array",
+                        items: { type: "string" }
+                    },
+                    lastRuns: {
+                        type: "array",
+                        items: {
+                            type: "object",
+                            properties: {
+                                success: { type: "number" }
+                            }
+                        }
+                    }
                 }
-            ],
-            response_format: { type: "json_object" },
-            temperature: 0.8
+            }
         });
-
-        const aiContent = JSON.parse(response.choices[0].message.content);
 
         // Structure the mission data
         const missionData = {
             name: missionName,
-            version: aiContent.version || 1,
+            version: 1,
             intent: objective,
             owner: user.email,
-            status: aiContent.status || "draft",
+            status: aiResponse.status || "draft",
             priority: priority || 2,
-            risk_score: aiContent.risk_score || 0.15,
-            // Store simulation metadata for UI display
+            risk_score: aiResponse.risk_score || 0.15,
             simulation_metadata: {
-                route: aiContent.route || "pilot",
-                lastRun: aiContent.lastRun || "Never",
-                successRate: aiContent.successRate || 92,
-                avgLatency: aiContent.avgLatency || 840,
-                tokensPerRun: aiContent.tokensPerRun || 950,
-                spendPerRun: aiContent.spendPerRun || "0.025",
-                lastRuns: aiContent.lastRuns || Array.from({ length: 10 }, () => ({ success: Math.random() > 0.1 ? 1 : 0 })),
-                confidence: aiContent.confidence || 89,
-                estimatedImpact: aiContent.estimatedImpact || "Moderate operational improvement expected",
-                suggestedOptimizations: aiContent.suggestedOptimizations || []
+                route: aiResponse.route || "pilot",
+                lastRun: "Never",
+                successRate: aiResponse.successRate || 92,
+                avgLatency: aiResponse.avgLatency || 840,
+                tokensPerRun: aiResponse.tokensPerRun || 950,
+                spendPerRun: aiResponse.spendPerRun || "0.025",
+                lastRuns: aiResponse.lastRuns || Array.from({ length: 10 }, () => ({ success: Math.random() > 0.1 ? 1 : 0 })),
+                confidence: aiResponse.confidence || 89,
+                estimatedImpact: aiResponse.estimatedImpact || "Moderate operational improvement expected",
+                suggestedOptimizations: aiResponse.suggestedOptimizations || []
             }
         };
 
@@ -93,7 +106,8 @@ Make it feel like a real mission that's been analyzed and ready to deploy.`
         console.error('Error generating mission simulation:', error);
         return Response.json({ 
             error: error.message,
-            details: 'Failed to generate mission simulation'
+            details: 'Failed to generate mission simulation',
+            stack: error.stack
         }, { status: 500 });
     }
 });

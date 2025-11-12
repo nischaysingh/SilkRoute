@@ -40,6 +40,7 @@ import IncidentVisualizer from "../atc/IncidentVisualizer";
 import AuditLogViewer from "../atc/AuditLogViewer";
 import AIRunbookSuggestions from "../atc/AIRunbookSuggestions";
 import PredictiveInsights from "../atc/PredictiveInsights";
+import { generateMissionSimulation } from "@/functions/generateMissionSimulation"; // ADDED IMPORT
 
 // Helper Components
 const KPICard = ({ title, value, unit, icon: Icon, trend, onClick }) => (
@@ -849,8 +850,6 @@ export default function ATCTab() {
     setMissionSimulationResult(null);
 
     try {
-      const { generateMissionSimulation } = await import("@/functions/generateMissionSimulation");
-      
       const response = await generateMissionSimulation({
         missionName: newMissionName,
         objective: newMissionObjective,
@@ -889,14 +888,13 @@ export default function ATCTab() {
           agent: "ai-copilot"
         }, ...prev]);
         
-        // Reset form but keep dialog open to show results
       } else {
         throw new Error(response.data.error || "Failed to create mission");
       }
     } catch (error) {
       console.error('Error creating mission:', error);
       toast.error("Failed to create mission", {
-        description: error.message || "Please try again"
+        description: error.response?.data?.details || error.message || "Please try again"
       });
     } finally {
       setCreatingMission(false);
