@@ -8,7 +8,6 @@ import CashFlow from './pages/CashFlow';
 import Management from './pages/Management';
 import SilkRouteAI from './pages/SilkRouteAI';
 import CoPilot from './pages/CoPilot';
-import Workflows from './pages/Workflows';
 import Layout from './Layout.jsx';
 
 
@@ -23,7 +22,6 @@ export const PAGES = {
     "Management": Management,
     "SilkRouteAI": SilkRouteAI,
     "CoPilot": CoPilot,
-    "Workflows": Workflows,
 }
 
 export const pagesConfig = {

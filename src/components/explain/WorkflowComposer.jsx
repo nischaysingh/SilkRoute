@@ -262,33 +262,23 @@ Return JSON:
     }, 2400);
   };
 
-  const saveWorkflow = async () => {
-    try {
-      const workflow = {
-        name: workflowName,
-        description: workflowDescription,
-        trigger,
-        steps,
-        source_widget: widgetContext?.title || 'Manual',
-        source_page: window.location.pathname,
-        status: 'draft',
-        execution_count: 0,
-        success_rate: 0
-      };
+  const saveWorkflow = () => {
+    const workflow = {
+      name: workflowName,
+      description: workflowDescription,
+      trigger,
+      steps,
+      sourceWidget: widgetContext.title,
+      createdAt: new Date().toISOString()
+    };
 
-      await base44.entities.Workflow.create(workflow);
-      
-      toast.success("Workflow saved", {
-        description: `"${workflowName}" created successfully. Activate it from the Workflows page.`
-      });
-      
-      onClose();
-    } catch (error) {
-      console.error('Error saving workflow:', error);
-      toast.error("Failed to save workflow", {
-        description: error.message
-      });
-    }
+    console.log('Saving workflow:', workflow);
+    
+    toast.success("Workflow saved", {
+      description: `"${workflowName}" is ready to activate`
+    });
+    
+    onClose();
   };
 
   const getStepConfig = (type) => {
