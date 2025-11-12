@@ -684,12 +684,20 @@ Return JSON:
                       </CardHeader>
                       <CardContent className="space-y-3">
                         <div>
-                          <Label className="text-gray-400 text-xs">Step Name</Label>
+                          <Label className="text-purple-300 text-xs font-semibold">Step Name</Label>
                           <Input
                             value={selectedStepData.name}
                             onChange={(e) => updateStep(selectedStepData.id, { name: e.target.value })}
-                            className="bg-white/5 border-white/10 text-white mt-1 text-sm"
+                            className="bg-white/10 border-purple-500/30 text-white mt-1 text-sm focus:border-purple-500"
+                            placeholder="Enter descriptive step name"
                           />
+                        </div>
+
+                        <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/30">
+                          <div className="text-xs text-blue-300 font-semibold mb-2">💡 Step Info</div>
+                          <div className="text-xs text-gray-300">
+                            {getStepConfig(selectedStepData.type).description}
+                          </div>
                         </div>
 
                         {selectedStepData.type === 'alert' && (
