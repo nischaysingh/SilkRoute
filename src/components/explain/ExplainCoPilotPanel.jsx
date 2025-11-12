@@ -338,7 +338,21 @@ export default function ExplainCoPilotPanel() {
           <div>
             <h4 className="text-sm font-semibold text-white mb-3">Quick Actions</h4>
             <div className="grid grid-cols-2 gap-2">
-              {activeData.actions.map((actionKey) => {
+              {/* Primary Action: New Workflow (Always Visible) */}
+              <Button
+                size="sm"
+                onClick={() => handleAction('new_workflow')}
+                className="col-span-2 justify-start h-auto py-3 px-4 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 border-0 text-white"
+              >
+                <GitBranch className="w-4 h-4 mr-2 flex-shrink-0" />
+                <div className="text-left">
+                  <div className="text-sm font-semibold">Create Workflow</div>
+                  <div className="text-[10px] text-purple-200">Auto-generate multi-step automation</div>
+                </div>
+              </Button>
+
+              {/* Other Actions */}
+              {activeData.actions.filter(a => a !== 'new_workflow').map((actionKey) => {
                 const config = getActionConfig(actionKey);
                 return (
                   <Button
