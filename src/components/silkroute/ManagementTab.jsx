@@ -10,7 +10,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Activity, TrendingUp, TrendingDown, Clock, AlertCircle, CheckCircle,
   Search, Play, Pause, Trash2, Eye, History, GitBranch, Sparkles,
-  BarChart3, Zap, FileText, Download, RefreshCw, AlertTriangle, Target, BookOpen, User // Added User icon
+  BarChart3, Zap, FileText, Download, RefreshCw, AlertTriangle, Target, BookOpen, User, Shield
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -20,11 +20,12 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { format } from "date-fns";
 import RunbookManager from "../runbooks/RunbookManager";
-import RealTimeMissionAnalytics from "../analytics/RealTimeMissionAnalytics"; // Keep this import, though its usage changes
+import RealTimeMissionAnalytics from "../analytics/RealTimeMissionAnalytics";
 import GoalOrchestrator from "../orchestration/GoalOrchestrator";
-import PersonaBuilder from "../personas/PersonaBuilder"; // New import
-import EnhancedAnalyticsDashboard from "../analytics/EnhancedAnalyticsDashboard"; // New import
-import WorkflowOptimizer from "../optimization/WorkflowOptimizer"; // New import
+import PersonaBuilder from "../personas/PersonaBuilder";
+import EnhancedAnalyticsDashboard from "../analytics/EnhancedAnalyticsDashboard";
+import WorkflowOptimizer from "../optimization/WorkflowOptimizer";
+import AIAuditCenter from "../audit/AIAuditCenter";
 
 export default function ManagementTab() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -33,7 +34,7 @@ export default function ManagementTab() {
   const [loadingAudit, setLoadingAudit] = useState(false);
   const [versionHistoryOpen, setVersionHistoryOpen] = useState(false);
   const [executionHistoryOpen, setExecutionHistoryOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState("workflows"); // New state for active tab
+  const [activeTab, setActiveTab] = useState("workflows");
   const queryClient = useQueryClient();
 
   // Fetch all workflows
@@ -239,6 +240,10 @@ export default function ManagementTab() {
             <User className="w-4 h-4 mr-2" />
             Personas
           </TabsTrigger>
+          <TabsTrigger value="audit">
+            <Shield className="w-4 h-4 mr-2" />
+            AI Audit
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="workflows" className="space-y-6 mt-6">
@@ -306,7 +311,7 @@ export default function ManagementTab() {
                                     {workflow.description}
                                   </p>
                                 )}
-                                <div className="flex items-center gap-2 text-xs text-slate-500">
+                                <div className="flex items-center gap-2 text-xs text-slate-50">
                                   <Clock className="w-3 h-3" />
                                   {format(new Date(workflow.updated_date || workflow.created_date), 'MMM dd, yyyy')}
                                 </div>
@@ -657,6 +662,11 @@ export default function ManagementTab() {
         {/* NEW: Personas Tab */}
         <TabsContent value="personas" className="space-y-6 mt-6">
           <PersonaBuilder />
+        </TabsContent>
+
+        {/* NEW: AI Audit Tab */}
+        <TabsContent value="audit" className="space-y-6 mt-6">
+          <AIAuditCenter />
         </TabsContent>
       </Tabs>
 
