@@ -1,9 +1,10 @@
+
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { LineChart, Line, AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
-import { TrendingUp, TrendingDown, Activity, DollarSign, Clock, Zap, AlertTriangle, Eye, Sparkles, Loader2 } from "lucide-react";
+import { TrendingUp, TrendingDown, Activity, DollarSign, Clock, Zap, AlertTriangle, Eye, Sparkles, Loader2, Brain } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
@@ -12,7 +13,7 @@ import { detectAnomalies } from "@/functions/detectAnomalies";
 import { predictMissionPerformance } from "@/functions/predictMissionPerformance";
 import { motion, AnimatePresence } from "framer-motion";
 
-export default function RealTimeMissionAnalytics({ missionId }) {
+export default function RealTimeMissionAnalytics({ missionId, onAnomalyClick }) {
   const [predictionData, setPredictionData] = useState(null);
   const [anomalyData, setAnomalyData] = useState(null);
   const [loadingPrediction, setLoadingPrediction] = useState(false);
@@ -233,7 +234,7 @@ export default function RealTimeMissionAnalytics({ missionId }) {
         </Card>
       </div>
 
-      {/* Anomaly Detection */}
+      {/* Anomaly Detection - Enhanced with RCA trigger */}
       <Card className="bg-white border-slate-200">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
@@ -269,12 +270,13 @@ export default function RealTimeMissionAnalytics({ missionId }) {
             <div className="space-y-3">
               {anomalyData.anomalies.map((anomaly, idx) => (
                 <Card key={idx} className={cn(
-                  "border-2",
+                  "border-2 cursor-pointer hover:shadow-md transition-all",
                   anomaly.severity === "critical" ? "border-red-300 bg-red-50" :
                   anomaly.severity === "high" ? "border-orange-300 bg-orange-50" :
                   anomaly.severity === "medium" ? "border-amber-300 bg-amber-50" :
                   "border-blue-300 bg-blue-50"
-                )}>
+                )}
+                onClick={() => onAnomalyClick && onAnomalyClick(anomaly)}>
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex-1">
@@ -306,6 +308,22 @@ export default function RealTimeMissionAnalytics({ missionId }) {
                         </Badge>
                       </div>
                     </div>
+                    
+                    {onAnomalyClick && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onAnomalyClick(anomaly);
+                        }}
+                        className="w-full mt-3 h-7 text-xs"
+                      >
+                        <Brain className="w-3 h-3 mr-1" />
+                        Root Cause Analysis
+                      </Button>
+                    )}
+
                     {anomaly.recommended_actions?.length > 0 && (
                       <div className="mt-3 pt-3 border-t border-slate-200">
                         <div className="text-xs font-semibold text-slate-900 mb-2">Recommended Actions:</div>

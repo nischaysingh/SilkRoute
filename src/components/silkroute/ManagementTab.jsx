@@ -10,7 +10,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Activity, TrendingUp, TrendingDown, Clock, AlertCircle, CheckCircle,
   Search, Play, Pause, Trash2, Eye, History, GitBranch, Sparkles,
-  BarChart3, Zap, FileText, Download, RefreshCw, AlertTriangle, Target, BookOpen
+  BarChart3, Zap, FileText, Download, RefreshCw, AlertTriangle, Target, BookOpen, User // Added User icon
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -20,8 +20,11 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { format } from "date-fns";
 import RunbookManager from "../runbooks/RunbookManager";
-import RealTimeMissionAnalytics from "../analytics/RealTimeMissionAnalytics";
+import RealTimeMissionAnalytics from "../analytics/RealTimeMissionAnalytics"; // Keep this import, though its usage changes
 import GoalOrchestrator from "../orchestration/GoalOrchestrator";
+import PersonaBuilder from "../personas/PersonaBuilder"; // New import
+import EnhancedAnalyticsDashboard from "../analytics/EnhancedAnalyticsDashboard"; // New import
+import WorkflowOptimizer from "../optimization/WorkflowOptimizer"; // New import
 
 export default function ManagementTab() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -220,6 +223,10 @@ export default function ManagementTab() {
             <Activity className="w-4 h-4 mr-2" />
             Analytics
           </TabsTrigger>
+          <TabsTrigger value="optimizer">
+            <Zap className="w-4 h-4 mr-2" />
+            Optimizer
+          </TabsTrigger>
           <TabsTrigger value="runbooks">
             <BookOpen className="w-4 h-4 mr-2" />
             Runbooks
@@ -227,6 +234,10 @@ export default function ManagementTab() {
           <TabsTrigger value="orchestration">
             <Target className="w-4 h-4 mr-2" />
             Orchestration
+          </TabsTrigger>
+          <TabsTrigger value="personas">
+            <User className="w-4 h-4 mr-2" />
+            Personas
           </TabsTrigger>
         </TabsList>
 
@@ -610,22 +621,27 @@ export default function ManagementTab() {
           </div>
         </TabsContent>
 
-        {/* NEW: Analytics Tab */}
+        {/* Analytics Tab - Enhanced */}
         <TabsContent value="analytics" className="space-y-6 mt-6">
           {selectedWorkflow ? (
-            <RealTimeMissionAnalytics missionId={selectedWorkflow.id} />
+            <EnhancedAnalyticsDashboard missionId={selectedWorkflow.id} />
           ) : (
             <Card className="bg-gradient-to-br from-blue-50 to-purple-50 border-blue-200">
               <CardContent className="p-12 text-center">
                 <Activity className="w-16 h-16 mx-auto mb-4 text-blue-400 opacity-50" />
                 <h4 className="text-lg font-semibold text-slate-900 mb-2">No Mission Selected</h4>
-                <p className="text-sm text-slate-600">Select a workflow to view real-time analytics</p>
+                <p className="text-sm text-slate-600">Select a workflow to view enhanced analytics</p>
               </CardContent>
             </Card>
           )}
         </TabsContent>
 
-        {/* NEW: Runbooks Tab */}
+        {/* NEW: Optimizer Tab */}
+        <TabsContent value="optimizer" className="space-y-6 mt-6">
+          <WorkflowOptimizer workflow={selectedWorkflow} />
+        </TabsContent>
+
+        {/* Runbooks Tab */}
         <TabsContent value="runbooks" className="space-y-6 mt-6">
           <RunbookManager 
             missionId={selectedWorkflow?.id} 
@@ -633,9 +649,14 @@ export default function ManagementTab() {
           />
         </TabsContent>
 
-        {/* NEW: Orchestration Tab */}
+        {/* Orchestration Tab */}
         <TabsContent value="orchestration" className="space-y-6 mt-6">
           <GoalOrchestrator />
+        </TabsContent>
+
+        {/* NEW: Personas Tab */}
+        <TabsContent value="personas" className="space-y-6 mt-6">
+          <PersonaBuilder />
         </TabsContent>
       </Tabs>
 
