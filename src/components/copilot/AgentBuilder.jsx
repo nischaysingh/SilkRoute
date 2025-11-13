@@ -7,14 +7,163 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Sparkles, Plus, Database, Zap, Shield, Play, Save, Copy } from "lucide-react";
+import { Sparkles, Plus, Database, Zap, Shield, Play, Save, Copy, Loader2, CheckCircle, Target } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
+import { base44 } from "@/api/base44Client";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export default function AgentBuilder() {
   const [prompt, setPrompt] = useState("");
   const [blueprint, setBlueprint] = useState(null);
   const [building, setBuilding] = useState(false);
+  const [agentName, setAgentName] = useState("");
+  const queryClient = useQueryClient();
+
+  const generateBlueprintMutation = useMutation({
+    mutationFn: async (mission) => {
+      const response = await base44.integrations.Core.InvokeLLM({
+        prompt: `You are an AI agent architect. Based on this mission description, design a complete agent blueprint.
+
+Mission: ${mission}
+
+Generate a detailed blueprint with:
+1. Agent name (concise, snake_case format like "invoice_reconciler_v1")
+2. Data inputs needed (list 2-4 specific sources)
+3. Trigger configurations (when should it run)
+4. Recommended AI model (gpt-4o-mini, gpt-4o, or claude-3-haiku)
+5. Required safeguards for this use case
+6. Expected outputs/actions
+7. Cost and runtime estimates
+
+Return ONLY valid JSON matching this schema:
+{
+  "name": "string (snake_case)",
+  "mission": "string",
+  "inputs": [{"name": "string", "type": "string", "description": "string"}],
+  "triggers": [{"type": "schedule|event|webhook", "config": "string"}],
+  "model": {"name": "string", "profile": "cost-balanced|accuracy-focused", "reasoning": "string"},
+  "safeguards": [{"name": "string", "enabled": true, "description": "string"}],
+  "outputs": [{"name": "string", "action": "string"}],
+  "estimatedCost": "string",
+  "estimatedRuntime": "string"
+}`,
+        response_json_schema: {
+          type: "object",
+          properties: {
+            name: { type: "string" },
+            mission: { type: "string" },
+            inputs: { 
+              type: "array", 
+              items: { 
+                type: "object",
+                properties: {
+                  name: { type: "string" },
+                  type: { type: "string" },
+                  description: { type: "string" }
+                }
+              }
+            },
+            triggers: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  type: { type: "string" },
+                  config: { type: "string" }
+                }
+              }
+            },
+            model: {
+              type: "object",
+              properties: {
+                name: { type: "string" },
+                profile: { type: "string" },
+                reasoning: { type: "string" }
+              }
+            },
+            safeguards: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  name: { type: "string" },
+                  enabled: { type: "boolean" },
+                  description: { type: "string" }
+                }
+              }
+            },
+            outputs: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  name: { type: "string" },
+                  action: { type: "string" }
+                }
+              }
+            },
+            estimatedCost: { type: "string" },
+            estimatedRuntime: { type: "string" }
+          }
+        }
+      });
+      return response;
+    },
+    onSuccess: (data) => {
+      setBlueprint(data);
+      setAgentName(data.name);
+      toast.success("Agent blueprint generated!");
+    },
+    onError: (error) => {
+      toast.error("Failed to generate blueprint", {
+        description: error.message
+      });
+    }
+  });
+
+  const deployAgentMutation = useMutation({
+    mutationFn: async (blueprintData) => {
+      // Create an AIMission with the blueprint
+      const mission = await base44.entities.AIMission.create({
+        name: blueprintData.name,
+        version: 1,
+        intent: blueprintData.mission,
+        status: "draft",
+        priority: 3,
+        risk_score: 0.2,
+        simulation_metadata: {
+          route: "pilot",
+          successRate: 90,
+          avgLatency: parseInt(blueprintData.estimatedRuntime?.match(/\d+/)?.[0] || "45") * 1000,
+          tokensPerRun: 450,
+          spendPerRun: blueprintData.estimatedCost?.match(/\d+\.\d+/)?.[0] || "0.04",
+          model: blueprintData.model?.name || "gpt-4o-mini",
+          inputs: blueprintData.inputs?.map(i => i.name) || [],
+          triggers: blueprintData.triggers?.map(t => t.config) || [],
+          safeguards: blueprintData.safeguards?.filter(s => s.enabled).map(s => s.name) || [],
+          outputs: blueprintData.outputs?.map(o => o.name) || [],
+          confidence: 0.88,
+          estimatedImpact: "AI-generated agent ready for testing"
+        }
+      });
+      return mission;
+    },
+    onSuccess: (mission) => {
+      queryClient.invalidateQueries({ queryKey: ['ai-missions'] });
+      toast.success("Agent deployed successfully! 🚀", {
+        description: `${mission.name} is now in draft mode`
+      });
+      setBlueprint(null);
+      setPrompt("");
+      setAgentName("");
+    },
+    onError: (error) => {
+      toast.error("Failed to deploy agent", {
+        description: error.message
+      });
+    }
+  });
 
   const handleBuild = () => {
     if (!prompt.trim()) {
@@ -23,53 +172,29 @@ export default function AgentBuilder() {
     }
 
     setBuilding(true);
-
-    // Simulate AI parsing
-    setTimeout(() => {
-      setBlueprint({
-        name: "Invoice Reconciliation Agent",
-        mission: prompt,
-        inputs: [
-          { name: "QuickBooks API", type: "integration", description: "Fetch invoice data" },
-          { name: "Invoice emails", type: "email", description: "Parse incoming invoices from inbox" }
-        ],
-        triggers: [
-          { type: "schedule", config: "Every Friday at 9:00 AM" },
-          { type: "event", config: "On new invoice received" }
-        ],
-        model: {
-          name: "gpt-4o",
-          profile: "cost-balanced",
-          reasoning: "Requires accuracy for financial data"
-        },
-        safeguards: [
-          { name: "Approval required", enabled: true, description: "Human review before updating QuickBooks" },
-          { name: "Sandbox mode", enabled: true, description: "Test first 3 runs in sandbox" },
-          { name: "PII masking", enabled: true, description: "Mask customer sensitive data" }
-        ],
-        outputs: [
-          { name: "QuickBooks update", action: "Create/update invoice records" },
-          { name: "Slack notification", action: "Post summary to #finance channel" }
-        ],
-        estimatedCost: "$2.40/month",
-        estimatedRuntime: "~45s per execution"
-      });
-      setBuilding(false);
-      toast.success("Agent blueprint generated!");
-    }, 2000);
+    generateBlueprintMutation.mutate(prompt);
   };
 
   const handleDeploy = () => {
-    toast.success("Agent deployed to Pilot!", {
-      description: "Now active and ready for approval"
-    });
+    if (!blueprint) return;
+    deployAgentMutation.mutate(blueprint);
   };
 
   const handleClone = () => {
+    if (!blueprint) return;
+    
+    // Clone blueprint for editing
+    setPrompt(blueprint.mission);
     toast.success("Blueprint cloned", {
-      description: "You can now modify and redeploy"
+      description: "Modify and regenerate to create a variant"
     });
   };
+
+  React.useEffect(() => {
+    if (generateBlueprintMutation.isSuccess || generateBlueprintMutation.isError) {
+      setBuilding(false);
+    }
+  }, [generateBlueprintMutation.isSuccess, generateBlueprintMutation.isError]);
 
   return (
     <div className="space-y-4">
@@ -95,23 +220,18 @@ export default function AgentBuilder() {
           <Textarea
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
-            placeholder="Example: Build an AI agent that reconciles invoices every Friday and updates QuickBooks..."
+            placeholder="Example: Create an agent that manages and delegates tasks for the workforce. It should be able to handle all types of events like labor shortage, extra workload, etc."
             className="min-h-32 mb-4"
+            disabled={building}
           />
           <Button
             onClick={handleBuild}
-            disabled={building}
+            disabled={building || !prompt.trim()}
             className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
           >
             {building ? (
               <>
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                  className="mr-2"
-                >
-                  <Sparkles className="w-4 h-4" />
-                </motion.div>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                 Generating Blueprint...
               </>
             ) : (
@@ -141,13 +261,32 @@ export default function AgentBuilder() {
                     <p className="text-sm text-slate-700">{blueprint.mission}</p>
                   </div>
                   <div className="flex gap-2">
-                    <Button size="sm" variant="outline" onClick={handleClone}>
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      onClick={handleClone}
+                      disabled={deployAgentMutation.isPending}
+                    >
                       <Copy className="w-4 h-4 mr-1" />
                       Clone
                     </Button>
-                    <Button size="sm" onClick={handleDeploy} className="bg-emerald-600 hover:bg-emerald-700">
-                      <Play className="w-4 h-4 mr-1" />
-                      Deploy
+                    <Button 
+                      size="sm" 
+                      onClick={handleDeploy} 
+                      className="bg-emerald-600 hover:bg-emerald-700"
+                      disabled={deployAgentMutation.isPending}
+                    >
+                      {deployAgentMutation.isPending ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+                          Deploying...
+                        </>
+                      ) : (
+                        <>
+                          <Play className="w-4 h-4 mr-1" />
+                          Deploy
+                        </>
+                      )}
                     </Button>
                   </div>
                 </div>
@@ -164,7 +303,7 @@ export default function AgentBuilder() {
                     <h4 className="text-sm font-bold text-slate-900">Data Inputs</h4>
                   </div>
                   <div className="space-y-2">
-                    {blueprint.inputs.map((input, idx) => (
+                    {blueprint.inputs?.map((input, idx) => (
                       <div key={idx} className="p-2 rounded bg-slate-50 border border-slate-200">
                         <div className="flex items-center justify-between mb-1">
                           <span className="text-sm font-semibold text-slate-900">{input.name}</span>
@@ -185,7 +324,7 @@ export default function AgentBuilder() {
                     <h4 className="text-sm font-bold text-slate-900">Triggers</h4>
                   </div>
                   <div className="space-y-2">
-                    {blueprint.triggers.map((trigger, idx) => (
+                    {blueprint.triggers?.map((trigger, idx) => (
                       <div key={idx} className="p-2 rounded bg-slate-50 border border-slate-200">
                         <div className="flex items-center justify-between mb-1">
                           <Badge className="bg-amber-100 text-amber-700 text-xs capitalize">{trigger.type}</Badge>
@@ -207,13 +346,13 @@ export default function AgentBuilder() {
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-slate-600">Model:</span>
-                      <span className="text-sm font-semibold text-slate-900">{blueprint.model.name}</span>
+                      <span className="text-sm font-semibold text-slate-900">{blueprint.model?.name || "gpt-4o-mini"}</span>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-slate-600">Profile:</span>
-                      <Badge className="bg-purple-100 text-purple-700 text-xs">{blueprint.model.profile}</Badge>
+                      <Badge className="bg-purple-100 text-purple-700 text-xs">{blueprint.model?.profile || "cost-balanced"}</Badge>
                     </div>
-                    <p className="text-xs text-slate-600 italic">{blueprint.model.reasoning}</p>
+                    <p className="text-xs text-slate-600 italic">{blueprint.model?.reasoning || "Optimized for cost and performance"}</p>
                   </div>
                 </CardContent>
               </Card>
@@ -226,13 +365,13 @@ export default function AgentBuilder() {
                     <h4 className="text-sm font-bold text-slate-900">Safeguards</h4>
                   </div>
                   <div className="space-y-2">
-                    {blueprint.safeguards.map((guard, idx) => (
+                    {blueprint.safeguards?.map((guard, idx) => (
                       <div key={idx} className="flex items-center justify-between p-2 rounded bg-slate-50 border border-slate-200">
                         <div className="flex-1">
                           <div className="text-sm font-semibold text-slate-900">{guard.name}</div>
                           <div className="text-xs text-slate-600">{guard.description}</div>
                         </div>
-                        <Switch checked={guard.enabled} />
+                        <Switch checked={guard.enabled} disabled />
                       </div>
                     ))}
                   </div>
@@ -265,21 +404,22 @@ export default function AgentBuilder() {
           <h4 className="text-sm font-bold text-slate-900 mb-3">Pre-built Agent Templates</h4>
           <div className="grid grid-cols-3 gap-3">
             {[
-              { name: "Invoice Reconciler", category: "Finance" },
-              { name: "CRM Sync Agent", category: "Sales" },
-              { name: "Inventory Monitor", category: "Operations" },
-              { name: "Report Generator", category: "Analytics" },
-              { name: "Customer Support", category: "Service" },
-              { name: "Data Pipeline", category: "Engineering" }
+              { name: "Invoice Reconciler", category: "Finance", template: "Create an agent that reconciles invoices from QuickBooks with payment records and sends weekly summaries to the finance team" },
+              { name: "CRM Sync Agent", category: "Sales", template: "Build an agent that syncs customer data from HubSpot to our internal database every 6 hours and flags data inconsistencies" },
+              { name: "Inventory Monitor", category: "Operations", template: "Design an agent that monitors inventory levels, predicts stockouts, and automatically creates purchase orders when levels are low" },
+              { name: "Report Generator", category: "Analytics", template: "Create an agent that generates monthly performance reports from our analytics data and sends them to stakeholders" },
+              { name: "Customer Support", category: "Service", template: "Build an agent that triages support tickets, categorizes them by priority, and routes to appropriate teams" },
+              { name: "Data Pipeline", category: "Engineering", template: "Design an agent that extracts data from multiple sources, transforms it, and loads it into our data warehouse daily" }
             ].map((template, idx) => (
               <Button
                 key={idx}
                 variant="outline"
-                className="flex flex-col items-start h-auto py-3"
+                className="flex flex-col items-start h-auto py-3 hover:bg-purple-50 hover:border-purple-300 transition-all"
                 onClick={() => {
-                  setPrompt(`Build an AI agent for ${template.name.toLowerCase()}`);
+                  setPrompt(template.template);
                   toast.info(`Template loaded: ${template.name}`);
                 }}
+                disabled={building}
               >
                 <span className="text-sm font-semibold text-slate-900">{template.name}</span>
                 <Badge className="mt-1 bg-slate-100 text-slate-600 text-xs">{template.category}</Badge>
