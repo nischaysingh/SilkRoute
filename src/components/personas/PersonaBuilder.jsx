@@ -1029,6 +1029,19 @@ export default function PersonaBuilder() {
           )}
 
           <DialogFooter>
+            <Button
+              onClick={(e) => {
+                e.stopPropagation();
+                setDetailDialogOpen(false);
+                setSelectedPersona(selectedPersona);
+                setTrainingModuleOpen(true);
+              }}
+              variant="outline"
+              className="border-purple-300 text-purple-700 hover:bg-purple-50"
+            >
+              <GraduationCap className="w-4 h-4 mr-2" />
+              Train This Persona
+            </Button>
             <Button variant="outline" onClick={() => setDetailDialogOpen(false)}>
               Close
             </Button>
