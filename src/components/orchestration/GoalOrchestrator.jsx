@@ -6,8 +6,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
-import { Target, Sparkles, GitBranch, Check, AlertTriangle, TrendingUp, Loader2, Play, Eye, Plus } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Target, Sparkles, GitBranch, Check, AlertTriangle, TrendingUp, Loader2, Play, Eye, Plus, Calendar, DollarSign, Users, Zap, ChevronRight, Activity } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -22,6 +24,8 @@ export default function GoalOrchestrator() {
   const [newGoalName, setNewGoalName] = useState("");
   const [newGoalDesc, setNewGoalDesc] = useState("");
   const [newGoalPriority, setNewGoalPriority] = useState("2");
+  const [targetDate, setTargetDate] = useState("");
+  const [targetMetrics, setTargetMetrics] = useState("");
   const [orchestrating, setOrchestrating] = useState(false);
 
   const queryClient = useQueryClient();
@@ -29,6 +33,11 @@ export default function GoalOrchestrator() {
   const { data: goals = [], isLoading } = useQuery({
     queryKey: ['strategic-goals'],
     queryFn: () => base44.entities.StrategicGoal.list('-created_date', 20)
+  });
+
+  const { data: missions = [] } = useQuery({
+    queryKey: ['ai-missions'],
+    queryFn: () => base44.entities.AIMission.list()
   });
 
   const createGoalMutation = useMutation({
@@ -39,6 +48,8 @@ export default function GoalOrchestrator() {
       setCreateDialogOpen(false);
       setNewGoalName("");
       setNewGoalDesc("");
+      setTargetDate("");
+      setTargetMetrics("");
     }
   });
 
@@ -55,11 +66,17 @@ export default function GoalOrchestrator() {
           description: `${response.data.breakdown.suggested_missions.length} missions suggested`
         });
         queryClient.invalidateQueries({ queryKey: ['strategic-goals'] });
-        setSelectedGoal({ ...goal, ...response.data.breakdown });
+        
+        // Update the selected goal with breakdown data
+        const updatedGoal = await base44.entities.StrategicGoal.filter({ id: goal.id });
+        setSelectedGoal(updatedGoal[0]);
         setDetailDialogOpen(true);
       }
     } catch (error) {
-      toast.error("Failed to breakdown goal");
+      console.error("Breakdown error:", error);
+      toast.error("Failed to breakdown goal", {
+        description: error.response?.data?.error || error.message
+      });
     } finally {
       setOrchestrating(false);
     }
@@ -75,12 +92,19 @@ export default function GoalOrchestrator() {
 
       if (response.data.success) {
         toast.success("Goal progress analyzed", {
-          description: response.data.analysis.analysis
+          description: response.data.analysis.analysis?.substring(0, 100) || "Analysis complete"
         });
         queryClient.invalidateQueries({ queryKey: ['strategic-goals'] });
+        
+        // Refresh goal data
+        const updatedGoal = await base44.entities.StrategicGoal.filter({ id: goal.id });
+        setSelectedGoal(updatedGoal[0]);
       }
     } catch (error) {
-      toast.error("Failed to monitor goal");
+      console.error("Monitor error:", error);
+      toast.error("Failed to monitor goal", {
+        description: error.response?.data?.error || error.message
+      });
     } finally {
       setOrchestrating(false);
     }
@@ -88,19 +112,82 @@ export default function GoalOrchestrator() {
 
   const handleCreateGoal = () => {
     if (!newGoalName || !newGoalDesc) {
-      toast.error("Please fill in all fields");
+      toast.error("Please fill in all required fields");
       return;
     }
+
+    const metrics = targetMetrics ? targetMetrics.split('\n').reduce((obj, line) => {
+      const [key, value] = line.split(':').map(s => s.trim());
+      if (key && value) obj[key] = value;
+      return obj;
+    }, {}) : {};
 
     createGoalMutation.mutate({
       name: newGoalName,
       description: newGoalDesc,
       priority: parseInt(newGoalPriority),
       status: "planning",
-      target_metrics: {},
+      target_metrics: metrics,
+      target_date: targetDate || null,
       linked_missions: [],
       progress_percentage: 0
     });
+  };
+
+  const handleDeployMissions = async (goal) => {
+    if (!goal.ai_suggested_missions || goal.ai_suggested_missions.length === 0) {
+      toast.error("No missions to deploy");
+      return;
+    }
+
+    try {
+      toast.loading("Deploying missions...", { id: "deploy-missions" });
+
+      // Create actual missions from suggestions
+      const missionIds = [];
+      for (const suggestion of goal.ai_suggested_missions) {
+        const mission = await base44.entities.AIMission.create({
+          name: suggestion.name,
+          version: 1,
+          intent: suggestion.intent,
+          status: "armed",
+          priority: suggestion.priority,
+          risk_score: 0.2,
+          simulation_metadata: {
+            route: suggestion.route_suggestion,
+            successRate: 92,
+            avgLatency: 850,
+            tokensPerRun: 450,
+            spendPerRun: "0.042",
+            confidence: 0.88
+          }
+        });
+        missionIds.push(mission.id);
+      }
+
+      // Update goal with linked missions
+      await base44.entities.StrategicGoal.update(goal.id, {
+        linked_missions: missionIds,
+        status: "on-track",
+        progress_percentage: 10
+      });
+
+      toast.success("Missions deployed! 🚀", {
+        id: "deploy-missions",
+        description: `${missionIds.length} missions are now active`
+      });
+
+      queryClient.invalidateQueries({ queryKey: ['strategic-goals'] });
+      queryClient.invalidateQueries({ queryKey: ['ai-missions'] });
+      
+      setDetailDialogOpen(false);
+    } catch (error) {
+      console.error("Deploy error:", error);
+      toast.error("Failed to deploy missions", {
+        id: "deploy-missions",
+        description: error.message
+      });
+    }
   };
 
   return (
@@ -150,7 +237,7 @@ export default function GoalOrchestrator() {
                 transition={{ delay: idx * 0.05 }}
               >
                 <Card className={cn(
-                  "border-2",
+                  "border-2 hover:shadow-lg transition-all",
                   goal.status === "on-track" ? "border-emerald-300 bg-emerald-50" :
                   goal.status === "at-risk" ? "border-amber-300 bg-amber-50" :
                   goal.status === "achieved" ? "border-blue-300 bg-blue-50" :
@@ -161,7 +248,7 @@ export default function GoalOrchestrator() {
                       <div className="flex-1">
                         <h4 className="text-lg font-bold text-slate-900 mb-1">{goal.name}</h4>
                         <p className="text-sm text-slate-600 line-clamp-2 mb-2">{goal.description}</p>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 flex-wrap">
                           <Badge className={cn(
                             "text-xs",
                             goal.status === "on-track" ? "bg-emerald-100 text-emerald-700" :
@@ -174,39 +261,42 @@ export default function GoalOrchestrator() {
                           <Badge className="bg-purple-100 text-purple-700 text-xs">
                             P{goal.priority}
                           </Badge>
+                          {goal.target_date && (
+                            <Badge className="bg-blue-100 text-blue-700 text-xs">
+                              <Calendar className="w-3 h-3 mr-1" />
+                              {new Date(goal.target_date).toLocaleDateString()}
+                            </Badge>
+                          )}
                         </div>
                       </div>
                     </div>
 
-                    {/* Progress */}
                     <div className="mb-4">
                       <div className="flex items-center justify-between text-xs text-slate-600 mb-1">
                         <span>Progress</span>
-                        <span className="font-bold text-slate-900">{goal.progress_percentage}%</span>
+                        <span className="font-bold text-slate-900">{goal.progress_percentage || 0}%</span>
                       </div>
-                      <Progress value={goal.progress_percentage} className="h-2" />
+                      <Progress value={goal.progress_percentage || 0} className="h-2" />
                     </div>
 
-                    {/* Linked Missions */}
                     {goal.linked_missions?.length > 0 && (
-                      <div className="mb-4">
-                        <div className="text-xs text-slate-600 mb-1">
-                          {goal.linked_missions.length} linked missions
+                      <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                        <div className="text-xs text-blue-900 font-semibold mb-1 flex items-center gap-1">
+                          <Activity className="w-3 h-3" />
+                          {goal.linked_missions.length} active missions
                         </div>
                       </div>
                     )}
 
-                    {/* AI Suggestions */}
                     {goal.ai_suggested_missions?.length > 0 && (
                       <div className="mb-4 p-3 bg-purple-50 border border-purple-200 rounded-lg">
                         <div className="text-xs text-purple-900 font-semibold mb-1 flex items-center gap-1">
                           <Sparkles className="w-3 h-3" />
-                          {goal.ai_suggested_missions.length} AI-suggested missions
+                          {goal.ai_suggested_missions.length} AI-suggested missions ready
                         </div>
                       </div>
                     )}
 
-                    {/* Actions */}
                     <div className="flex gap-2">
                       {!goal.ai_suggested_missions && (
                         <Button
@@ -220,7 +310,7 @@ export default function GoalOrchestrator() {
                           ) : (
                             <GitBranch className="w-3 h-3 mr-1" />
                           )}
-                          Breakdown
+                          AI Breakdown
                         </Button>
                       )}
                       {goal.linked_missions?.length > 0 && (
@@ -231,7 +321,11 @@ export default function GoalOrchestrator() {
                           disabled={orchestrating}
                           className="flex-1 h-8 text-xs"
                         >
-                          <TrendingUp className="w-3 h-3 mr-1" />
+                          {orchestrating ? (
+                            <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                          ) : (
+                            <TrendingUp className="w-3 h-3 mr-1" />
+                          )}
                           Monitor
                         </Button>
                       )}
@@ -258,9 +352,12 @@ export default function GoalOrchestrator() {
 
       {/* Create Goal Dialog */}
       <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
-        <DialogContent className="bg-white border-slate-200">
+        <DialogContent className="bg-white border-slate-200 max-w-2xl">
           <DialogHeader>
-            <DialogTitle className="text-slate-900">Create Strategic Goal</DialogTitle>
+            <DialogTitle className="text-slate-900 flex items-center gap-2">
+              <Target className="w-5 h-5 text-purple-600" />
+              Create Strategic Goal
+            </DialogTitle>
             <DialogDescription className="text-slate-600">
               Define a high-level objective for AI orchestration
             </DialogDescription>
@@ -276,6 +373,7 @@ export default function GoalOrchestrator() {
                 className="bg-white border-slate-200"
               />
             </div>
+            
             <div>
               <Label className="text-slate-900 text-sm mb-2 block">Description</Label>
               <Textarea
@@ -285,17 +383,56 @@ export default function GoalOrchestrator() {
                 className="bg-white border-slate-200 min-h-24"
               />
             </div>
-            <div>
-              <Label className="text-slate-900 text-sm mb-2 block">Priority</Label>
-              <Input
-                type="number"
-                min="1"
-                max="5"
-                value={newGoalPriority}
-                onChange={(e) => setNewGoalPriority(e.target.value)}
-                className="bg-white border-slate-200"
-              />
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label className="text-slate-900 text-sm mb-2 block">Priority (1-5)</Label>
+                <Select value={newGoalPriority} onValueChange={setNewGoalPriority}>
+                  <SelectTrigger className="bg-white border-slate-200">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white border-slate-200">
+                    <SelectItem value="1">P1 - Critical</SelectItem>
+                    <SelectItem value="2">P2 - High</SelectItem>
+                    <SelectItem value="3">P3 - Medium</SelectItem>
+                    <SelectItem value="4">P4 - Low</SelectItem>
+                    <SelectItem value="5">P5 - Background</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label className="text-slate-900 text-sm mb-2 block">Target Date (Optional)</Label>
+                <Input
+                  type="date"
+                  value={targetDate}
+                  onChange={(e) => setTargetDate(e.target.value)}
+                  className="bg-white border-slate-200"
+                />
+              </div>
             </div>
+
+            <div>
+              <Label className="text-slate-900 text-sm mb-2 block">Target Metrics (Optional)</Label>
+              <Textarea
+                value={targetMetrics}
+                onChange={(e) => setTargetMetrics(e.target.value)}
+                placeholder="cost_reduction: 15%&#10;revenue_increase: 20%&#10;customer_satisfaction: 90%"
+                className="bg-white border-slate-200 min-h-20 font-mono text-xs"
+              />
+              <p className="text-xs text-slate-500 mt-1">One metric per line in format: metric_name: value</p>
+            </div>
+
+            <Card className="bg-purple-50 border-purple-200">
+              <CardContent className="p-3">
+                <div className="flex items-start gap-2">
+                  <Sparkles className="w-4 h-4 text-purple-600 flex-shrink-0 mt-0.5" />
+                  <div className="text-xs text-purple-900">
+                    AI will automatically break down this goal into executable missions and suggest optimal execution strategies
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
           <DialogFooter>
@@ -304,139 +441,368 @@ export default function GoalOrchestrator() {
             </Button>
             <Button
               onClick={handleCreateGoal}
-              disabled={!newGoalName || !newGoalDesc}
+              disabled={!newGoalName || !newGoalDesc || createGoalMutation.isPending}
               className="bg-purple-600 hover:bg-purple-700"
             >
+              {createGoalMutation.isPending ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <Plus className="w-4 h-4 mr-2" />
+              )}
               Create Goal
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Goal Detail Dialog */}
+      {/* Enhanced Goal Detail Dialog */}
       <Dialog open={detailDialogOpen} onOpenChange={setDetailDialogOpen}>
-        <DialogContent className="bg-white border-slate-200 max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="bg-white border-slate-200 max-w-5xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-slate-900">{selectedGoal?.name}</DialogTitle>
-            <DialogDescription className="text-slate-600">
-              {selectedGoal?.description}
-            </DialogDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                <DialogTitle className="text-slate-900 text-xl">{selectedGoal?.name}</DialogTitle>
+                <DialogDescription className="text-slate-600">
+                  {selectedGoal?.description}
+                </DialogDescription>
+              </div>
+              <Badge className={cn(
+                "text-sm px-3 py-1",
+                selectedGoal?.status === "on-track" ? "bg-emerald-100 text-emerald-700" :
+                selectedGoal?.status === "at-risk" ? "bg-amber-100 text-amber-700" :
+                selectedGoal?.status === "achieved" ? "bg-blue-100 text-blue-700" :
+                "bg-slate-100 text-slate-700"
+              )}>
+                {selectedGoal?.status}
+              </Badge>
+            </div>
           </DialogHeader>
 
           {selectedGoal && (
-            <div className="space-y-6 py-4">
-              {/* Status Overview */}
-              <div className="grid grid-cols-3 gap-3">
-                <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
-                  <div className="text-xs text-slate-600 mb-1">Status</div>
-                  <Badge className={cn(
-                    selectedGoal.status === "on-track" ? "bg-emerald-100 text-emerald-700" :
-                    selectedGoal.status === "at-risk" ? "bg-amber-100 text-amber-700" :
-                    "bg-slate-100 text-slate-700"
-                  )}>
-                    {selectedGoal.status}
-                  </Badge>
-                </div>
-                <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
-                  <div className="text-xs text-slate-600 mb-1">Progress</div>
-                  <div className="text-xl font-bold text-slate-900">
-                    {selectedGoal.progress_percentage}%
-                  </div>
-                </div>
-                <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
-                  <div className="text-xs text-slate-600 mb-1">Priority</div>
-                  <Badge className="bg-purple-100 text-purple-700">
-                    P{selectedGoal.priority}
-                  </Badge>
-                </div>
-              </div>
+            <Tabs defaultValue="overview" className="mt-4">
+              <TabsList className="bg-slate-100">
+                <TabsTrigger value="overview">Overview</TabsTrigger>
+                <TabsTrigger value="missions">AI Missions</TabsTrigger>
+                <TabsTrigger value="analysis">Analysis</TabsTrigger>
+              </TabsList>
 
-              {/* AI Suggested Missions */}
-              {selectedGoal.ai_suggested_missions?.length > 0 && (
-                <div>
-                  <h4 className="text-sm font-bold text-slate-900 mb-3">AI-Suggested Missions</h4>
-                  <div className="space-y-2">
-                    {selectedGoal.ai_suggested_missions.map((mission, idx) => (
-                      <Card key={idx} className="border-2 border-purple-200 bg-purple-50">
-                        <CardContent className="p-4">
-                          <div className="flex items-start gap-3">
-                            <div className="w-8 h-8 rounded-lg bg-purple-600 text-white flex items-center justify-center font-bold text-sm">
-                              {idx + 1}
+              <TabsContent value="overview" className="space-y-4 mt-4">
+                <div className="grid grid-cols-4 gap-3">
+                  <Card className="bg-slate-50 border-slate-200">
+                    <CardContent className="p-4 text-center">
+                      <Target className="w-5 h-5 mx-auto mb-2 text-purple-600" />
+                      <div className="text-xs text-slate-600 mb-1">Priority</div>
+                      <Badge className="bg-purple-100 text-purple-700">P{selectedGoal.priority}</Badge>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-slate-50 border-slate-200">
+                    <CardContent className="p-4 text-center">
+                      <Activity className="w-5 h-5 mx-auto mb-2 text-blue-600" />
+                      <div className="text-xs text-slate-600 mb-1">Progress</div>
+                      <div className="text-xl font-bold text-slate-900">{selectedGoal.progress_percentage || 0}%</div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-slate-50 border-slate-200">
+                    <CardContent className="p-4 text-center">
+                      <Zap className="w-5 h-5 mx-auto mb-2 text-emerald-600" />
+                      <div className="text-xs text-slate-600 mb-1">Missions</div>
+                      <div className="text-xl font-bold text-slate-900">{selectedGoal.linked_missions?.length || 0}</div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-slate-50 border-slate-200">
+                    <CardContent className="p-4 text-center">
+                      <Calendar className="w-5 h-5 mx-auto mb-2 text-amber-600" />
+                      <div className="text-xs text-slate-600 mb-1">Target Date</div>
+                      <div className="text-xs font-bold text-slate-900">
+                        {selectedGoal.target_date ? new Date(selectedGoal.target_date).toLocaleDateString() : "Not set"}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {Object.keys(selectedGoal.target_metrics || {}).length > 0 && (
+                  <Card className="bg-blue-50 border-blue-200">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-sm text-slate-900">Target Metrics</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-2 gap-3">
+                        {Object.entries(selectedGoal.target_metrics).map(([key, value]) => (
+                          <div key={key} className="p-3 bg-white rounded border border-blue-200">
+                            <div className="text-xs text-slate-600 mb-1 capitalize">{key.replace(/_/g, ' ')}</div>
+                            <div className="text-base font-bold text-blue-900">{value}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {selectedGoal.risk_assessment && (
+                  <Card className="bg-amber-50 border-amber-200">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-sm text-slate-900 flex items-center gap-2">
+                        <AlertTriangle className="w-4 h-4 text-amber-600" />
+                        Risk Assessment
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-2 text-sm">
+                        {selectedGoal.risk_assessment.risks?.map((risk, idx) => (
+                          <div key={idx} className="flex items-start gap-2 p-2 bg-white rounded">
+                            <Badge className="bg-amber-100 text-amber-700 text-xs">{risk.severity}</Badge>
+                            <span className="text-slate-700">{risk.description}</span>
+                          </div>
+                        ))}
+                        {selectedGoal.risk_assessment.overall_risk && (
+                          <div className="pt-2 border-t border-amber-200">
+                            <div className="text-xs text-amber-900 font-semibold">
+                              Overall Risk: {selectedGoal.risk_assessment.overall_risk}
                             </div>
-                            <div className="flex-1">
-                              <h5 className="text-sm font-bold text-slate-900 mb-1">{mission.name}</h5>
-                              <p className="text-xs text-slate-700 mb-2">{mission.intent}</p>
-                              <div className="flex items-center gap-2 mb-2">
-                                <Badge className="bg-purple-100 text-purple-700 text-xs">
-                                  P{mission.priority}
-                                </Badge>
-                                <Badge className={cn(
-                                  "text-xs",
-                                  mission.route_suggestion === "pilot" && "bg-blue-100 text-blue-700",
-                                  mission.route_suggestion === "copilot" && "bg-purple-100 text-purple-700",
-                                  mission.route_suggestion === "autopilot" && "bg-emerald-100 text-emerald-700"
-                                )}>
-                                  {mission.route_suggestion}
-                                </Badge>
-                                <span className="text-xs text-slate-600">~{mission.estimated_duration}</span>
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+              </TabsContent>
+
+              <TabsContent value="missions" className="space-y-4 mt-4">
+                {selectedGoal.ai_suggested_missions?.length > 0 ? (
+                  <>
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-sm font-bold text-slate-900">AI-Generated Mission Plan</h4>
+                      {!selectedGoal.linked_missions?.length && (
+                        <Button
+                          size="sm"
+                          onClick={() => handleDeployMissions(selectedGoal)}
+                          className="bg-emerald-600 hover:bg-emerald-700 h-8 text-xs"
+                        >
+                          <Play className="w-3 h-3 mr-1" />
+                          Deploy All Missions
+                        </Button>
+                      )}
+                    </div>
+
+                    <div className="space-y-3">
+                      {selectedGoal.ai_suggested_missions.map((mission, idx) => (
+                        <Card key={idx} className="border-2 border-purple-200 bg-purple-50">
+                          <CardContent className="p-4">
+                            <div className="flex items-start gap-3">
+                              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-blue-600 text-white flex items-center justify-center font-bold text-base flex-shrink-0">
+                                {idx + 1}
                               </div>
-                              {mission.dependencies?.length > 0 && (
-                                <div className="text-xs text-slate-600">
-                                  Depends on: {mission.dependencies.join(", ")}
+                              <div className="flex-1">
+                                <h5 className="text-base font-bold text-slate-900 mb-2">{mission.name}</h5>
+                                <p className="text-sm text-slate-700 mb-3">{mission.intent}</p>
+                                
+                                <div className="flex items-center gap-2 mb-3 flex-wrap">
+                                  <Badge className="bg-purple-100 text-purple-700 text-xs">
+                                    P{mission.priority} Priority
+                                  </Badge>
+                                  <Badge className={cn(
+                                    "text-xs",
+                                    mission.route_suggestion === "pilot" && "bg-blue-100 text-blue-700",
+                                    mission.route_suggestion === "copilot" && "bg-purple-100 text-purple-700",
+                                    mission.route_suggestion === "autopilot" && "bg-emerald-100 text-emerald-700"
+                                  )}>
+                                    {mission.route_suggestion}
+                                  </Badge>
+                                  <Badge className="bg-slate-100 text-slate-700 text-xs">
+                                    <Clock className="w-3 h-3 mr-1" />
+                                    ~{mission.estimated_duration}
+                                  </Badge>
                                 </div>
-                              )}
+
+                                {mission.rationale && (
+                                  <div className="p-3 bg-blue-50 rounded-lg border border-blue-200 text-xs text-slate-700">
+                                    <strong className="text-blue-900">Rationale:</strong> {mission.rationale}
+                                  </div>
+                                )}
+
+                                {mission.dependencies?.length > 0 && (
+                                  <div className="mt-2 text-xs text-slate-600">
+                                    <strong>Dependencies:</strong> {mission.dependencies.join(", ")}
+                                  </div>
+                                )}
+                              </div>
                             </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+
+                    {selectedGoal.execution_strategy && (
+                      <Card className="bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-200">
+                        <CardContent className="p-4">
+                          <h4 className="text-sm font-semibold text-blue-900 mb-2 flex items-center gap-2">
+                            <GitBranch className="w-4 h-4" />
+                            AI Execution Strategy
+                          </h4>
+                          <p className="text-sm text-slate-700 mb-2">{selectedGoal.execution_strategy}</p>
+                          <div className="grid grid-cols-2 gap-3 mt-3">
+                            <div className="text-xs">
+                              <span className="text-slate-600">Timeline: </span>
+                              <span className="font-semibold text-slate-900">{selectedGoal.estimated_timeline}</span>
+                            </div>
+                            {selectedGoal.success_probability && (
+                              <div className="text-xs">
+                                <span className="text-slate-600">Success Prob: </span>
+                                <span className="font-semibold text-emerald-700">
+                                  {(selectedGoal.success_probability * 100).toFixed(0)}%
+                                </span>
+                              </div>
+                            )}
                           </div>
                         </CardContent>
                       </Card>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Execution Strategy */}
-              {selectedGoal.execution_strategy && (
-                <Card className="bg-blue-50 border-blue-200">
-                  <CardContent className="p-4">
-                    <div className="text-xs font-semibold text-blue-900 mb-1">Execution Strategy</div>
-                    <p className="text-sm text-slate-700 mb-2">
-                      {selectedGoal.execution_strategy} execution
-                    </p>
-                    <div className="text-xs text-slate-600">
-                      Timeline: {selectedGoal.estimated_timeline}
-                    </div>
-                    {selectedGoal.success_probability && (
-                      <div className="mt-2">
-                        <Badge className="bg-emerald-100 text-emerald-700 text-xs">
-                          {(selectedGoal.success_probability * 100).toFixed(0)}% success probability
-                        </Badge>
-                      </div>
                     )}
-                  </CardContent>
-                </Card>
-              )}
+                  </>
+                ) : (
+                  <Card className="bg-slate-50 border-slate-200">
+                    <CardContent className="p-12 text-center">
+                      <GitBranch className="w-16 h-16 mx-auto mb-4 text-slate-300" />
+                      <h4 className="text-base font-semibold text-slate-900 mb-2">No mission plan yet</h4>
+                      <p className="text-sm text-slate-600 mb-4">
+                        Click "AI Breakdown" to let AI analyze this goal and suggest missions
+                      </p>
+                      <Button
+                        onClick={() => {
+                          setDetailDialogOpen(false);
+                          handleBreakdownGoal(selectedGoal);
+                        }}
+                        disabled={orchestrating}
+                        className="bg-purple-600 hover:bg-purple-700"
+                      >
+                        <GitBranch className="w-4 h-4 mr-2" />
+                        AI Breakdown
+                      </Button>
+                    </CardContent>
+                  </Card>
+                )}
+              </TabsContent>
 
-              {/* Risk Factors */}
-              {selectedGoal.risk_factors?.length > 0 && (
-                <div>
-                  <h4 className="text-sm font-bold text-slate-900 mb-2">Risk Factors</h4>
-                  <div className="space-y-1">
-                    {selectedGoal.risk_factors.map((risk, idx) => (
-                      <div key={idx} className="flex items-center gap-2 text-sm text-slate-700 p-2 bg-amber-50 rounded border border-amber-200">
-                        <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0" />
-                        {risk}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
+              <TabsContent value="analysis" className="space-y-4 mt-4">
+                {selectedGoal.risk_assessment ? (
+                  <>
+                    <Card className="bg-gradient-to-br from-amber-50 to-orange-50 border-amber-200">
+                      <CardHeader className="pb-3">
+                        <CardTitle className="text-sm text-slate-900 flex items-center gap-2">
+                          <AlertTriangle className="w-4 h-4 text-amber-600" />
+                          Risk Analysis
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        {selectedGoal.risk_assessment.risks?.map((risk, idx) => (
+                          <div key={idx} className="p-3 bg-white rounded-lg border border-amber-200">
+                            <div className="flex items-start justify-between mb-2">
+                              <h5 className="text-sm font-semibold text-slate-900">{risk.description}</h5>
+                              <Badge className={cn(
+                                "text-xs",
+                                risk.severity === "critical" && "bg-red-100 text-red-700",
+                                risk.severity === "high" && "bg-amber-100 text-amber-700",
+                                risk.severity === "medium" && "bg-blue-100 text-blue-700",
+                                risk.severity === "low" && "bg-slate-100 text-slate-700"
+                              )}>
+                                {risk.severity}
+                              </Badge>
+                            </div>
+                            <p className="text-xs text-slate-600">
+                              <strong>Mitigation:</strong> {risk.mitigation}
+                            </p>
+                          </div>
+                        ))}
+
+                        {selectedGoal.risk_assessment.overall_risk && (
+                          <Card className="bg-amber-100 border-amber-300">
+                            <CardContent className="p-3">
+                              <div className="text-xs font-semibold text-amber-900">
+                                Overall Risk Level: {selectedGoal.risk_assessment.overall_risk}
+                              </div>
+                            </CardContent>
+                          </Card>
+                        )}
+                      </CardContent>
+                    </Card>
+
+                    {selectedGoal.risk_assessment.recommendations?.length > 0 && (
+                      <Card className="bg-emerald-50 border-emerald-200">
+                        <CardHeader className="pb-3">
+                          <CardTitle className="text-sm text-slate-900 flex items-center gap-2">
+                            <Check className="w-4 h-4 text-emerald-600" />
+                            Recommendations
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="space-y-2">
+                            {selectedGoal.risk_assessment.recommendations.map((rec, idx) => (
+                              <div key={idx} className="flex items-start gap-2 text-sm text-slate-700">
+                                <ChevronRight className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
+                                <span>{rec}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )}
+                  </>
+                ) : (
+                  <Card className="bg-slate-50 border-slate-200">
+                    <CardContent className="p-12 text-center">
+                      <TrendingUp className="w-16 h-16 mx-auto mb-4 text-slate-300" />
+                      <h4 className="text-base font-semibold text-slate-900 mb-2">No analysis available</h4>
+                      <p className="text-sm text-slate-600 mb-4">
+                        Monitor this goal to get AI-powered progress analysis
+                      </p>
+                      {selectedGoal.linked_missions?.length > 0 && (
+                        <Button
+                          onClick={() => {
+                            setDetailDialogOpen(false);
+                            handleMonitorGoal(selectedGoal);
+                          }}
+                          disabled={orchestrating}
+                          className="bg-blue-600 hover:bg-blue-700"
+                        >
+                          <TrendingUp className="w-4 h-4 mr-2" />
+                          Run Analysis
+                        </Button>
+                      )}
+                    </CardContent>
+                  </Card>
+                )}
+              </TabsContent>
+            </Tabs>
           )}
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setDetailDialogOpen(false)}>
               Close
             </Button>
+            {selectedGoal && !selectedGoal.ai_suggested_missions && (
+              <Button
+                onClick={() => {
+                  setDetailDialogOpen(false);
+                  handleBreakdownGoal(selectedGoal);
+                }}
+                disabled={orchestrating}
+                className="bg-purple-600 hover:bg-purple-700"
+              >
+                <GitBranch className="w-4 h-4 mr-2" />
+                AI Breakdown
+              </Button>
+            )}
+            {selectedGoal?.ai_suggested_missions?.length > 0 && !selectedGoal.linked_missions?.length && (
+              <Button
+                onClick={() => handleDeployMissions(selectedGoal)}
+                className="bg-emerald-600 hover:bg-emerald-700"
+              >
+                <Play className="w-4 h-4 mr-2" />
+                Deploy Missions
+              </Button>
+            )}
           </DialogFooter>
         </DialogContent>
       </Dialog>
