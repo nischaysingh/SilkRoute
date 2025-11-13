@@ -18,14 +18,29 @@ export default function ConversationalBuilder({ onBuildComplete }) {
   const [buildingLive, setBuildingLive] = useState(false);
   const [buildProgress, setBuildProgress] = useState([]);
   const messagesEndRef = useRef(null);
+  const shouldAutoScroll = useRef(true);
+  const messagesContainerRef = useRef(null);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (shouldAutoScroll.current) {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
   };
 
+  // Handle manual scroll - disable auto-scroll if user scrolls up
+  const handleScroll = () => {
+    if (!messagesContainerRef.current) return;
+    
+    const { scrollTop, scrollHeight, clientHeight } = messagesContainerRef.current;
+    const isNearBottom = scrollHeight - scrollTop - clientHeight < 100;
+    
+    shouldAutoScroll.current = isNearBottom;
+  };
+
+  // Only scroll when messages change and auto-scroll is enabled
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, buildProgress]);
 
   // Initialize conversation with Co-Pilot Builder Agent
   useEffect(() => {
@@ -71,6 +86,7 @@ export default function ConversationalBuilder({ onBuildComplete }) {
 
     setInput("");
     setIsThinking(true);
+    shouldAutoScroll.current = true; // Re-enable auto-scroll when sending
 
     try {
       // Get current conversation state
@@ -142,7 +158,7 @@ export default function ConversationalBuilder({ onBuildComplete }) {
     <Card className="bg-white/80 backdrop-blur-sm border-slate-200 shadow-sm h-[600px] flex flex-col">
       <CardContent className="p-0 flex flex-col h-full">
         {/* Header */}
-        <div className="p-4 border-b border-slate-200 bg-gradient-to-r from-purple-50 to-blue-50">
+        <div className="p-4 border-b border-slate-200 bg-gradient-to-r from-purple-50 to-blue-50 flex-shrink-0">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg">
               <MessageCircle className="w-5 h-5 text-white" />
@@ -160,20 +176,26 @@ export default function ConversationalBuilder({ onBuildComplete }) {
         </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
-          <AnimatePresence>
+        <div 
+          ref={messagesContainerRef}
+          onScroll={handleScroll}
+          className="flex-1 overflow-y-auto p-4 space-y-4"
+        >
+          <AnimatePresence mode="popLayout">
             {messages.map((message, idx) => (
               <motion.div
-                key={idx}
+                key={`${message.role}-${idx}`}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                layout
                 className={cn(
                   "flex gap-3",
                   message.role === "user" ? "justify-end" : "justify-start"
                 )}
               >
                 {message.role === "assistant" && (
-                  <Avatar className="w-8 h-8 bg-gradient-to-r from-purple-600 to-blue-600 flex items-center justify-center">
+                  <Avatar className="w-8 h-8 bg-gradient-to-r from-purple-600 to-blue-600 flex items-center justify-center flex-shrink-0">
                     <Sparkles className="w-4 h-4 text-white" />
                   </Avatar>
                 )}
@@ -239,7 +261,7 @@ export default function ConversationalBuilder({ onBuildComplete }) {
                 </div>
 
                 {message.role === "user" && (
-                  <Avatar className="w-8 h-8 bg-slate-200 flex items-center justify-center">
+                  <Avatar className="w-8 h-8 bg-slate-200 flex items-center justify-center flex-shrink-0">
                     <User className="w-4 h-4 text-slate-600" />
                   </Avatar>
                 )}
@@ -254,7 +276,7 @@ export default function ConversationalBuilder({ onBuildComplete }) {
               animate={{ opacity: 1 }}
               className="flex gap-3 justify-start"
             >
-              <Avatar className="w-8 h-8 bg-gradient-to-r from-purple-600 to-blue-600 flex items-center justify-center">
+              <Avatar className="w-8 h-8 bg-gradient-to-r from-purple-600 to-blue-600 flex items-center justify-center flex-shrink-0">
                 <Sparkles className="w-4 h-4 text-white" />
               </Avatar>
               <div className="bg-slate-100 rounded-lg p-3">
@@ -303,7 +325,7 @@ export default function ConversationalBuilder({ onBuildComplete }) {
         </div>
 
         {/* Input */}
-        <div className="p-4 border-t border-slate-200 bg-white">
+        <div className="p-4 border-t border-slate-200 bg-white flex-shrink-0">
           <div className="flex gap-2">
             <Input
               value={input}
