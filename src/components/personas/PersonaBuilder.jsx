@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,12 +12,15 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
-import { User, Plus, Edit, Trash2, Eye, Sparkles, Check, Brain, MessageSquare, Loader2, Activity, TrendingUp, Star, Award, Target, Clock, Zap } from "lucide-react";
+import { User, Plus, Edit, Trash2, Eye, Sparkles, Check, Brain, MessageSquare, Loader2, Activity, TrendingUp, Star, Award, Target, Clock, Zap, GraduationCap, Users, TestTube } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
+import PersonaTrainingModule from "./PersonaTrainingModule";
+import MultiAgentCollaboration from "./MultiAgentCollaboration";
+import AutomatedTestingSuite from "../testing/AutomatedTestingSuite";
 
 const PERSONALITY_TRAITS = [
   "Analytical", "Creative", "Detail-oriented", "Strategic", "Empathetic",
@@ -34,6 +38,8 @@ export default function PersonaBuilder() {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   const [selectedPersona, setSelectedPersona] = useState(null);
+  const [trainingModuleOpen, setTrainingModuleOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState("personas");
   
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -174,285 +180,365 @@ export default function PersonaBuilder() {
 
   return (
     <div className="space-y-6">
-      {/* Dashboard Section */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-            <Brain className="w-5 h-5 text-blue-600" />
-            AI Personas Dashboard
-          </h3>
-          <Button
-            onClick={() => setCreateDialogOpen(true)}
-            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Create Persona
-          </Button>
-        </div>
+      {/* Navigation Tabs */}
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList className="bg-white border border-slate-200">
+          <TabsTrigger value="personas" className="data-[state=active]:bg-blue-50">
+            <User className="w-4 h-4 mr-2" />
+            Personas
+          </TabsTrigger>
+          <TabsTrigger value="training" className="data-[state=active]:bg-purple-50">
+            <GraduationCap className="w-4 h-4 mr-2" />
+            Training
+          </TabsTrigger>
+          <TabsTrigger value="collaboration" className="data-[state=active]:bg-emerald-50">
+            <Users className="w-4 h-4 mr-2" />
+            Multi-Agent
+          </TabsTrigger>
+          <TabsTrigger value="testing" className="data-[state=active]:bg-amber-50">
+            <TestTube className="w-4 h-4 mr-2" />
+            Testing
+          </TabsTrigger>
+        </TabsList>
 
-        {/* KPI Cards */}
-        <div className="grid grid-cols-4 gap-4">
-          <Card className="bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-200">
-            <CardContent className="p-5">
-              <div className="flex items-center justify-between mb-2">
-                <User className="w-5 h-5 text-blue-600" />
-                <Badge className="bg-blue-100 text-blue-700 text-xs">Total</Badge>
-              </div>
-              <div className="text-3xl font-bold text-blue-900 mb-1">{personas.length}</div>
-              <div className="text-xs text-blue-700">AI Personas</div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-200">
-            <CardContent className="p-5">
-              <div className="flex items-center justify-between mb-2">
-                <Activity className="w-5 h-5 text-emerald-600" />
-                <Badge className="bg-emerald-100 text-emerald-700 text-xs">Active</Badge>
-              </div>
-              <div className="text-3xl font-bold text-emerald-900 mb-1">{activePersonas}</div>
-              <div className="text-xs text-emerald-700">Deployed</div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200">
-            <CardContent className="p-5">
-              <div className="flex items-center justify-between mb-2">
-                <Star className="w-5 h-5 text-purple-600" />
-                <Badge className="bg-purple-100 text-purple-700 text-xs">Avg</Badge>
-              </div>
-              <div className="text-3xl font-bold text-purple-900 mb-1">{avgSatisfaction.toFixed(0)}%</div>
-              <div className="text-xs text-purple-700">Satisfaction</div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-amber-50 to-orange-50 border-amber-200">
-            <CardContent className="p-5">
-              <div className="flex items-center justify-between mb-2">
-                <Target className="w-5 h-5 text-amber-600" />
-                <Badge className="bg-amber-100 text-amber-700 text-xs">Avg</Badge>
-              </div>
-              <div className="text-3xl font-bold text-amber-900 mb-1">{avgSuccessRate.toFixed(0)}%</div>
-              <div className="text-xs text-amber-700">Success Rate</div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Analytics Row */}
-        <div className="grid grid-cols-2 gap-4">
-          {/* Domain Distribution */}
-          <Card className="bg-white border-slate-200">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm text-slate-900">Knowledge Domain Distribution</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={200}>
-                <PieChart>
-                  <Pie
-                    data={domainChartData}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                    outerRadius={70}
-                    fill="#8884d8"
-                    dataKey="value"
-                  >
-                    {domainChartData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-
-          {/* Top Performers */}
-          <Card className="bg-white border-slate-200">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm text-slate-900 flex items-center gap-2">
-                <Award className="w-4 h-4 text-amber-600" />
-                Top Performing Personas
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                {topPerformers.map((persona, idx) => (
-                  <div key={persona.id} className="flex items-center justify-between p-3 bg-gradient-to-r from-amber-50 to-orange-50 rounded-lg border border-amber-200">
-                    <div className="flex items-center gap-3">
-                      <div className={cn(
-                        "w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm",
-                        idx === 0 ? "bg-yellow-500" :
-                        idx === 1 ? "bg-slate-400" :
-                        idx === 2 ? "bg-amber-600" :
-                        "bg-blue-600"
-                      )}>
-                        {idx + 1}
-                      </div>
-                      <div>
-                        <div className="text-sm font-semibold text-slate-900">{persona.name}</div>
-                        <div className="text-xs text-slate-600">
-                          {persona.knowledge_domains?.slice(0, 2).join(", ")}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-lg font-bold text-amber-900">
-                        {((persona.performance_metrics?.avg_user_satisfaction || 0) * 100).toFixed(0)}%
-                      </div>
-                      <div className="text-xs text-slate-600">satisfaction</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-
-      {/* Personas Grid */}
-      <div>
-        <h4 className="text-base font-bold text-slate-900 mb-4">All AI Personas ({personas.length})</h4>
-        
-        {isLoading ? (
-          <div className="text-center py-12">
-            <Loader2 className="w-8 h-8 animate-spin mx-auto text-blue-600 mb-2" />
-            <p className="text-sm text-slate-600">Loading personas...</p>
-          </div>
-        ) : personas.length === 0 ? (
-          <Card className="bg-gradient-to-br from-blue-50 to-purple-50 border-blue-200">
-            <CardContent className="p-12 text-center">
-              <User className="w-16 h-16 mx-auto mb-4 text-blue-400 opacity-50" />
-              <h4 className="text-lg font-semibold text-slate-900 mb-2">No personas yet</h4>
-              <p className="text-sm text-slate-600 mb-4">Create custom AI personas for specialized tasks</p>
+        {/* Personas Tab */}
+        <TabsContent value="personas" className="space-y-4 mt-6">
+          {/* Dashboard Section */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                <Brain className="w-5 h-5 text-blue-600" />
+                AI Personas Dashboard
+              </h3>
               <Button
                 onClick={() => setCreateDialogOpen(true)}
-                className="bg-blue-600 hover:bg-blue-700"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
               >
-                <Sparkles className="w-4 h-4 mr-2" />
-                Create First Persona
+                <Plus className="w-4 h-4 mr-2" />
+                Create Persona
+              </Button>
+            </div>
+
+            {/* KPI Cards */}
+            <div className="grid grid-cols-4 gap-4">
+              <Card className="bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-200">
+                <CardContent className="p-5">
+                  <div className="flex items-center justify-between mb-2">
+                    <User className="w-5 h-5 text-blue-600" />
+                    <Badge className="bg-blue-100 text-blue-700 text-xs">Total</Badge>
+                  </div>
+                  <div className="text-3xl font-bold text-blue-900 mb-1">{personas.length}</div>
+                  <div className="text-xs text-blue-700">AI Personas</div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-200">
+                <CardContent className="p-5">
+                  <div className="flex items-center justify-between mb-2">
+                    <Activity className="w-5 h-5 text-emerald-600" />
+                    <Badge className="bg-emerald-100 text-emerald-700 text-xs">Active</Badge>
+                  </div>
+                  <div className="text-3xl font-bold text-emerald-900 mb-1">{activePersonas}</div>
+                  <div className="text-xs text-emerald-700">Deployed</div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200">
+                <CardContent className="p-5">
+                  <div className="flex items-center justify-between mb-2">
+                    <Star className="w-5 h-5 text-purple-600" />
+                    <Badge className="bg-purple-100 text-purple-700 text-xs">Avg</Badge>
+                  </div>
+                  <div className="text-3xl font-bold text-purple-900 mb-1">{avgSatisfaction.toFixed(0)}%</div>
+                  <div className="text-xs text-purple-700">Satisfaction</div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gradient-to-br from-amber-50 to-orange-50 border-amber-200">
+                <CardContent className="p-5">
+                  <div className="flex items-center justify-between mb-2">
+                    <Target className="w-5 h-5 text-amber-600" />
+                    <Badge className="bg-amber-100 text-amber-700 text-xs">Avg</Badge>
+                  </div>
+                  <div className="text-3xl font-bold text-amber-900 mb-1">{avgSuccessRate.toFixed(0)}%</div>
+                  <div className="text-xs text-amber-700">Success Rate</div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Analytics Row */}
+            <div className="grid grid-cols-2 gap-4">
+              {/* Domain Distribution */}
+              <Card className="bg-white border-slate-200">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm text-slate-900">Knowledge Domain Distribution</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={200}>
+                    <PieChart>
+                      <Pie
+                        data={domainChartData}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                        outerRadius={70}
+                        fill="#8884d8"
+                        dataKey="value"
+                      >
+                        {domainChartData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+
+              {/* Top Performers */}
+              <Card className="bg-white border-slate-200">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm text-slate-900 flex items-center gap-2">
+                    <Award className="w-4 h-4 text-amber-600" />
+                    Top Performing Personas
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    {topPerformers.map((persona, idx) => (
+                      <div key={persona.id} className="flex items-center justify-between p-3 bg-gradient-to-r from-amber-50 to-orange-50 rounded-lg border border-amber-200">
+                        <div className="flex items-center gap-3">
+                          <div className={cn(
+                            "w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm",
+                            idx === 0 ? "bg-yellow-500" :
+                            idx === 1 ? "bg-slate-400" :
+                            idx === 2 ? "bg-amber-600" :
+                            "bg-blue-600"
+                          )}>
+                            {idx + 1}
+                          </div>
+                          <div>
+                            <div className="text-sm font-semibold text-slate-900">{persona.name}</div>
+                            <div className="text-xs text-slate-600">
+                              {persona.knowledge_domains?.slice(0, 2).join(", ")}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-lg font-bold text-amber-900">
+                            {((persona.performance_metrics?.avg_user_satisfaction || 0) * 100).toFixed(0)}%
+                          </div>
+                          <div className="text-xs text-slate-600">satisfaction</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+
+          {/* Personas Grid */}
+          <div>
+            <h4 className="text-base font-bold text-slate-900 mb-4">All AI Personas ({personas.length})</h4>
+            
+            {isLoading ? (
+              <div className="text-center py-12">
+                <Loader2 className="w-8 h-8 animate-spin mx-auto text-blue-600 mb-2" />
+                <p className="text-sm text-slate-600">Loading personas...</p>
+              </div>
+            ) : personas.length === 0 ? (
+              <Card className="bg-gradient-to-br from-blue-50 to-purple-50 border-blue-200">
+                <CardContent className="p-12 text-center">
+                  <User className="w-16 h-16 mx-auto mb-4 text-blue-400 opacity-50" />
+                  <h4 className="text-lg font-semibold text-slate-900 mb-2">No personas yet</h4>
+                  <p className="text-sm text-slate-600 mb-4">Create custom AI personas for specialized tasks</p>
+                  <Button
+                    onClick={() => setCreateDialogOpen(true)}
+                    className="bg-blue-600 hover:bg-blue-700"
+                  >
+                    <Sparkles className="w-4 h-4 mr-2" />
+                    Create First Persona
+                  </Button>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <AnimatePresence>
+                  {personas.map((persona, idx) => (
+                    <motion.div
+                      key={persona.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: idx * 0.03 }}
+                    >
+                      <Card className={cn(
+                        "border-2 hover:shadow-lg transition-all cursor-pointer",
+                        persona.status === "active" ? "border-emerald-300 bg-emerald-50" :
+                        persona.status === "testing" ? "border-blue-300 bg-blue-50" :
+                        "border-slate-300 bg-slate-50 opacity-70"
+                      )}
+                      onClick={() => {
+                        setSelectedPersona(persona);
+                        setDetailDialogOpen(true);
+                      }}>
+                        <CardContent className="p-5">
+                          <div className="flex items-start justify-between mb-3">
+                            <div className="flex items-center gap-2">
+                              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center text-white font-bold text-lg">
+                                {persona.name.charAt(0)}
+                              </div>
+                              <div>
+                                <h4 className="text-base font-bold text-slate-900">{persona.name}</h4>
+                                <Badge className={cn(
+                                  "text-xs mt-1",
+                                  persona.status === "active" ? "bg-emerald-100 text-emerald-700" :
+                                  persona.status === "testing" ? "bg-blue-100 text-blue-700" :
+                                  "bg-slate-100 text-slate-700"
+                                )}>
+                                  {persona.status}
+                                </Badge>
+                              </div>
+                            </div>
+                          </div>
+
+                          <p className="text-sm text-slate-600 mb-3 line-clamp-2">{persona.description}</p>
+
+                          {/* Performance Metrics */}
+                          <div className="grid grid-cols-3 gap-2 mb-3">
+                            <div className="text-center p-2 bg-white rounded border border-slate-200">
+                              <div className="text-lg font-bold text-emerald-600">
+                                {((persona.performance_metrics?.avg_user_satisfaction || 0) * 100).toFixed(0)}%
+                              </div>
+                              <div className="text-xs text-slate-600">Satisfaction</div>
+                            </div>
+                            <div className="text-center p-2 bg-white rounded border border-slate-200">
+                              <div className="text-lg font-bold text-blue-600">
+                                {((persona.performance_metrics?.task_success_rate || 0) * 100).toFixed(0)}%
+                              </div>
+                              <div className="text-xs text-slate-600">Success</div>
+                            </div>
+                            <div className="text-center p-2 bg-white rounded border border-slate-200">
+                              <div className="text-lg font-bold text-purple-600">
+                                {((persona.performance_metrics?.avg_response_quality || 0) * 100).toFixed(0)}%
+                              </div>
+                              <div className="text-xs text-slate-600">Quality</div>
+                            </div>
+                          </div>
+
+                          {/* Traits */}
+                          {persona.personality_traits?.length > 0 && (
+                            <div className="mb-3">
+                              <div className="text-xs text-slate-600 mb-1">Traits</div>
+                              <div className="flex flex-wrap gap-1">
+                                {persona.personality_traits.slice(0, 3).map((trait, tidx) => (
+                                  <Badge key={tidx} className="bg-purple-100 text-purple-700 text-xs">
+                                    {trait}
+                                  </Badge>
+                                ))}
+                                {persona.personality_traits.length > 3 && (
+                                  <Badge className="bg-slate-100 text-slate-700 text-xs">
+                                    +{persona.personality_traits.length - 3}
+                                  </Badge>
+                                )}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Knowledge Domains */}
+                          {persona.knowledge_domains?.length > 0 && (
+                            <div className="mb-3">
+                              <div className="text-xs text-slate-600 mb-1">Domains</div>
+                              <div className="flex flex-wrap gap-1">
+                                {persona.knowledge_domains.slice(0, 2).map((domain, didx) => (
+                                  <Badge key={didx} className="bg-blue-100 text-blue-700 text-xs">
+                                    {domain}
+                                  </Badge>
+                                ))}
+                                {persona.knowledge_domains.length > 2 && (
+                                  <Badge className="bg-slate-100 text-slate-700 text-xs">
+                                    +{persona.knowledge_domains.length - 2}
+                                  </Badge>
+                                )}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Communication Style */}
+                          <div className="p-2 bg-white rounded border border-slate-200 mb-3">
+                            <div className="flex items-center gap-2 text-xs">
+                              <MessageSquare className="w-3 h-3 text-slate-500" />
+                              <span className="text-slate-900 font-semibold">{persona.communication_style?.tone}</span>
+                              <span className="text-slate-400">•</span>
+                              <span className="text-slate-900">{persona.communication_style?.verbosity}</span>
+                            </div>
+                          </div>
+
+                          {/* Train Button */}
+                          <Button
+                            onClick={(e) => {
+                              e.stopPropagation(); // Prevent opening detail dialog
+                              setSelectedPersona(persona);
+                              setTrainingModuleOpen(true);
+                            }}
+                            variant="outline"
+                            className="w-full h-8 text-xs border-purple-300 text-purple-700 hover:bg-purple-50"
+                          >
+                            <GraduationCap className="w-3 h-3 mr-1" />
+                            Train This Persona
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </div>
+            )}
+          </div>
+        </TabsContent>
+
+        {/* Training Tab */}
+        <TabsContent value="training" className="mt-6">
+          <Card className="bg-gradient-to-br from-purple-50 to-blue-50 border-purple-200">
+            <CardContent className="p-12 text-center">
+              <GraduationCap className="w-16 h-16 mx-auto mb-4 text-purple-600" />
+              <h4 className="text-lg font-semibold text-slate-900 mb-2">Persona Training Module</h4>
+              <p className="text-sm text-slate-600 mb-4">
+                Select a persona from the Personas tab and click "Train This Persona" to begin fine-tuning.
+              </p>
+              <Button
+                onClick={() => setActiveTab("personas")}
+                className="bg-purple-600 hover:bg-purple-700"
+              >
+                <User className="w-4 h-4 mr-2" />
+                Browse Personas
               </Button>
             </CardContent>
           </Card>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <AnimatePresence>
-              {personas.map((persona, idx) => (
-                <motion.div
-                  key={persona.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: idx * 0.03 }}
-                >
-                  <Card className={cn(
-                    "border-2 hover:shadow-lg transition-all cursor-pointer",
-                    persona.status === "active" ? "border-emerald-300 bg-emerald-50" :
-                    persona.status === "testing" ? "border-blue-300 bg-blue-50" :
-                    "border-slate-300 bg-slate-50 opacity-70"
-                  )}
-                  onClick={() => {
-                    setSelectedPersona(persona);
-                    setDetailDialogOpen(true);
-                  }}>
-                    <CardContent className="p-5">
-                      <div className="flex items-start justify-between mb-3">
-                        <div className="flex items-center gap-2">
-                          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center text-white font-bold text-lg">
-                            {persona.name.charAt(0)}
-                          </div>
-                          <div>
-                            <h4 className="text-base font-bold text-slate-900">{persona.name}</h4>
-                            <Badge className={cn(
-                              "text-xs mt-1",
-                              persona.status === "active" ? "bg-emerald-100 text-emerald-700" :
-                              persona.status === "testing" ? "bg-blue-100 text-blue-700" :
-                              "bg-slate-100 text-slate-700"
-                            )}>
-                              {persona.status}
-                            </Badge>
-                          </div>
-                        </div>
-                      </div>
+        </TabsContent>
 
-                      <p className="text-sm text-slate-600 mb-3 line-clamp-2">{persona.description}</p>
+        {/* Multi-Agent Collaboration Tab */}
+        <TabsContent value="collaboration" className="mt-6">
+          <MultiAgentCollaboration />
+        </TabsContent>
 
-                      {/* Performance Metrics */}
-                      <div className="grid grid-cols-3 gap-2 mb-3">
-                        <div className="text-center p-2 bg-white rounded border border-slate-200">
-                          <div className="text-lg font-bold text-emerald-600">
-                            {((persona.performance_metrics?.avg_user_satisfaction || 0) * 100).toFixed(0)}%
-                          </div>
-                          <div className="text-xs text-slate-600">Satisfaction</div>
-                        </div>
-                        <div className="text-center p-2 bg-white rounded border border-slate-200">
-                          <div className="text-lg font-bold text-blue-600">
-                            {((persona.performance_metrics?.task_success_rate || 0) * 100).toFixed(0)}%
-                          </div>
-                          <div className="text-xs text-slate-600">Success</div>
-                        </div>
-                        <div className="text-center p-2 bg-white rounded border border-slate-200">
-                          <div className="text-lg font-bold text-purple-600">
-                            {((persona.performance_metrics?.avg_response_quality || 0) * 100).toFixed(0)}%
-                          </div>
-                          <div className="text-xs text-slate-600">Quality</div>
-                        </div>
-                      </div>
+        {/* Testing Tab */}
+        <TabsContent value="testing" className="mt-6">
+          <AutomatedTestingSuite />
+        </TabsContent>
+      </Tabs>
 
-                      {/* Traits */}
-                      {persona.personality_traits?.length > 0 && (
-                        <div className="mb-3">
-                          <div className="text-xs text-slate-600 mb-1">Traits</div>
-                          <div className="flex flex-wrap gap-1">
-                            {persona.personality_traits.slice(0, 3).map((trait, tidx) => (
-                              <Badge key={tidx} className="bg-purple-100 text-purple-700 text-xs">
-                                {trait}
-                              </Badge>
-                            ))}
-                            {persona.personality_traits.length > 3 && (
-                              <Badge className="bg-slate-100 text-slate-700 text-xs">
-                                +{persona.personality_traits.length - 3}
-                              </Badge>
-                            )}
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Knowledge Domains */}
-                      {persona.knowledge_domains?.length > 0 && (
-                        <div className="mb-3">
-                          <div className="text-xs text-slate-600 mb-1">Domains</div>
-                          <div className="flex flex-wrap gap-1">
-                            {persona.knowledge_domains.slice(0, 2).map((domain, didx) => (
-                              <Badge key={didx} className="bg-blue-100 text-blue-700 text-xs">
-                                {domain}
-                              </Badge>
-                            ))}
-                            {persona.knowledge_domains.length > 2 && (
-                              <Badge className="bg-slate-100 text-slate-700 text-xs">
-                                +{persona.knowledge_domains.length - 2}
-                              </Badge>
-                            )}
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Communication Style */}
-                      <div className="p-2 bg-white rounded border border-slate-200">
-                        <div className="flex items-center gap-2 text-xs">
-                          <MessageSquare className="w-3 h-3 text-slate-500" />
-                          <span className="text-slate-900 font-semibold">{persona.communication_style?.tone}</span>
-                          <span className="text-slate-400">•</span>
-                          <span className="text-slate-900">{persona.communication_style?.verbosity}</span>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </div>
-        )}
-      </div>
+      {/* Training Module Dialog */}
+      {trainingModuleOpen && selectedPersona && (
+        <PersonaTrainingModule
+          persona={selectedPersona}
+          onClose={() => {
+            setTrainingModuleOpen(false);
+            queryClient.invalidateQueries({ queryKey: ['ai-personas'] });
+          }}
+        />
+      )}
 
       {/* Create Dialog */}
       <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
