@@ -23,6 +23,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { LineChart, Line, ResponsiveContainer } from 'recharts';
+import MissionDependencyGraph from "./MissionDependencyGraph";
 
 export default function ToolboxTab() {
   const [activeView, setActiveView] = useState("overview");
@@ -852,7 +853,7 @@ export default function ToolboxTab() {
     { id: "decide", name: "Decide", icon: GitBranch, category: "logic", description: "Branch based on condition" },
     { id: "generate", name: "Generate", icon: Sparkles, category: "ai", description: "AI content generation" },
     { id: "update_record", name: "Update Record", icon: Edit, category: "output", description: "Update database record" },
-    { id: "send_email", name: "Send Email", icon: MessageSquare, category: "output", description: "Send email notification" },
+    { id: "send_email", name: "Send Email", icon: MessageSquare, category: "output", description: "Post to Slack channel" },
     { id: "send_slack", name: "Send Slack", icon: MessageSquare, category: "output", description: "Post to Slack channel" },
     { id: "schedule", name: "Schedule", icon: Target, category: "control", description: "Schedule future execution" },
     { id: "wait", name: "Wait", icon: Target, category: "control", description: "Pause execution" },
@@ -1597,7 +1598,7 @@ export default function ToolboxTab() {
             </CardContent>
           </Card>
 
-          {/* Graph Visualization */}
+          {/* Interactive Graph Visualization */}
           <Card className="bg-white/80 backdrop-blur-sm border-slate-200">
             <CardHeader>
               <CardTitle className="text-slate-900 text-lg flex items-center gap-2">
@@ -1607,13 +1608,15 @@ export default function ToolboxTab() {
               <p className="text-sm text-slate-600 mt-1">Zoomable view of missions, data sources, and policies</p>
             </CardHeader>
             <CardContent>
-              <div className="bg-slate-50 rounded-lg p-8 border border-slate-200 min-h-[400px] flex items-center justify-center">
-                <div className="text-center">
-                  <Network className="w-16 h-16 mx-auto mb-4 text-purple-400 opacity-50" />
-                  <p className="text-slate-900 text-sm mb-2">Interactive Graph Visualization</p>
-                  <p className="text-slate-600 text-xs">Nodes: {opsGraphData.nodes.length} • Edges: {opsGraphData.edges.length}</p>
-                </div>
-              </div>
+              <MissionDependencyGraph
+                nodes={opsGraphData.nodes}
+                edges={opsGraphData.edges}
+                onNodeClick={(node) => {
+                  toast.info(`Selected: ${node.label}`, {
+                    description: `Type: ${node.type}`
+                  });
+                }}
+              />
 
               {/* Node Legend */}
               <div className="flex gap-4 mt-4">
