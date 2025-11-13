@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Target, Sparkles, GitBranch, Check, AlertTriangle, TrendingUp, Loader2, Play, Eye, Plus, Calendar, DollarSign, Users, Zap, ChevronRight, Activity } from "lucide-react";
+import { Target, Sparkles, GitBranch, Check, AlertTriangle, TrendingUp, Loader2, Play, Eye, Plus, Calendar, Clock, Activity, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -506,7 +507,7 @@ export default function GoalOrchestrator() {
 
                   <Card className="bg-slate-50 border-slate-200">
                     <CardContent className="p-4 text-center">
-                      <Zap className="w-5 h-5 mx-auto mb-2 text-emerald-600" />
+                      <GitBranch className="w-5 h-5 mx-auto mb-2 text-emerald-600" />
                       <div className="text-xs text-slate-600 mb-1">Missions</div>
                       <div className="text-xl font-bold text-slate-900">{selectedGoal.linked_missions?.length || 0}</div>
                     </CardContent>
