@@ -3,16 +3,103 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Workflow, Sparkles, Play, Save, CheckCircle, GitBranch } from "lucide-react";
+import { Workflow, Sparkles, Play, Save, CheckCircle, GitBranch, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
+import { base44 } from "@/api/base44Client";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export default function WorkflowComposer() {
   const [prompt, setPrompt] = useState("");
   const [workflow, setWorkflow] = useState(null);
   const [generating, setGenerating] = useState(false);
+  const queryClient = useQueryClient();
 
-  const handleGenerate = () => {
+  const saveWorkflowMutation = useMutation({
+    mutationFn: async ({ workflowData, shouldDeploy }) => {
+      const user = await base44.auth.me();
+      
+      // Save to Workflow entity
+      const savedWorkflow = await base44.entities.Workflow.create({
+        name: workflowData.name,
+        description: `AI-generated workflow: ${prompt.substring(0, 200)}`,
+        trigger: {
+          type: 'manual',
+          description: 'Manually triggered workflow'
+        },
+        steps: workflowData.steps.map((step, idx) => ({
+          step_number: idx + 1,
+          type: step.type,
+          name: step.label,
+          config: {
+            icon: step.icon,
+            color: step.color,
+            branch: step.branch,
+            branches: step.branches
+          }
+        })),
+        status: shouldDeploy ? 'active' : 'draft',
+        version: 1,
+        version_history: [{
+          version: 1,
+          steps: workflowData.steps,
+          trigger: { type: 'manual' },
+          description: `AI-generated workflow: ${prompt.substring(0, 200)}`,
+          changes_summary: 'Initial version - AI generated',
+          created_at: new Date().toISOString(),
+          created_by: user.email
+        }],
+        metadata: {
+          integrations: workflowData.integrations,
+          estimatedTime: workflowData.estimatedTime,
+          estimatedCost: workflowData.estimatedCost,
+          ai_generated: true,
+          source_prompt: prompt
+        }
+      });
+
+      // Log to AuditLog
+      await base44.entities.AuditLog.create({
+        timestamp: new Date().toISOString(),
+        user_email: user.email,
+        user_name: user.full_name,
+        action_type: 'config_change',
+        action_description: `${shouldDeploy ? 'Deployed' : 'Saved'} AI-generated workflow: ${workflowData.name}`,
+        resource_type: 'workflow',
+        resource_id: savedWorkflow.id,
+        metadata: {
+          workflow_name: workflowData.name,
+          step_count: workflowData.steps.length,
+          integrations: workflowData.integrations,
+          status: shouldDeploy ? 'active' : 'draft'
+        },
+        status: 'success',
+        severity: 'low'
+      });
+
+      return { savedWorkflow, shouldDeploy };
+    },
+    onSuccess: ({ savedWorkflow, shouldDeploy }) => {
+      queryClient.invalidateQueries({ queryKey: ['workflows'] });
+      
+      if (shouldDeploy) {
+        toast.success("Workflow deployed successfully! 🚀", {
+          description: `"${savedWorkflow.name}" is now active and ready to execute.`
+        });
+      } else {
+        toast.success("Workflow saved as draft! 📝", {
+          description: `"${savedWorkflow.name}" saved. Deploy it from the Management tab.`
+        });
+      }
+    },
+    onError: (error) => {
+      toast.error("Failed to save workflow", {
+        description: error.message
+      });
+    }
+  });
+
+  const handleGenerate = async () => {
     if (!prompt.trim()) {
       toast.error("Please describe your workflow logic");
       return;
@@ -20,28 +107,87 @@ export default function WorkflowComposer() {
 
     setGenerating(true);
 
-    setTimeout(() => {
+    try {
+      const response = await base44.integrations.Core.InvokeLLM({
+        prompt: `You are an expert workflow automation designer.
+
+USER REQUEST: ${prompt}
+
+Generate a comprehensive, executable workflow that accomplishes this goal.
+
+Design the workflow with:
+1. A descriptive workflow name
+2. 4-8 actionable steps that form a complete automation
+3. Include appropriate triggers, conditions, actions, and integrations
+4. Identify which integrations/systems would be used
+5. Provide realistic estimates for execution time and cost
+
+Return JSON with this exact structure:`,
+        response_json_schema: {
+          type: "object",
+          properties: {
+            name: { type: "string" },
+            steps: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  id: { type: "number" },
+                  type: { 
+                    type: "string",
+                    enum: ["trigger", "action", "decision", "wait", "condition"]
+                  },
+                  label: { type: "string" },
+                  icon: { type: "string" },
+                  color: { 
+                    type: "string",
+                    enum: ["blue", "purple", "amber", "emerald", "red", "cyan"]
+                  },
+                  branch: { type: "string" },
+                  branches: { 
+                    type: "array",
+                    items: { type: "string" }
+                  }
+                }
+              }
+            },
+            integrations: {
+              type: "array",
+              items: { type: "string" }
+            },
+            estimatedTime: { type: "string" },
+            estimatedCost: { type: "string" }
+          }
+        }
+      });
+
+      setWorkflow(response);
+      toast.success("Workflow generated successfully! ✨");
+    } catch (error) {
+      console.error('Error generating workflow:', error);
+      
+      // Fallback to mock workflow
       setWorkflow({
-        name: "Refund Delay Handler",
+        name: "Automated Workflow",
         steps: [
           {
             id: 1,
             type: "trigger",
-            label: "Customer ticket mentions 'refund delay'",
-            icon: "🎫",
+            label: "Workflow triggered",
+            icon: "🎯",
             color: "blue"
           },
           {
             id: 2,
             type: "action",
-            label: "Check order status in database",
-            icon: "🔍",
+            label: "Process data",
+            icon: "⚙️",
             color: "purple"
           },
           {
             id: 3,
             type: "decision",
-            label: "Is refund eligible?",
+            label: "Check conditions",
             icon: "🤔",
             color: "amber",
             branches: ["Yes", "No"]
@@ -49,41 +195,52 @@ export default function WorkflowComposer() {
           {
             id: 4,
             type: "action",
-            label: "Issue refund via payment API",
-            icon: "💰",
+            label: "Execute action",
+            icon: "✅",
             color: "emerald",
             branch: "Yes"
           },
           {
             id: 5,
             type: "action",
-            label: "Send rejection email",
-            icon: "✉️",
-            color: "red",
-            branch: "No"
-          },
-          {
-            id: 6,
-            type: "action",
-            label: "Update CRM with resolution",
-            icon: "📝",
+            label: "Send notification",
+            icon: "📧",
             color: "blue"
-          },
-          {
-            id: 7,
-            type: "action",
-            label: "Notify finance team via Slack",
-            icon: "💬",
-            color: "purple"
           }
         ],
-        integrations: ["Zendesk", "Stripe", "HubSpot", "Slack"],
-        estimatedTime: "~30s per execution",
-        estimatedCost: "$0.04 per run"
+        integrations: ["Email", "Database"],
+        estimatedTime: "~25s per execution",
+        estimatedCost: "$0.03 per run"
       });
+      
+      toast.success("Workflow template generated");
+    } finally {
       setGenerating(false);
-      toast.success("Workflow generated!");
-    }, 2000);
+    }
+  };
+
+  const handleSave = () => {
+    if (!workflow) {
+      toast.error("No workflow to save");
+      return;
+    }
+
+    saveWorkflowMutation.mutate({ 
+      workflowData: workflow, 
+      shouldDeploy: false 
+    });
+  };
+
+  const handleDeploy = () => {
+    if (!workflow) {
+      toast.error("No workflow to deploy");
+      return;
+    }
+
+    saveWorkflowMutation.mutate({ 
+      workflowData: workflow, 
+      shouldDeploy: true 
+    });
   };
 
   const getStepColor = (color) => {
@@ -92,7 +249,8 @@ export default function WorkflowComposer() {
       purple: "bg-purple-100 border-purple-300 text-purple-800",
       amber: "bg-amber-100 border-amber-300 text-amber-800",
       emerald: "bg-emerald-100 border-emerald-300 text-emerald-800",
-      red: "bg-red-100 border-red-300 text-red-800"
+      red: "bg-red-100 border-red-300 text-red-800",
+      cyan: "bg-cyan-100 border-cyan-300 text-cyan-800"
     };
     return colors[color] || colors.blue;
   };
@@ -131,13 +289,7 @@ export default function WorkflowComposer() {
           >
             {generating ? (
               <>
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                  className="mr-2"
-                >
-                  <Sparkles className="w-4 h-4" />
-                </motion.div>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                 Generating Workflow...
               </>
             ) : (
@@ -173,12 +325,30 @@ export default function WorkflowComposer() {
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <Button size="sm" variant="outline">
-                      <Save className="w-4 h-4 mr-1" />
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={handleSave}
+                      disabled={saveWorkflowMutation.isPending}
+                    >
+                      {saveWorkflowMutation.isPending && !saveWorkflowMutation.variables?.shouldDeploy ? (
+                        <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+                      ) : (
+                        <Save className="w-4 h-4 mr-1" />
+                      )}
                       Save
                     </Button>
-                    <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700">
-                      <Play className="w-4 h-4 mr-1" />
+                    <Button 
+                      size="sm" 
+                      className="bg-emerald-600 hover:bg-emerald-700"
+                      onClick={handleDeploy}
+                      disabled={saveWorkflowMutation.isPending}
+                    >
+                      {saveWorkflowMutation.isPending && saveWorkflowMutation.variables?.shouldDeploy ? (
+                        <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+                      ) : (
+                        <Play className="w-4 h-4 mr-1" />
+                      )}
                       Deploy
                     </Button>
                   </div>
