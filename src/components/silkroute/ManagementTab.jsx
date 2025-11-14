@@ -26,6 +26,7 @@ import PersonaBuilder from "../personas/PersonaBuilder";
 import EnhancedAnalyticsDashboard from "../analytics/EnhancedAnalyticsDashboard";
 import WorkflowOptimizer from "../optimization/WorkflowOptimizer";
 import AIAuditCenter from "../audit/AIAuditCenter";
+import AIMissionsList from "../silkroute/AIMissionsList";
 
 export default function ManagementTab() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -34,7 +35,7 @@ export default function ManagementTab() {
   const [loadingAudit, setLoadingAudit] = useState(false);
   const [versionHistoryOpen, setVersionHistoryOpen] = useState(false);
   const [executionHistoryOpen, setExecutionHistoryOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState("workflows");
+  const [activeTab, setActiveTab] = useState("orchestration"); // Changed initial activeTab to "orchestration"
   const queryClient = useQueryClient();
 
   // Fetch all workflows
@@ -657,6 +658,10 @@ export default function ManagementTab() {
         {/* Orchestration Tab */}
         <TabsContent value="orchestration" className="space-y-6 mt-6">
           <GoalOrchestrator />
+          
+          <div className="mt-8">
+            <AIMissionsList />
+          </div>
         </TabsContent>
 
         {/* NEW: Personas Tab */}
