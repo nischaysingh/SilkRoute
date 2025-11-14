@@ -12,7 +12,7 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
-import { User, Plus, Edit, Trash2, Eye, Sparkles, Check, Brain, MessageSquare, Loader2, Activity, TrendingUp, Star, Award, Target, Clock, Zap, GraduationCap, Users, TestTube } from "lucide-react";
+import { User, Plus, Edit, Trash2, Eye, Sparkles, Check, Brain, MessageSquare, Loader2, Activity, TrendingUp, Star, Award, Target, Clock, Zap, GraduationCap, Users, TestTube, MessageCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -21,6 +21,7 @@ import { base44 } from "@/api/base44Client";
 import PersonaTrainingModule from "./PersonaTrainingModule";
 import MultiAgentCollaboration from "./MultiAgentCollaboration";
 import AutomatedTestingSuite from "../testing/AutomatedTestingSuite";
+import PersonaChatDialog from "./PersonaChatDialog"; // New import
 
 const PERSONALITY_TRAITS = [
   "Analytical", "Creative", "Detail-oriented", "Strategic", "Empathetic",
@@ -40,7 +41,8 @@ export default function PersonaBuilder() {
   const [selectedPersona, setSelectedPersona] = useState(null);
   const [trainingModuleOpen, setTrainingModuleOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("personas");
-  
+  const [chatPersona, setChatPersona] = useState(null); // New state
+
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [traits, setTraits] = useState([]);
@@ -140,7 +142,7 @@ export default function PersonaBuilder() {
   // Dashboard calculations
   const activePersonas = personas.filter(p => p.status === 'active').length;
   const testingPersonas = personas.filter(p => p.status === 'testing').length;
-  const avgSatisfaction = personas.length > 0 
+  const avgSatisfaction = personas.length > 0
     ? (personas.reduce((sum, p) => sum + (p.performance_metrics?.avg_user_satisfaction || 0), 0) / personas.length * 100)
     : 0;
   const avgSuccessRate = personas.length > 0
@@ -181,7 +183,7 @@ export default function PersonaBuilder() {
   return (
     <div className="space-y-6">
       {/* Navigation Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="bg-white border border-slate-200">
           <TabsTrigger value="personas" className="data-[state=active]:bg-blue-50">
             <User className="w-4 h-4 mr-2" />
@@ -342,7 +344,7 @@ export default function PersonaBuilder() {
           {/* Personas Grid */}
           <div>
             <h4 className="text-base font-bold text-slate-900 mb-4">All AI Personas ({personas.length})</h4>
-            
+
             {isLoading ? (
               <div className="text-center py-12">
                 <Loader2 className="w-8 h-8 animate-spin mx-auto text-blue-600 mb-2" />
@@ -374,15 +376,13 @@ export default function PersonaBuilder() {
                       transition={{ delay: idx * 0.03 }}
                     >
                       <Card className={cn(
-                        "border-2 hover:shadow-lg transition-all cursor-pointer",
+                        "border-2 hover:shadow-lg transition-all", // Removed cursor-pointer from card
                         persona.status === "active" ? "border-emerald-300 bg-emerald-50" :
                         persona.status === "testing" ? "border-blue-300 bg-blue-50" :
                         "border-slate-300 bg-slate-50 opacity-70"
                       )}
-                      onClick={() => {
-                        setSelectedPersona(persona);
-                        setDetailDialogOpen(true);
-                      }}>
+                      // Removed onClick from Card
+                      >
                         <CardContent className="p-5">
                           <div className="flex items-start justify-between mb-3">
                             <div className="flex items-center gap-2">
@@ -475,19 +475,46 @@ export default function PersonaBuilder() {
                             </div>
                           </div>
 
-                          {/* Train Button */}
-                          <Button
-                            onClick={(e) => {
-                              e.stopPropagation(); // Prevent opening detail dialog
-                              setSelectedPersona(persona);
-                              setTrainingModuleOpen(true);
-                            }}
-                            variant="outline"
-                            className="w-full h-8 text-xs border-purple-300 text-purple-700 hover:bg-purple-50"
-                          >
-                            <GraduationCap className="w-3 h-3 mr-1" />
-                            Train This Persona
-                          </Button>
+                          {/* Action Buttons */}
+                          <div className="flex gap-2 mt-3">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={(e) => {
+                                e.stopPropagation(); // Prevent opening detail dialog if button is part of card's click
+                                setSelectedPersona(persona);
+                                setDetailDialogOpen(true);
+                              }}
+                              className="flex-1 h-8 text-xs border-blue-300 text-blue-700 hover:bg-blue-50"
+                            >
+                              <Eye className="w-3 h-3 mr-1" />
+                              View
+                            </Button>
+                            <Button
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation(); // Prevent opening detail dialog
+                                setChatPersona(persona);
+                              }}
+                              className="flex-1 h-8 text-xs bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+                            >
+                              <MessageCircle className="w-3 h-3 mr-1" />
+                              Chat
+                            </Button>
+                            <Button
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation(); // Prevent opening detail dialog
+                                setSelectedPersona(persona);
+                                setTrainingModuleOpen(true);
+                              }}
+                              variant="outline"
+                              className="flex-1 h-8 text-xs border-purple-300 text-purple-700 hover:bg-purple-50"
+                            >
+                              <GraduationCap className="w-3 h-3 mr-1" />
+                              Train
+                            </Button>
+                          </div>
                         </CardContent>
                       </Card>
                     </motion.div>
@@ -1060,6 +1087,13 @@ export default function PersonaBuilder() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Persona Chat Dialog */}
+      <PersonaChatDialog
+        persona={chatPersona}
+        open={!!chatPersona}
+        onOpenChange={(open) => !open && setChatPersona(null)}
+      />
     </div>
   );
 }
