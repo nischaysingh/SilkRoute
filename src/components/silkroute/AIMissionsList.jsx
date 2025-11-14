@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -12,7 +13,7 @@ import { formatDistanceToNow, parseISO } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
 import AgentVersionControl from "./AgentVersionControl";
 
-export default function AIMissionsList() {
+export default function AIMissionsList({ onMissionSelect, selectedMissionId }) {
   const queryClient = useQueryClient();
   const [expandedMissionId, setExpandedMissionId] = React.useState(null);
   const [executingMissionId, setExecutingMissionId] = React.useState(null);
@@ -111,6 +112,12 @@ export default function AIMissionsList() {
     return allMissions.filter(m => m.name === missionName).length;
   };
 
+  const handleMissionClick = (mission) => {
+    if (onMissionSelect) {
+      onMissionSelect(mission);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="text-center py-12">
@@ -150,6 +157,7 @@ export default function AIMissionsList() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {missions.map((mission) => {
             const versionCount = getVersionCount(mission.name);
+            const isSelected = selectedMissionId === mission.id;
             return (
               <motion.div
                 key={mission.id}
@@ -160,6 +168,7 @@ export default function AIMissionsList() {
                 <Card
                   className={cn(
                     "border-2 transition-all cursor-pointer hover:shadow-lg",
+                    isSelected && 'ring-2 ring-purple-400 ring-offset-2',
                     mission.status === 'running' && 'border-emerald-300 bg-emerald-50',
                     mission.status === 'armed' && 'border-blue-300 bg-blue-50',
                     mission.status === 'paused' && 'border-amber-300 bg-amber-50',
@@ -169,6 +178,7 @@ export default function AIMissionsList() {
                     mission.status === 'testing' && 'border-blue-300 bg-blue-50',
                     executingMissionId === mission.id && 'animate-pulse'
                   )}
+                  onClick={() => handleMissionClick(mission)}
                 >
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between mb-3">
@@ -177,6 +187,9 @@ export default function AIMissionsList() {
                           <h3 className="text-lg font-bold text-slate-900">{mission.name}</h3>
                           {mission.is_production && (
                             <Badge className="bg-emerald-100 text-emerald-700 text-xs">PROD</Badge>
+                          )}
+                          {isSelected && (
+                            <Badge className="bg-purple-100 text-purple-700 text-xs">Selected</Badge>
                           )}
                         </div>
                         <Badge className={cn("text-xs", getStatusColor(mission.status))}>
@@ -223,7 +236,7 @@ export default function AIMissionsList() {
                       </div>
                     </div>
 
-                    <div className="flex gap-2">
+                    <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
                       <Button
                         size="sm"
                         variant="outline"

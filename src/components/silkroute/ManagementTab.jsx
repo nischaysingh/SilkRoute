@@ -31,11 +31,12 @@ import AIMissionsList from "../silkroute/AIMissionsList";
 export default function ManagementTab() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedWorkflow, setSelectedWorkflow] = useState(null);
+  const [selectedMission, setSelectedMission] = useState(null); // NEW: State for selected mission
   const [auditReport, setAuditReport] = useState(null);
   const [loadingAudit, setLoadingAudit] = useState(false);
   const [versionHistoryOpen, setVersionHistoryOpen] = useState(false);
   const [executionHistoryOpen, setExecutionHistoryOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState("orchestration"); // Changed initial activeTab to "orchestration"
+  const [activeTab, setActiveTab] = useState("orchestration");
   const queryClient = useQueryClient();
 
   // Fetch all workflows
@@ -167,6 +168,9 @@ export default function ManagementTab() {
     w.description?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  // Get selected item (workflow or mission) for Analytics/Optimizer/Runbooks tabs
+  const selectedItem = selectedWorkflow || selectedMission;
+
   const getStatusColor = (status) => {
     switch (status) {
       case 'active': return 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30';
@@ -297,6 +301,7 @@ export default function ManagementTab() {
                               )}
                               onClick={() => {
                                 setSelectedWorkflow(workflow);
+                                setSelectedMission(null); // Clear selected mission when a workflow is selected
                                 setAuditReport(null);
                               }}
                             >
@@ -629,14 +634,14 @@ export default function ManagementTab() {
 
         {/* Analytics Tab - Enhanced */}
         <TabsContent value="analytics" className="space-y-6 mt-6">
-          {selectedWorkflow ? (
-            <EnhancedAnalyticsDashboard missionId={selectedWorkflow.id} />
+          {selectedItem ? (
+            <EnhancedAnalyticsDashboard missionId={selectedItem.id} />
           ) : (
             <Card className="bg-gradient-to-br from-blue-50 to-purple-50 border-blue-200">
               <CardContent className="p-12 text-center">
                 <Activity className="w-16 h-16 mx-auto mb-4 text-blue-400 opacity-50" />
-                <h4 className="text-lg font-semibold text-slate-900 mb-2">No Mission Selected</h4>
-                <p className="text-sm text-slate-600">Select a workflow to view enhanced analytics</p>
+                <h4 className="text-lg font-semibold text-slate-900 mb-2">No Mission or Workflow Selected</h4> {/* Updated text */}
+                <p className="text-sm text-slate-600">Select a workflow from the Workflows tab or a mission from the Orchestration tab to view analytics</p> {/* Updated text */}
               </CardContent>
             </Card>
           )}
@@ -644,13 +649,13 @@ export default function ManagementTab() {
 
         {/* NEW: Optimizer Tab */}
         <TabsContent value="optimizer" className="space-y-6 mt-6">
-          <WorkflowOptimizer workflow={selectedWorkflow} />
+          <WorkflowOptimizer workflow={selectedItem} /> {/* Pass selectedItem */}
         </TabsContent>
 
         {/* Runbooks Tab */}
         <TabsContent value="runbooks" className="space-y-6 mt-6">
           <RunbookManager 
-            missionId={selectedWorkflow?.id} 
+            missionId={selectedItem?.id} // Pass selectedItem ID
             incidentId={null}
           />
         </TabsContent>
@@ -660,7 +665,7 @@ export default function ManagementTab() {
           <GoalOrchestrator />
           
           <div className="mt-8">
-            <AIMissionsList />
+            <AIMissionsList onMissionSelect={setSelectedMission} selectedMissionId={selectedMission?.id} /> {/* Pass mission selection props */}
           </div>
         </TabsContent>
 
