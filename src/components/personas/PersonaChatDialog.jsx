@@ -13,12 +13,16 @@ import { cn } from "@/lib/utils";
 import { base44 } from "@/api/base44Client";
 
 export default function PersonaChatDialog({ persona, open, onOpenChange }) {
-  const [messages, setMessages] = useState([]);
+  // Store messages per persona using a Map
+  const [conversationsByPersona, setConversationsByPersona] = useState(new Map());
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef(null);
   const shouldAutoScroll = useRef(true);
   const messagesContainerRef = useRef(null);
+
+  // Get messages for current persona
+  const messages = persona ? (conversationsByPersona.get(persona.id) || []) : [];
 
   const scrollToBottom = () => {
     if (shouldAutoScroll.current) {
@@ -39,17 +43,19 @@ export default function PersonaChatDialog({ persona, open, onOpenChange }) {
     scrollToBottom();
   }, [messages]);
 
+  // Initialize conversation for new persona
   useEffect(() => {
-    if (open && persona && messages.length === 0) {
-      // Initialize with greeting
+    if (open && persona && !conversationsByPersona.has(persona.id)) {
       const greeting = getPersonaGreeting(persona);
-      setMessages([{
+      const newConversations = new Map(conversationsByPersona);
+      newConversations.set(persona.id, [{
         role: "assistant",
         content: greeting,
         timestamp: new Date().toISOString()
       }]);
+      setConversationsByPersona(newConversations);
     }
-  }, [open, persona]);
+  }, [open, persona?.id]);
 
   const getPersonaGreeting = (persona) => {
     const emoji = persona.communication_style?.emoji_usage ? "👋 " : "";
@@ -75,13 +81,18 @@ export default function PersonaChatDialog({ persona, open, onOpenChange }) {
       timestamp: new Date().toISOString()
     };
 
-    setMessages(prev => [...prev, userMessage]);
+    // Update messages for this specific persona
+    const newConversations = new Map(conversationsByPersona);
+    const currentMessages = newConversations.get(persona.id) || [];
+    newConversations.set(persona.id, [...currentMessages, userMessage]);
+    setConversationsByPersona(newConversations);
+
     setInput("");
     setIsLoading(true);
     shouldAutoScroll.current = true;
 
     try {
-      const conversationHistory = messages.map(m => ({
+      const conversationHistory = currentMessages.map(m => ({
         role: m.role,
         content: m.content
       }));
@@ -99,7 +110,11 @@ export default function PersonaChatDialog({ persona, open, onOpenChange }) {
         usage: response.data.usage
       };
 
-      setMessages(prev => [...prev, assistantMessage]);
+      // Add assistant response to this persona's conversation
+      const updatedConversations = new Map(conversationsByPersona);
+      const updatedMessages = updatedConversations.get(persona.id) || [];
+      updatedConversations.set(persona.id, [...updatedMessages, assistantMessage]);
+      setConversationsByPersona(updatedConversations);
     } catch (error) {
       console.error("Persona chat error:", error);
       toast.error("Failed to get response", {
@@ -111,19 +126,27 @@ export default function PersonaChatDialog({ persona, open, onOpenChange }) {
         content: "I apologize, but I encountered an issue processing your request. Please try again.",
         timestamp: new Date().toISOString()
       };
-      setMessages(prev => [...prev, errorMessage]);
+
+      const updatedConversations = new Map(conversationsByPersona);
+      const updatedMessages = updatedConversations.get(persona.id) || [];
+      updatedConversations.set(persona.id, [...updatedMessages, errorMessage]);
+      setConversationsByPersona(updatedConversations);
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleClearChat = () => {
+    if (!persona) return;
+    
     const greeting = getPersonaGreeting(persona);
-    setMessages([{
+    const newConversations = new Map(conversationsByPersona);
+    newConversations.set(persona.id, [{
       role: "assistant",
       content: greeting,
       timestamp: new Date().toISOString()
     }]);
+    setConversationsByPersona(newConversations);
     toast.info("Conversation cleared");
   };
 
@@ -196,7 +219,7 @@ export default function PersonaChatDialog({ persona, open, onOpenChange }) {
           <AnimatePresence mode="popLayout">
             {messages.map((message, idx) => (
               <motion.div
-                key={idx}
+                key={`${persona.id}-${idx}`}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
