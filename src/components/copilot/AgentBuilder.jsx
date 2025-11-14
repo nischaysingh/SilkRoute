@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -124,12 +125,12 @@ Return ONLY valid JSON matching this schema:
 
   const deployAgentMutation = useMutation({
     mutationFn: async (blueprintData) => {
-      // Create an AIMission with the blueprint
+      // Create an AIMission with the blueprint - status is "armed" so it's ready to execute
       const mission = await base44.entities.AIMission.create({
         name: blueprintData.name,
         version: 1,
         intent: blueprintData.mission,
-        status: "draft",
+        status: "armed", // Changed from "draft" to "armed" - ready to execute
         priority: 3,
         risk_score: 0.2,
         simulation_metadata: {
@@ -144,15 +145,15 @@ Return ONLY valid JSON matching this schema:
           safeguards: blueprintData.safeguards?.filter(s => s.enabled).map(s => s.name) || [],
           outputs: blueprintData.outputs?.map(o => o.name) || [],
           confidence: 0.88,
-          estimatedImpact: "AI-generated agent ready for testing"
+          estimatedImpact: "AI-generated agent ready for execution"
         }
       });
       return mission;
     },
     onSuccess: (mission) => {
       queryClient.invalidateQueries({ queryKey: ['ai-missions'] });
-      toast.success("Agent deployed successfully! 🚀", {
-        description: `${mission.name} is now in draft mode`
+      toast.success("Agent deployed and armed! 🚀", {
+        description: `${mission.name} is ready to execute - find it in Management > Orchestration`
       });
       setBlueprint(null);
       setPrompt("");
@@ -284,7 +285,7 @@ Return ONLY valid JSON matching this schema:
                       ) : (
                         <>
                           <Play className="w-4 h-4 mr-1" />
-                          Deploy
+                          Deploy & Arm
                         </>
                       )}
                     </Button>

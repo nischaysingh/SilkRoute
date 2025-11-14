@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -14,6 +15,7 @@ import { motion, AnimatePresence } from "framer-motion";
 export default function AIMissionsList() {
   const queryClient = useQueryClient();
   const [expandedMissionId, setExpandedMissionId] = React.useState(null);
+  const [executingMissionId, setExecutingMissionId] = React.useState(null);
 
   const { data: missions = [], isLoading, isError } = useQuery({
     queryKey: ['ai-missions'],
@@ -34,6 +36,41 @@ export default function AIMissionsList() {
       });
     }
   });
+
+  const executeMissionMutation = useMutation({
+    mutationFn: async ({ missionId, inputData }) => {
+      const response = await base44.functions.invoke('executeAIMission', {
+        mission_id: missionId,
+        input_data: inputData || {}
+      });
+      return response.data;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['ai-missions'] });
+      setExecutingMissionId(null);
+      
+      if (data.success) {
+        toast.success(`Mission executed successfully! ✨`, {
+          description: data.expected_outcome
+        });
+      } else {
+        toast.warning(`Mission completed with some failures`, {
+          description: `${data.results.filter(r => r.status === 'succeeded').length}/${data.results.length} steps succeeded`
+        });
+      }
+    },
+    onError: (error) => {
+      toast.error("Failed to execute mission", {
+        description: error.message
+      });
+      setExecutingMissionId(null);
+    }
+  });
+
+  const handleExecuteMission = (missionId) => {
+    setExecutingMissionId(missionId);
+    executeMissionMutation.mutate({ missionId, inputData: {} });
+  };
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -100,6 +137,7 @@ export default function AIMissionsList() {
                   mission.status === 'failed' && 'border-red-300 bg-red-50',
                   mission.status === 'succeeded' && 'border-purple-300 bg-purple-50',
                   mission.status === 'draft' && 'border-slate-300 bg-slate-50',
+                  executingMissionId === mission.id && 'animate-pulse'
                 )}
               >
                 <CardContent className="p-4">
@@ -107,7 +145,7 @@ export default function AIMissionsList() {
                     <div>
                       <h3 className="text-lg font-bold text-slate-900 mb-1">{mission.name}</h3>
                       <Badge className={cn("text-xs", getStatusColor(mission.status))}>
-                        {mission.status}
+                        {executingMissionId === mission.id ? 'executing...' : mission.status}
                       </Badge>
                     </div>
                     <div className="text-right">
@@ -153,15 +191,24 @@ export default function AIMissionsList() {
                       <Eye className="w-3 h-3 mr-1" />
                       Details
                     </Button>
-                    {mission.status === 'armed' ? (
+                    {mission.status === 'armed' || mission.status === 'draft' ? (
                       <Button
                         size="sm"
-                        onClick={() => updateMissionStatusMutation.mutate({ missionId: mission.id, status: 'running' })}
-                        disabled={updateMissionStatusMutation.isPending}
+                        onClick={() => handleExecuteMission(mission.id)}
+                        disabled={executingMissionId === mission.id}
                         className="flex-1 h-8 text-xs bg-emerald-600 hover:bg-emerald-700"
                       >
-                        <Play className="w-3 h-3 mr-1" />
-                        Run
+                        {executingMissionId === mission.id ? (
+                          <>
+                            <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                            Executing
+                          </>
+                        ) : (
+                          <>
+                            <Play className="w-3 h-3 mr-1" />
+                            Execute
+                          </>
+                        )}
                       </Button>
                     ) : mission.status === 'running' ? (
                       <Button
@@ -176,12 +223,21 @@ export default function AIMissionsList() {
                     ) : (
                       <Button
                         size="sm"
-                        onClick={() => updateMissionStatusMutation.mutate({ missionId: mission.id, status: 'armed' })}
-                        disabled={updateMissionStatusMutation.isPending}
+                        onClick={() => handleExecuteMission(mission.id)}
+                        disabled={executingMissionId === mission.id}
                         className="flex-1 h-8 text-xs bg-blue-600 hover:bg-blue-700"
                       >
-                        <GitBranch className="w-3 h-3 mr-1" />
-                        Arm
+                        {executingMissionId === mission.id ? (
+                          <>
+                            <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                            Running
+                          </>
+                        ) : (
+                          <>
+                            <Play className="w-3 h-3 mr-1" />
+                            Re-run
+                          </>
+                        )}
                       </Button>
                     )}
                   </div>
