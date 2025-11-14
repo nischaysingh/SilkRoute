@@ -33,14 +33,18 @@ Deno.serve(async (req) => {
         const inventory = await base44.asServiceRole.entities.Inventory.list('-created_date', 10);
         const people = await base44.asServiceRole.entities.People.list('-created_date', 10);
         
-        // Build the execution prompt with full context
-        const executionPrompt = `You are an AI agent executor. Your job is to execute this mission:
+        // Build the execution prompt with full context and advanced configuration
+        const executionPrompt = `You are an AI agent executor with access to a complete operational toolkit.
 
 MISSION NAME: ${mission.name}
 MISSION INTENT: ${mission.intent}
+VERSION: ${mission.version}
 
 CONFIGURATION:
 ${JSON.stringify(mission.simulation_metadata, null, 2)}
+
+ADVANCED AI SETTINGS:
+${mission.advanced_config ? JSON.stringify(mission.advanced_config, null, 2) : 'Default settings'}
 
 CURRENT CONTEXT:
 - Recent Orders: ${JSON.stringify(entities.slice(0, 5), null, 2)}
@@ -50,39 +54,50 @@ CURRENT CONTEXT:
 INPUT DATA PROVIDED:
 ${JSON.stringify(input_data || {}, null, 2)}
 
-AVAILABLE TOOLS:
-1. Create/Update/Delete Orders (Order entity)
-2. Create/Update/Delete Inventory (Inventory entity)
-3. Create/Update/Delete Accounting Transactions (AccountingTransaction entity)
-4. Create/Update/Delete CRM Tasks (CRMTask entity)
-5. Create/Update/Delete HR Assignments (HRAssignment entity)
-6. Create/Update/Delete Logs (OpsLog entity)
-7. Send Emails (SendEmail integration)
-8. Generate AI content (InvokeLLM integration)
+AVAILABLE TOOLS & ENTITIES:
+1. Order (create, update, filter, delete)
+2. Inventory (create, update, filter, delete)
+3. AccountingTransaction (create, update, filter)
+4. CRMTask (create, update, filter)
+5. HRAssignment (create, update, filter)
+6. OpsLog (create for logging)
+7. Bills, Payouts, Vendors, Accounts (accounting operations)
+8. SendEmail integration (send notifications)
+9. InvokeLLM integration (generate AI content, analyze data)
+
+EXECUTION GUIDELINES:
+- Follow the execution_steps from simulation_metadata if available
+- Respect all safeguards and thresholds
+- Log all significant actions to OpsLog
+- Handle errors gracefully
+- Return detailed results
 
 YOUR TASK:
-1. Analyze the mission intent and configuration
-2. Determine what specific actions need to be taken
-3. Return a detailed execution plan with specific tool calls
+Analyze the mission and create a detailed, executable plan with specific tool calls that will accomplish the mission objective.
 
 Return a JSON object with:
 {
   "execution_plan": [
     {
       "step": 1,
-      "action": "create_order|update_inventory|send_email|etc",
-      "entity_or_tool": "Order|Inventory|SendEmail|etc",
+      "action": "create_order|update_inventory|send_email|invoke_llm|etc",
+      "entity_or_tool": "Order|Inventory|SendEmail|InvokeLLM|etc",
       "operation": "create|update|filter|etc",
-      "parameters": {...},
-      "reasoning": "why this step"
+      "parameters": {...complete parameters},
+      "reasoning": "why this step is needed",
+      "validation": "what to check before executing",
+      "error_fallback": "what to do if this step fails"
     }
   ],
-  "expected_outcome": "description of what will happen",
+  "expected_outcome": "detailed description of what will happen",
   "estimated_duration": "time estimate",
-  "confidence": 0.95
+  "confidence": 0.95,
+  "risk_assessment": "any risks identified",
+  "preconditions": ["things that must be true before execution"],
+  "postconditions": ["things that will be true after execution"]
 }`;
 
-        // Get the execution plan from AI
+        // Get the execution plan from AI with advanced config
         const executionPlan = await base44.asServiceRole.integrations.Core.InvokeLLM({
             prompt: executionPrompt,
             response_json_schema: {
@@ -98,13 +113,18 @@ Return a JSON object with:
                                 entity_or_tool: { type: "string" },
                                 operation: { type: "string" },
                                 parameters: { type: "object" },
-                                reasoning: { type: "string" }
+                                reasoning: { type: "string" },
+                                validation: { type: "string" },
+                                error_fallback: { type: "string" }
                             }
                         }
                     },
                     expected_outcome: { type: "string" },
                     estimated_duration: { type: "string" },
-                    confidence: { type: "number" }
+                    confidence: { type: "number" },
+                    risk_assessment: { type: "string" },
+                    preconditions: { type: "array", items: { type: "string" } },
+                    postconditions: { type: "array", items: { type: "string" } }
                 }
             }
         });
@@ -115,7 +135,7 @@ Return a JSON object with:
             try {
                 let stepResult;
 
-                // Execute based on action type
+                // Execute based on entity/tool type
                 if (step.entity_or_tool === 'Order') {
                     if (step.operation === 'create') {
                         stepResult = await base44.asServiceRole.entities.Order.create(step.parameters);
@@ -148,6 +168,14 @@ Return a JSON object with:
                     if (step.operation === 'create') {
                         stepResult = await base44.asServiceRole.entities.OpsLog.create(step.parameters);
                     }
+                } else if (step.entity_or_tool === 'Bills') {
+                    if (step.operation === 'create') {
+                        stepResult = await base44.asServiceRole.entities.Bills.create(step.parameters);
+                    }
+                } else if (step.entity_or_tool === 'Vendors') {
+                    if (step.operation === 'create') {
+                        stepResult = await base44.asServiceRole.entities.Vendors.create(step.parameters);
+                    }
                 } else if (step.entity_or_tool === 'SendEmail') {
                     stepResult = await base44.asServiceRole.integrations.Core.SendEmail(step.parameters);
                 } else if (step.entity_or_tool === 'InvokeLLM') {
@@ -179,7 +207,8 @@ Return a JSON object with:
                     step: step.step,
                     status: 'failed',
                     error: stepError.message,
-                    reasoning: step.reasoning
+                    reasoning: step.reasoning,
+                    fallback: step.error_fallback
                 });
 
                 // Log error
@@ -190,7 +219,8 @@ Return a JSON object with:
                     level: 'error',
                     detail: {
                         action: step.action,
-                        error: stepError.message
+                        error: stepError.message,
+                        fallback: step.error_fallback
                     }
                 });
             }
@@ -205,31 +235,54 @@ Return a JSON object with:
             status: finalStatus
         });
 
+        // Update simulation metadata with actual run data
+        const updatedMetadata = {
+            ...mission.simulation_metadata,
+            lastRun: new Date().toISOString(),
+            lastRuns: [
+                ...(mission.simulation_metadata?.lastRuns || []).slice(-9),
+                {
+                    timestamp: new Date().toISOString(),
+                    status: finalStatus,
+                    duration: executionPlan.estimated_duration,
+                    steps_completed: results.filter(r => r.status === 'succeeded').length,
+                    total_steps: results.length
+                }
+            ]
+        };
+
+        await base44.asServiceRole.entities.AIMission.update(mission_id, {
+            simulation_metadata: updatedMetadata
+        });
+
         // Create AIRun record if entity exists
         try {
             await base44.asServiceRole.entities.AIRun.create({
                 mission_id: mission_id,
                 mission_name: mission.name,
+                mission_version: mission.version,
                 status: finalStatus,
                 execution_plan: executionPlan.execution_plan,
                 results: results,
                 executed_by: user.email,
                 confidence: executionPlan.confidence,
-                duration_estimate: executionPlan.estimated_duration
+                duration_estimate: executionPlan.estimated_duration,
+                risk_assessment: executionPlan.risk_assessment
             });
         } catch (e) {
-            // AIRun entity might not exist, that's okay
             console.log('Could not create AIRun record:', e.message);
         }
 
         return Response.json({
             success: allSucceeded,
             mission_name: mission.name,
+            mission_version: mission.version,
             status: finalStatus,
             execution_plan: executionPlan.execution_plan,
             results: results,
             expected_outcome: executionPlan.expected_outcome,
-            confidence: executionPlan.confidence
+            confidence: executionPlan.confidence,
+            risk_assessment: executionPlan.risk_assessment
         });
 
     } catch (error) {
