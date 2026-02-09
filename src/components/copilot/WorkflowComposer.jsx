@@ -3,11 +3,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Workflow, Sparkles, Play, Save, CheckCircle, GitBranch, Loader2, Zap, AlertTriangle, TrendingUp } from "lucide-react";
+import { Workflow, Sparkles, Play, Save, CheckCircle, GitBranch, Loader2, Zap, AlertTriangle, TrendingUp, FlaskConical } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { base44 } from "@/api/base44Client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import WorkflowTestingModule from "./WorkflowTestingModule";
 
 export default function WorkflowComposer() {
   const [prompt, setPrompt] = useState("");
@@ -15,6 +16,7 @@ export default function WorkflowComposer() {
   const [generating, setGenerating] = useState(false);
   const [optimizing, setOptimizing] = useState(false);
   const [optimization, setOptimization] = useState(null);
+  const [testingOpen, setTestingOpen] = useState(false);
   const queryClient = useQueryClient();
 
   const saveWorkflowMutation = useMutation({
@@ -498,6 +500,15 @@ Generate an improved workflow that implements these optimizations. Maintain the 
                     <Button 
                       size="sm" 
                       variant="outline"
+                      onClick={() => setTestingOpen(true)}
+                      className="border-cyan-300 text-cyan-700 hover:bg-cyan-50"
+                    >
+                      <FlaskConical className="w-4 h-4 mr-1" />
+                      Test
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant="outline"
                       onClick={handleOptimize}
                       disabled={optimizing}
                       className="border-purple-300 text-purple-700 hover:bg-purple-50"
@@ -758,6 +769,13 @@ Generate an improved workflow that implements these optimizations. Maintain the 
           </div>
         </CardContent>
       </Card>
+
+      {/* Testing Module */}
+      <WorkflowTestingModule
+        workflow={workflow}
+        open={testingOpen}
+        onClose={() => setTestingOpen(false)}
+      />
     </div>
   );
 }
