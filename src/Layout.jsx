@@ -20,6 +20,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ExplainModeProvider, useExplainMode } from "@/components/explain/ExplainModeContext";
 import ExplainCoPilotPanel from "@/components/explain/ExplainCoPilotPanel";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import AIAnalyticsAssistant from "@/components/analytics/AIAnalyticsAssistant";
 
 function LayoutContent({ children, currentPageName }) {
   const location = useLocation();
@@ -314,6 +315,7 @@ function LayoutContent({ children, currentPageName }) {
       </AnimatePresence>
 
       <ExplainCoPilotPanel />
+      <AIAnalyticsAssistant />
     </div>
   );
 }
