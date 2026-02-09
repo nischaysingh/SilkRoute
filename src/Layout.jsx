@@ -131,8 +131,8 @@ function LayoutContent({ children, currentPageName }) {
           </div>
 
           <div className="absolute left-1/2 transform -translate-x-1/2">
-            <h1 className="text-4xl font-medium text-center bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-              Opsentia
+            <h1 className="text-4xl font-medium text-center text-white">
+              Silkroute
             </h1>
           </div>
 
