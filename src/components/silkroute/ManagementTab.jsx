@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -370,6 +369,16 @@ export default function ManagementTab() {
                           >
                             <History className="w-3 h-3 mr-1" />
                             History
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => runAudit(selectedWorkflow.id)}
+                            disabled={loadingAudit}
+                            className="h-8 border-purple-300 text-purple-700 hover:bg-purple-50"
+                          >
+                            <Zap className="w-3 h-3 mr-1" />
+                            Optimize
                           </Button>
                           {selectedWorkflow.status === 'active' ? (
                             <Button

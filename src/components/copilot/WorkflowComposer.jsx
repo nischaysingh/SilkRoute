@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Workflow, Sparkles, Play, Save, CheckCircle, GitBranch, Loader2 } from "lucide-react";
+import { Workflow, Sparkles, Play, Save, CheckCircle, GitBranch, Loader2, Zap, AlertTriangle, TrendingUp } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { base44 } from "@/api/base44Client";
@@ -13,6 +13,8 @@ export default function WorkflowComposer() {
   const [prompt, setPrompt] = useState("");
   const [workflow, setWorkflow] = useState(null);
   const [generating, setGenerating] = useState(false);
+  const [optimizing, setOptimizing] = useState(false);
+  const [optimization, setOptimization] = useState(null);
   const queryClient = useQueryClient();
 
   const saveWorkflowMutation = useMutation({
@@ -243,6 +245,174 @@ Return JSON with this exact structure:`,
     });
   };
 
+  const handleOptimize = async () => {
+    if (!workflow) {
+      toast.error("No workflow to optimize");
+      return;
+    }
+
+    setOptimizing(true);
+    setOptimization(null);
+
+    try {
+      const response = await base44.integrations.Core.InvokeLLM({
+        prompt: `You are an expert workflow optimization AI. Analyze this workflow and provide actionable improvements.
+
+WORKFLOW TO ANALYZE:
+Name: ${workflow.name}
+Steps: ${JSON.stringify(workflow.steps, null, 2)}
+Integrations: ${workflow.integrations.join(', ')}
+Current Time: ${workflow.estimatedTime}
+Current Cost: ${workflow.estimatedCost}
+
+Analyze for:
+1. Redundant or duplicate steps that can be merged
+2. Steps that can run in parallel instead of sequentially
+3. Potential bottlenecks (slow external APIs, database queries)
+4. Cost optimization opportunities
+5. Security or compliance risks
+6. More efficient alternative approaches
+
+Provide specific, actionable recommendations with expected improvements.`,
+        response_json_schema: {
+          type: "object",
+          properties: {
+            redundancies: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  issue: { type: "string" },
+                  steps: { type: "array", items: { type: "number" } },
+                  recommendation: { type: "string" },
+                  impact: { type: "string" }
+                }
+              }
+            },
+            bottlenecks: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  issue: { type: "string" },
+                  step: { type: "number" },
+                  severity: { type: "string", enum: ["low", "medium", "high", "critical"] },
+                  recommendation: { type: "string" },
+                  expectedImprovement: { type: "string" }
+                }
+              }
+            },
+            parallelization: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  steps: { type: "array", items: { type: "number" } },
+                  recommendation: { type: "string" },
+                  timeSavings: { type: "string" }
+                }
+              }
+            },
+            costOptimizations: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  issue: { type: "string" },
+                  recommendation: { type: "string" },
+                  potentialSavings: { type: "string" }
+                }
+              }
+            },
+            overallScore: { type: "number" },
+            optimizedEstimatedTime: { type: "string" },
+            optimizedEstimatedCost: { type: "string" },
+            summary: { type: "string" }
+          }
+        }
+      });
+
+      setOptimization(response);
+      toast.success("Optimization analysis complete! ✨");
+    } catch (error) {
+      console.error('Error optimizing workflow:', error);
+      toast.error("Failed to analyze workflow", {
+        description: error.message
+      });
+    } finally {
+      setOptimizing(false);
+    }
+  };
+
+  const handleApplyOptimizations = async () => {
+    if (!optimization || !workflow) return;
+
+    setGenerating(true);
+
+    try {
+      const response = await base44.integrations.Core.InvokeLLM({
+        prompt: `Refactor this workflow based on the optimization recommendations.
+
+ORIGINAL WORKFLOW:
+${JSON.stringify(workflow, null, 2)}
+
+OPTIMIZATION RECOMMENDATIONS:
+${JSON.stringify(optimization, null, 2)}
+
+Generate an improved workflow that implements these optimizations. Maintain the same JSON structure as the original.`,
+        response_json_schema: {
+          type: "object",
+          properties: {
+            name: { type: "string" },
+            steps: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  id: { type: "number" },
+                  type: { 
+                    type: "string",
+                    enum: ["trigger", "action", "decision", "wait", "condition", "parallel"]
+                  },
+                  label: { type: "string" },
+                  icon: { type: "string" },
+                  color: { 
+                    type: "string",
+                    enum: ["blue", "purple", "amber", "emerald", "red", "cyan"]
+                  },
+                  branch: { type: "string" },
+                  branches: { 
+                    type: "array",
+                    items: { type: "string" }
+                  }
+                }
+              }
+            },
+            integrations: {
+              type: "array",
+              items: { type: "string" }
+            },
+            estimatedTime: { type: "string" },
+            estimatedCost: { type: "string" }
+          }
+        }
+      });
+
+      setWorkflow(response);
+      setOptimization(null);
+      toast.success("Workflow optimized successfully! 🚀", {
+        description: "Review the improved workflow and deploy when ready"
+      });
+    } catch (error) {
+      console.error('Error applying optimizations:', error);
+      toast.error("Failed to apply optimizations", {
+        description: error.message
+      });
+    } finally {
+      setGenerating(false);
+    }
+  };
+
   const getStepColor = (color) => {
     const colors = {
       blue: "bg-blue-100 border-blue-300 text-blue-800",
@@ -313,7 +483,7 @@ Return JSON with this exact structure:`,
             {/* Workflow Header */}
             <Card className="bg-emerald-50 border-emerald-200">
               <CardContent className="p-4">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between mb-3">
                   <div>
                     <h3 className="text-lg font-bold text-emerald-900">{workflow.name}</h3>
                     <div className="flex gap-2 mt-2">
@@ -325,6 +495,20 @@ Return JSON with this exact structure:`,
                     </div>
                   </div>
                   <div className="flex gap-2">
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={handleOptimize}
+                      disabled={optimizing}
+                      className="border-purple-300 text-purple-700 hover:bg-purple-50"
+                    >
+                      {optimizing ? (
+                        <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+                      ) : (
+                        <Zap className="w-4 h-4 mr-1" />
+                      )}
+                      Optimize
+                    </Button>
                     <Button 
                       size="sm" 
                       variant="outline"
@@ -353,6 +537,95 @@ Return JSON with this exact structure:`,
                     </Button>
                   </div>
                 </div>
+
+                {/* Optimization Results */}
+                {optimization && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    className="mt-4 pt-4 border-t border-emerald-300"
+                  >
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <Sparkles className="w-5 h-5 text-purple-600" />
+                        <h4 className="text-sm font-bold text-slate-900">AI Optimization Analysis</h4>
+                        <Badge className="bg-purple-100 text-purple-700 text-xs">
+                          Score: {optimization.overallScore}/100
+                        </Badge>
+                      </div>
+                      <Button
+                        size="sm"
+                        onClick={handleApplyOptimizations}
+                        className="bg-purple-600 hover:bg-purple-700"
+                      >
+                        <TrendingUp className="w-4 h-4 mr-1" />
+                        Apply Optimizations
+                      </Button>
+                    </div>
+
+                    <p className="text-sm text-slate-700 mb-3">{optimization.summary}</p>
+
+                    <div className="grid grid-cols-2 gap-2 mb-3">
+                      <div className="bg-white rounded-lg p-3 border border-slate-200">
+                        <div className="text-xs text-slate-600">Optimized Time</div>
+                        <div className="text-sm font-bold text-emerald-700">{optimization.optimizedEstimatedTime}</div>
+                      </div>
+                      <div className="bg-white rounded-lg p-3 border border-slate-200">
+                        <div className="text-xs text-slate-600">Optimized Cost</div>
+                        <div className="text-sm font-bold text-emerald-700">{optimization.optimizedEstimatedCost}</div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      {optimization.bottlenecks?.length > 0 && (
+                        <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                          <div className="flex items-center gap-2 mb-2">
+                            <AlertTriangle className="w-4 h-4 text-red-600" />
+                            <span className="text-xs font-bold text-red-900">Bottlenecks Detected</span>
+                          </div>
+                          {optimization.bottlenecks.slice(0, 2).map((bottleneck, idx) => (
+                            <div key={idx} className="text-xs text-slate-700 mb-1">
+                              • Step {bottleneck.step}: {bottleneck.issue} → {bottleneck.recommendation}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {optimization.redundancies?.length > 0 && (
+                        <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+                          <div className="text-xs font-bold text-amber-900 mb-2">Redundancies Found</div>
+                          {optimization.redundancies.slice(0, 2).map((redundancy, idx) => (
+                            <div key={idx} className="text-xs text-slate-700 mb-1">
+                              • {redundancy.issue} → {redundancy.recommendation}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {optimization.parallelization?.length > 0 && (
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                          <div className="text-xs font-bold text-blue-900 mb-2">Parallelization Opportunities</div>
+                          {optimization.parallelization.slice(0, 2).map((parallel, idx) => (
+                            <div key={idx} className="text-xs text-slate-700 mb-1">
+                              • {parallel.recommendation} ({parallel.timeSavings} faster)
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {optimization.costOptimizations?.length > 0 && (
+                        <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3">
+                          <div className="text-xs font-bold text-emerald-900 mb-2">Cost Savings</div>
+                          {optimization.costOptimizations.slice(0, 2).map((cost, idx) => (
+                            <div key={idx} className="text-xs text-slate-700 mb-1">
+                              • {cost.recommendation} (Save {cost.potentialSavings})
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </motion.div>
+                )}
               </CardContent>
             </Card>
 
