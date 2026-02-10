@@ -132,6 +132,7 @@ export default function IntegrationHub() {
   const [connectDialogOpen, setConnectDialogOpen] = useState(false);
   const [selectedIntegration, setSelectedIntegration] = useState(null);
   const [configData, setConfigData] = useState({ api_key: "" });
+  const [activeTab, setActiveTab] = useState("connected");
   const queryClient = useQueryClient();
 
   // Fetch connected integrations
@@ -272,7 +273,7 @@ export default function IntegrationHub() {
         </div>
       </div>
 
-      <Tabs defaultValue="connected" className="w-full">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="bg-slate-100">
           <TabsTrigger value="connected">Connected ({integrations.length})</TabsTrigger>
           <TabsTrigger value="available">Available ({INTEGRATION_CATALOG.length})</TabsTrigger>
@@ -289,7 +290,7 @@ export default function IntegrationHub() {
                   Connect your first data source to enable AI insights and workflow automation
                 </p>
                 <Button
-                  onClick={() => document.querySelector('[value="available"]').click()}
+                  onClick={() => setActiveTab("available")}
                   className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                 >
                   <Plus className="w-4 h-4 mr-2" />
