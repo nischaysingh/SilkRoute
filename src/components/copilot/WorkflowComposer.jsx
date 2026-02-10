@@ -123,8 +123,15 @@ Design the workflow with:
 1. A descriptive workflow name
 2. 4-8 actionable steps that form a complete automation
 3. Include appropriate triggers, conditions, actions, and integrations
-4. Identify which integrations/systems would be used
-5. Provide realistic estimates for execution time and cost
+4. Identify which integrations/systems would be used (e.g., Stripe, QuickBooks, Salesforce, Slack, Gmail, etc.)
+5. For each step, specify the data source being used (e.g., "Fetch from Stripe", "Update QuickBooks", "Send to Slack")
+6. Provide realistic estimates for execution time and cost
+
+IMPORTANT: Be specific about data sources. For example:
+- If processing payments, mention "Stripe API" or "PayPal"
+- If syncing accounting, mention "QuickBooks" or "Xero"
+- If sending notifications, mention "Slack", "Email", or "SMS"
+- If managing customers, mention "Salesforce", "HubSpot", or "Intercom"
 
 Return JSON with this exact structure:`,
         response_json_schema: {
@@ -142,6 +149,7 @@ Return JSON with this exact structure:`,
                     enum: ["trigger", "action", "decision", "wait", "condition"]
                   },
                   label: { type: "string" },
+                  dataSource: { type: "string" },
                   icon: { type: "string" },
                   color: { 
                     type: "string",
@@ -673,23 +681,28 @@ Generate an improved workflow that implements these optimizations. Maintain the 
 
                           {/* Step Content */}
                           <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              <Badge className={`text-xs capitalize ${
-                                step.type === "trigger" ? "bg-blue-100 text-blue-700" :
-                                step.type === "decision" ? "bg-amber-100 text-amber-700" :
-                                "bg-purple-100 text-purple-700"
-                              }`}>
-                                {step.type}
-                              </Badge>
-                              {step.branch && (
-                                <Badge className={`text-xs ${
-                                  step.branch === "Yes" ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700"
-                                }`}>
-                                  {step.branch}
-                                </Badge>
-                              )}
-                            </div>
-                            <p className="text-sm font-semibold text-slate-900">{step.label}</p>
+                           <div className="flex items-center gap-2 mb-1">
+                             <Badge className={`text-xs capitalize ${
+                               step.type === "trigger" ? "bg-blue-100 text-blue-700" :
+                               step.type === "decision" ? "bg-amber-100 text-amber-700" :
+                               "bg-purple-100 text-purple-700"
+                             }`}>
+                               {step.type}
+                             </Badge>
+                             {step.branch && (
+                               <Badge className={`text-xs ${
+                                 step.branch === "Yes" ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700"
+                               }`}>
+                                 {step.branch}
+                               </Badge>
+                             )}
+                             {step.dataSource && (
+                               <Badge className="bg-cyan-100 text-cyan-700 text-xs border border-cyan-300">
+                                 📊 {step.dataSource}
+                               </Badge>
+                             )}
+                           </div>
+                           <p className="text-sm font-semibold text-slate-900">{step.label}</p>
                           </div>
 
                           {/* Checkmark */}
