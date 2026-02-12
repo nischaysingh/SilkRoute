@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -84,29 +83,29 @@ export default function Overview() {
 
   // Cash Balance Data
   const cashBalanceData = [
-    { month: "Jul", balance: 180000, creditLine: 250000 },
-    { month: "Aug", balance: 195000, creditLine: 250000 },
-    { month: "Sep", balance: 210000, creditLine: 250000 },
-    { month: "Oct", balance: 225000, creditLine: 250000 },
-    { month: "Nov", balance: 238000, creditLine: 250000 },
-    { month: "Dec", balance: 245680, creditLine: 250000 },
+    { month: "Sep", balance: 180000, creditLine: 250000 },
+    { month: "Oct", balance: 195000, creditLine: 250000 },
+    { month: "Nov", balance: 210000, creditLine: 250000 },
+    { month: "Dec", balance: 225000, creditLine: 250000 },
+    { month: "Jan", balance: 238000, creditLine: 250000 },
+    { month: "Feb", balance: 245680, creditLine: 250000 },
   ];
 
   // Revenue vs Expense Data
   const revenueExpenseDataMTD = [
-    { month: "Jul", revenue: 75000, expenses: 45000 },
-    { month: "Aug", revenue: 82000, expenses: 48000 },
-    { month: "Sep", revenue: 79000, expenses: 46000 },
-    { month: "Oct", revenue: 88000, expenses: 52000 },
-    { month: "Nov", revenue: 91000, expenses: 49000 },
-    { month: "Dec", revenue: 89450, expenses: 51220 },
+    { month: "Sep", revenue: 75000, expenses: 45000 },
+    { month: "Oct", revenue: 82000, expenses: 48000 },
+    { month: "Nov", revenue: 79000, expenses: 46000 },
+    { month: "Dec", revenue: 88000, expenses: 52000 },
+    { month: "Jan", revenue: 91000, expenses: 49000 },
+    { month: "Feb", revenue: 89450, expenses: 51220 },
   ];
 
   const revenueExpenseDataYTD = [
-    { month: "Q1", revenue: 225000, expenses: 135000 },
-    { month: "Q2", revenue: 245000, expenses: 145000 },
-    { month: "Q3", revenue: 268000, expenses: 152000 },
-    { month: "Q4", revenue: 268450, expenses: 152220 },
+    { month: "Q2 2025", revenue: 225000, expenses: 135000 },
+    { month: "Q3 2025", revenue: 245000, expenses: 145000 },
+    { month: "Q4 2025", revenue: 268000, expenses: 152000 },
+    { month: "Q1 2026", revenue: 268450, expenses: 152220 },
   ];
 
   // Revenue Mix Data
@@ -127,14 +126,14 @@ export default function Overview() {
 
   // Risk & Alerts Data
   const alerts = [
-    { id: 1, title: "Sales Tax Filing Due Dec 31", severity: "critical", page: "Taxes", icon: FileText },
+    { id: 1, title: "Sales Tax Filing Due Feb 28", severity: "critical", page: "Taxes", icon: FileText },
     { id: 2, title: "3 Bills Overdue", severity: "warning", page: "MoneyOut", icon: AlertTriangle },
     { id: 3, title: "Payroll Coverage Risk Next Week", severity: "critical", page: "Payroll", icon: Users },
   ];
 
   // Payroll Coverage Data
   const payrollCoverage = {
-    nextPayDate: "Dec 31, 2024",
+    nextPayDate: "Feb 28, 2026",
     grossDue: 42500,
     projectedCash: 38000,
   };
@@ -142,9 +141,9 @@ export default function Overview() {
 
   // Collections Data
   const collections = [
-    { customer: "Acme Corp", amount: 15000, daysPastDue: 45, lastContact: "Dec 10" },
-    { customer: "Beta Solutions", amount: 8500, daysPastDue: 15, lastContact: "Dec 18" },
-    { customer: "Gamma LLC", amount: 3200, daysPastDue: 8, lastContact: "Dec 19" },
+    { customer: "Acme Corp", amount: 15000, daysPastDue: 45, lastContact: "Feb 1" },
+    { customer: "Beta Solutions", amount: 8500, daysPastDue: 15, lastContact: "Feb 8" },
+    { customer: "Gamma LLC", amount: 3200, daysPastDue: 8, lastContact: "Feb 9" },
   ];
   const totalOverdue = collections.reduce((sum, c) => sum + c.amount, 0);
 
@@ -238,7 +237,7 @@ export default function Overview() {
         type: "list",
         title: "Key Risks This Week",
         items: [
-          "🔴 Sales tax filing due Dec 31",
+          "🔴 Sales tax filing due Feb 28",
           "🟠 3 bills overdue totaling $12,450",
           "🔴 Payroll shortfall of $4,500 projected"
         ]
