@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -186,7 +185,7 @@ export default function CashFlow() {
   const inflows = [
     {
       id: 1,
-      date: "2024-12-20",
+      date: "2026-02-10",
       source: "Stripe",
       customer: "Acme Corp",
       gross: 12500,
@@ -202,7 +201,7 @@ export default function CashFlow() {
     },
     {
       id: 2,
-      date: "2024-12-19",
+      date: "2026-02-09",
       source: "DoorDash",
       customer: "Jane Doe",
       gross: 850,
@@ -218,7 +217,7 @@ export default function CashFlow() {
     },
     {
       id: 3,
-      date: "2024-12-18",
+      date: "2026-02-08",
       source: "App Store",
       customer: "Beta Inc",
       gross: 4200,
@@ -234,7 +233,7 @@ export default function CashFlow() {
     },
     {
       id: 4,
-      date: "2024-12-17",
+      date: "2026-02-07",
       source: "AWS",
       customer: "Gamma LLC",
       gross: 8900,
@@ -250,7 +249,7 @@ export default function CashFlow() {
     },
     {
       id: 5,
-      date: "2024-12-16",
+      date: "2026-02-06",
       source: "Stripe",
       customer: "Delta Corp",
       gross: 3400,
@@ -268,27 +267,27 @@ export default function CashFlow() {
 
   // Mock Outflows Data
   const outflows = [
-    { id: 1, vendor: "AWS", due_date: "2024-12-25", category: "COGS", amount: 3200, status: "Approved", tags: "recurring", bill_id: "BILL-001" },
-    { id: 2, vendor: "Office Depot", due_date: "2024-12-22", category: "OpEx", amount: 450, status: "Draft", tags: "", bill_id: "BILL-002" },
-    { id: 3, vendor: "Legal Co", due_date: "2024-12-28", category: "OpEx", amount: 8500, status: "Scheduled", tags: "legal", bill_id: "BILL-003" },
-    { id: 4, vendor: "WeWork", due_date: "2024-12-15", category: "OpEx", amount: 5200, status: "Paid", tags: "recurring", bill_id: "BILL-004" },
-    { id: 5, vendor: "Salesforce", due_date: "2024-12-30", category: "OpEx", amount: 1200, status: "Approved", tags: "recurring,saas", bill_id: "BILL-005" },
-    { id: 6, vendor: "Google Ads", due_date: "2024-12-29", category: "Marketing", amount: 2500, status: "Scheduled", tags: "recurring", bill_id: "BILL-006" },
-    { id: 7, vendor: "ServerSpace", due_date: "2024-12-10", category: "COGS", amount: 1800, status: "Paid", tags: "cloud", bill_id: "BILL-007" },
-    { id: 8, vendor: "Stripe", due_date: "2024-12-14", category: "Fees", amount: 375, status: "Paid", tags: "payment processor", bill_id: "BILL-008" },
-    { id: 9, vendor: "Payroll Inc", due_date: "2024-12-20", category: "Payroll", amount: 25000, status: "Approved", tags: "payroll", bill_id: "BILL-009" },
-    { id: 10, vendor: "Legal Co", due_date: "2024-12-10", category: "OpEx", amount: 6000, status: "Overdue", tags: "legal", bill_id: "BILL-010" },
+    { id: 1, vendor: "AWS", due_date: "2026-02-18", category: "COGS", amount: 3200, status: "Approved", tags: "recurring", bill_id: "BILL-001" },
+    { id: 2, vendor: "Office Depot", due_date: "2026-02-15", category: "OpEx", amount: 450, status: "Draft", tags: "", bill_id: "BILL-002" },
+    { id: 3, vendor: "Legal Co", due_date: "2026-02-20", category: "OpEx", amount: 8500, status: "Scheduled", tags: "legal", bill_id: "BILL-003" },
+    { id: 4, vendor: "WeWork", due_date: "2026-02-05", category: "OpEx", amount: 5200, status: "Paid", tags: "recurring", bill_id: "BILL-004" },
+    { id: 5, vendor: "Salesforce", due_date: "2026-02-22", category: "OpEx", amount: 1200, status: "Approved", tags: "recurring,saas", bill_id: "BILL-005" },
+    { id: 6, vendor: "Google Ads", due_date: "2026-02-21", category: "Marketing", amount: 2500, status: "Scheduled", tags: "recurring", bill_id: "BILL-006" },
+    { id: 7, vendor: "ServerSpace", due_date: "2026-02-01", category: "COGS", amount: 1800, status: "Paid", tags: "cloud", bill_id: "BILL-007" },
+    { id: 8, vendor: "Stripe", due_date: "2026-02-04", category: "Fees", amount: 375, status: "Paid", tags: "payment processor", bill_id: "BILL-008" },
+    { id: 9, vendor: "Payroll Inc", due_date: "2026-02-10", category: "Payroll", amount: 25000, status: "Approved", tags: "payroll", bill_id: "BILL-009" },
+    { id: 10, vendor: "Legal Co", due_date: "2026-01-31", category: "OpEx", amount: 6000, status: "Overdue", tags: "legal", bill_id: "BILL-010" },
   ];
 
   // Mock Net Flow Data (UPDATED)
   const netFlowData = [
-    { date: "Dec 14", inflows: 12500, outflows: 8900, net: 3600, balance: 232000, cumulativeNet: 3600, keyEvent: null, ocf: 15000, icf: -2000, fcf: 13000, projectedHigh: 235000, projectedLow: 230000, momentum_index: 2000 },
-    { date: "Dec 15", inflows: 8200, outflows: 15300, net: -7100, balance: 224900, cumulativeNet: -3500, keyEvent: "Payroll Run", ocf: 12000, icf: -1500, fcf: 10500, projectedHigh: 228000, projectedLow: 222000, momentum_index: -3000 },
-    { date: "Dec 16", inflows: 15800, outflows: 9400, net: 6400, balance: 231300, cumulativeNet: 2900, keyEvent: "Stripe Payout", ocf: 18000, icf: -3000, fcf: 15000, projectedHigh: 235000, projectedLow: 228000, momentum_index: 4000 },
-    { date: "Dec 17", inflows: 9500, outflows: 11200, net: -1700, balance: 229600, cumulativeNet: 1200, keyEvent: null, ocf: 13000, icf: -2500, fcf: 10500, projectedHigh: 233000, projectedLow: 227000, momentum_index: -1000 },
-    { date: "Dec 18", inflows: 7200, outflows: 12800, net: -5600, balance: 224000, cumulativeNet: -4400, keyEvent: "AWS Bill", ocf: 10000, icf: -3500, fcf: 6500, projectedHigh: 228000, projectedLow: 221000, momentum_index: -2500 },
-    { date: "Dec 19", inflows: 18950, outflows: 8200, net: 10750, balance: 234750, cumulativeNet: 6350, keyEvent: "App Store Payout", ocf: 22000, icf: -1000, fcf: 21000, projectedHigh: 238000, projectedLow: 232000, momentum_index: 5000 },
-    { date: "Dec 20", inflows: 14300, outflows: 10500, net: 3800, balance: 238550, cumulativeNet: 10150, keyEvent: null, ocf: 17000, icf: -2000, fcf: 15000, projectedHigh: 242000, projectedLow: 236000, momentum_index: 1000 },
+    { date: "Feb 4", inflows: 12500, outflows: 8900, net: 3600, balance: 232000, cumulativeNet: 3600, keyEvent: null, ocf: 15000, icf: -2000, fcf: 13000, projectedHigh: 235000, projectedLow: 230000, momentum_index: 2000 },
+    { date: "Feb 5", inflows: 8200, outflows: 15300, net: -7100, balance: 224900, cumulativeNet: -3500, keyEvent: "Payroll Run", ocf: 12000, icf: -1500, fcf: 10500, projectedHigh: 228000, projectedLow: 222000, momentum_index: -3000 },
+    { date: "Feb 6", inflows: 15800, outflows: 9400, net: 6400, balance: 231300, cumulativeNet: 2900, keyEvent: "Stripe Payout", ocf: 18000, icf: -3000, fcf: 15000, projectedHigh: 235000, projectedLow: 228000, momentum_index: 4000 },
+    { date: "Feb 7", inflows: 9500, outflows: 11200, net: -1700, balance: 229600, cumulativeNet: 1200, keyEvent: null, ocf: 13000, icf: -2500, fcf: 10500, projectedHigh: 233000, projectedLow: 227000, momentum_index: -1000 },
+    { date: "Feb 8", inflows: 7200, outflows: 12800, net: -5600, balance: 224000, cumulativeNet: -4400, keyEvent: "AWS Bill", ocf: 10000, icf: -3500, fcf: 6500, projectedHigh: 228000, projectedLow: 221000, momentum_index: -2500 },
+    { date: "Feb 9", inflows: 18950, outflows: 8200, net: 10750, balance: 234750, cumulativeNet: 6350, keyEvent: "App Store Payout", ocf: 22000, icf: -1000, fcf: 21000, projectedHigh: 238000, projectedLow: 232000, momentum_index: 5000 },
+    { date: "Feb 10", inflows: 14300, outflows: 10500, net: 3800, balance: 238550, cumulativeNet: 10150, keyEvent: null, ocf: 17000, icf: -2000, fcf: 15000, projectedHigh: 242000, projectedLow: 236000, momentum_index: 1000 },
   ];
 
   // Mock Forecast Data
@@ -303,10 +302,10 @@ export default function CashFlow() {
 
   // Mock Upcoming Movements
   const upcomingMovements = [
-    { date: "2024-12-31", type: "outflow", title: "Payroll Run", amount: 42500, category: "Payroll" },
-    { date: "2024-12-28", type: "outflow", title: "Legal Co Payment", amount: 8500, category: "OpEx" },
-    { date: "2024-12-27", type: "inflow", title: "Stripe Payout", amount: 15200, category: "Revenue" },
-    { date: "2024-12-30", type: "outflow", title: "AWS Bill", amount: 3200, category: "COGS" },
+    { date: "2026-02-28", type: "outflow", title: "Payroll Run", amount: 42500, category: "Payroll" },
+    { date: "2026-02-20", type: "outflow", title: "Legal Co Payment", amount: 8500, category: "OpEx" },
+    { date: "2026-02-17", type: "inflow", title: "Stripe Payout", amount: 15200, category: "Revenue" },
+    { date: "2026-02-22", type: "outflow", title: "AWS Bill", amount: 3200, category: "COGS" },
   ];
 
   // Top Customers
@@ -422,11 +421,11 @@ export default function CashFlow() {
 
   // Predicted Inflow Events
   const predictedInflows = [
-    { date: "2024-12-27", source: "Stripe", amount: 13500, confidence: "High", type: "Recurring" },
-    { date: "2024-12-28", source: "DoorDash", amount: 920, confidence: "Medium", type: "Variable" },
-    { date: "2024-12-29", source: "AWS", amount: 8900, confidence: "High", type: "Monthly" },
-    { date: "2024-12-31", source: "App Store", amount: 4200, confidence: "High", type: "Subscription" },
-    { date: "2025-01-02", source: "Stripe", amount: 11200, confidence: "Medium", type: "Recurring" },
+    { date: "2026-02-17", source: "Stripe", amount: 13500, confidence: "High", type: "Recurring" },
+    { date: "2026-02-18", source: "DoorDash", amount: 920, confidence: "Medium", type: "Variable" },
+    { date: "2026-02-19", source: "AWS", amount: 8900, confidence: "High", type: "Monthly" },
+    { date: "2026-02-20", source: "App Store", amount: 4200, confidence: "High", type: "Subscription" },
+    { date: "2026-02-22", source: "Stripe", amount: 11200, confidence: "Medium", type: "Recurring" },
   ];
 
   // Customer Health Scores
@@ -440,7 +439,7 @@ export default function CashFlow() {
 
   // At-Risk Customers
   const atRiskCustomers = [
-    { name: "Delta Corp", score: 55, issue: "Payment delays increasing", lastPayment: "2024-12-16" }
+    { name: "Delta Corp", score: 55, issue: "Payment delays increasing", lastPayment: "2026-02-06" }
   ];
 
   // NRR Data
@@ -624,11 +623,11 @@ export default function CashFlow() {
   };
 
   const cashBalanceData = [
-    { month: "Nov 20", balance: 180000 },
-    { month: "Nov 27", balance: 195000 },
-    { month: "Dec 4", balance: 210000 },
-    { month: "Dec 11", balance: 225000 },
-    { month: "Dec 18", balance: 238000 },
+    { month: "Jan 10", balance: 180000 },
+    { month: "Jan 17", balance: 195000 },
+    { month: "Jan 24", balance: 210000 },
+    { month: "Jan 31", balance: 225000 },
+    { month: "Feb 7", balance: 238000 },
   ];
 
 
@@ -3133,7 +3132,7 @@ export default function CashFlow() {
                   </CardHeader>
                   <CardContent className="pt-0 space-y-3">
                     <p className="text-xs text-gray-300 leading-relaxed">
-                      <span className="font-semibold text-white">Week of Dec 14–20:</span>
+                      <span className="font-semibold text-white">Week of Feb 4–10:</span>
                       <br />
                       Net inflows: <span className="font-semibold text-emerald-400">+$12,300</span>
                       <br />
@@ -3152,7 +3151,7 @@ export default function CashFlow() {
                         size="sm"
                         className="w-full bg-white/5 border-white/10 text-white hover:bg-white/10 text-xs h-7"
                         onClick={() => {
-                          navigator.clipboard.writeText(`Week of Dec 14–20:\nNet inflows: +$12,300\nRunway change: +0.6 months\nTop variance driver: AWS bill delay\nLiquidity stress: Low (65/100)\nRecommended actions: Reduce OpEx 3% next week.`);
+                          navigator.clipboard.writeText(`Week of Feb 4–10:\nNet inflows: +$12,300\nRunway change: +0.6 months\nTop variance driver: AWS bill delay\nLiquidity stress: Low (65/100)\nRecommended actions: Reduce OpEx 3% next week.`);
                         }}
                       >
                         <Copy className="w-3 h-3 mr-1" />
@@ -3324,46 +3323,46 @@ export default function CashFlow() {
                     <div>
                       <label className="text-xs text-gray-400 mb-2 block">Interest Rate Change</label>
                       <div className="flex items-center gap-2">
-                        <input
-                          type="range"
-                          min="0"
-                          max="2"
-                          step="0.1"
-                          value={macroInputs.interestRate}
-                          onChange={(e) => setMacroInputs({...macroInputs, interestRate: parseFloat(e.target.value)})}
-                          className="flex-1 accent-red-500"
-                        />
-                        <span className="text-sm font-semibold text-white w-12 text-right">+{macroInputs.interestRate}%</span>
+                       <input
+                         type="range"
+                         min="0"
+                         max="2"
+                         step="0.1"
+                         value={macroInputs.interestRate}
+                         onChange={(e) => setMacroInputs({...macroInputs, interestRate: parseFloat(e.target.value)})}
+                         className="flex-1 h-2 bg-white/10 rounded-lg appearance-none cursor-pointer"
+                       />
+                       <span className="text-sm font-semibold text-white w-12 text-right">+{macroInputs.interestRate}%</span>
                       </div>
                     </div>
                     <div>
                       <label className="text-xs text-gray-400 mb-2 block">Inflation Impact</label>
                       <div className="flex items-center gap-2">
-                        <input
-                          type="range"
-                          min="0"
-                          max="3"
-                          step="0.1"
-                          value={macroInputs.inflation}
-                          onChange={(e) => setMacroInputs({...macroInputs, inflation: parseFloat(e.target.value)})}
-                          className="flex-1 accent-red-500"
-                        />
-                        <span className="text-sm font-semibold text-white w-12 text-right">+{macroInputs.inflation}%</span>
+                       <input
+                         type="range"
+                         min="0"
+                         max="3"
+                         step="0.1"
+                         value={macroInputs.inflation}
+                         onChange={(e) => setMacroInputs({...macroInputs, inflation: parseFloat(e.target.value)})}
+                         className="flex-1 h-2 bg-white/10 rounded-lg appearance-none cursor-pointer"
+                       />
+                       <span className="text-sm font-semibold text-white w-12 text-right">+{macroInputs.inflation}%</span>
                       </div>
                     </div>
                     <div>
                       <label className="text-xs text-gray-400 mb-2 block">Stripe Fee Change</label>
                       <div className="flex items-center gap-2">
-                        <input
-                          type="range"
-                          min="0"
-                          max="1"
-                          step="0.05"
-                          value={macroInputs.stripeFee}
-                          onChange={(e) => setMacroInputs({...macroInputs, stripeFee: parseFloat(e.target.value)})}
-                          className="flex-1 accent-red-500"
-                        />
-                        <span className="text-sm font-semibold text-white w-12 text-right">+{macroInputs.stripeFee}%</span>
+                       <input
+                         type="range"
+                         min="0"
+                         max="1"
+                         step="0.05"
+                         value={macroInputs.stripeFee}
+                         onChange={(e) => setMacroInputs({...macroInputs, stripeFee: parseFloat(e.target.value)})}
+                         className="flex-1 h-2 bg-white/10 rounded-lg appearance-none cursor-pointer"
+                       />
+                       <span className="text-sm font-semibold text-white w-12 text-right">+{macroInputs.stripeFee}%</span>
                       </div>
                     </div>
                   </div>
@@ -4309,10 +4308,10 @@ export default function CashFlow() {
                 <CardContent className="pt-0">
                   <div className="space-y-2">
                     {[
-                      { vendor: "Payroll Run", date: "Dec 31", category: "Payroll", amount: 42500, confidence: 98, tag: "Recurring", risk: "low" },
-                      { vendor: "AWS", date: "Jan 1", category: "OpEx", amount: 3200, confidence: 85, tag: "Recurring", risk: "medium" },
-                      { vendor: "Stripe Payout", date: "Dec 28", category: "Revenue", amount: 15800, confidence: 92, tag: "Recurring", risk: "low" },
-                      { vendor: "Legal Co", date: "Jan 5", category: "OpEx", amount: 8500, confidence: 75, tag: "One-time", risk: "high" },
+                     { vendor: "Payroll Run", date: "Feb 28", category: "Payroll", amount: 42500, confidence: 98, tag: "Recurring", risk: "low" },
+                     { vendor: "AWS", date: "Mar 1", category: "OpEx", amount: 3200, confidence: 85, tag: "Recurring", risk: "medium" },
+                     { vendor: "Stripe Payout", date: "Feb 20", category: "Revenue", amount: 15800, confidence: 92, tag: "Recurring", risk: "low" },
+                     { vendor: "Legal Co", date: "Mar 5", category: "OpEx", amount: 8500, confidence: 75, tag: "One-time", risk: "high" },
                     ].map((movement, idx) => (
                       <div
                         key={idx}
@@ -4497,9 +4496,9 @@ export default function CashFlow() {
                               </TableHeader>
                               <TableBody>
                                 {[
-                                  { name: "Base Case", created: "Oct 20", runway: "18.4 mo", confidence: "92%", tag: "baseline" },
-                                  { name: "Revenue Drop (-10%)", created: "Oct 19", runway: "17.3 mo", confidence: "84%", tag: "risk" },
-                                  { name: "2 New Hires", created: "Oct 18", runway: "16.1 mo", confidence: "75%", tag: "growth" },
+                                  { name: "Base Case", created: "Feb 10", runway: "18.4 mo", confidence: "92%", tag: "baseline" },
+                                  { name: "Revenue Drop (-10%)", created: "Feb 9", runway: "17.3 mo", confidence: "84%", tag: "risk" },
+                                  { name: "2 New Hires", created: "Feb 8", runway: "16.1 mo", confidence: "75%", tag: "growth" },
                                 ].map((scenario, idx) => (
                                   <TableRow key={idx} className="border-white/10 hover:bg-white/5 transition-all">
                                     <TableCell className="font-medium text-white text-xs">{scenario.name}</TableCell>
@@ -5369,7 +5368,7 @@ export default function CashFlow() {
           {selectedAnomaly && (
             <div className="mt-6 space-y-6">
               <div className="p-4 rounded-lg bg-orange-500/10 border border-orange-500/30">
-                <div className="text-sm font-semibold text-white mb-2">Detected on Dec 18, 2024</div>
+                <div className="text-sm font-semibold text-white mb-2">Detected on Feb 8, 2026</div>
                 <p className="text-xs text-orange-300 leading-relaxed">
                   Net flow deviated 18% from the 7-day average. This was caused by:
                 </p>
@@ -5561,9 +5560,9 @@ export default function CashFlow() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="bg-gray-900/95 backdrop-blur-xl border-white/10 text-white">
-                      <SelectItem value="jan2025">Jan 2025</SelectItem>
-                      <SelectItem value="feb2025">Feb 2025</SelectItem>
-                      <SelectItem value="mar2025">Mar 2025</SelectItem>
+                     <SelectItem value="mar2026">Mar 2026</SelectItem>
+                     <SelectItem value="apr2026">Apr 2026</SelectItem>
+                     <SelectItem value="may2026">May 2026</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

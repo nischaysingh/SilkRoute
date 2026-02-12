@@ -202,10 +202,10 @@ export default function FPA() {
 
 
   const tradeTape = [
-  { id: 1, date: "2024-12-15", action: "Accelerated AR Collection", expectedROI: 8.2, realizedROI: 9.1, cashImpact: "$45K", status: "outperformed" },
-  { id: 2, date: "2024-12-10", action: "Marketing Channel Reallocation", expectedROI: 6.1, realizedROI: 5.8, cashImpact: "-$9K/mo", status: "on-track" },
-  { id: 3, date: "2024-12-01", action: "Delayed Contractor Hiring", expectedROI: 12.5, realizedROI: 11.9, cashImpact: "$92K", status: "on-track" },
-  { id: 4, date: "2024-11-20", action: "Vendor Payment Extension", expectedROI: 4.8, realizedROI: 4.2, status: "underperformed" }];
+  { id: 1, date: "2026-02-05", action: "Accelerated AR Collection", expectedROI: 8.2, realizedROI: 9.1, cashImpact: "$45K", status: "outperformed" },
+  { id: 2, date: "2026-01-30", action: "Marketing Channel Reallocation", expectedROI: 6.1, realizedROI: 5.8, cashImpact: "-$9K/mo", status: "on-track" },
+  { id: 3, date: "2026-01-20", action: "Delayed Contractor Hiring", expectedROI: 12.5, realizedROI: 11.9, cashImpact: "$92K", status: "on-track" },
+  { id: 4, date: "2026-01-10", action: "Vendor Payment Extension", expectedROI: 4.8, realizedROI: 4.2, status: "underperformed" }];
 
 
   const capitalEfficiency = [
@@ -247,39 +247,39 @@ export default function FPA() {
 
   const storyChapters = [
   {
-    chapter: "Q1 2024 — Growth Phase",
+    chapter: "Q1 2025 — Growth Phase",
     narrative: "Revenue grew 18% QoQ driven by enterprise expansion. Payroll increased 12% from strategic hires.",
     metrics: { revenue: "+18%", burn: "+12%", runway: "8.2mo" },
     sentiment: "positive",
-    inflectionPoint: { date: "Feb 2024", event: "First enterprise contract ($180K ARR)", causal: "Hiring surge → Payroll ↑ 12% → Burn ↑ 0.3x → Runway ↓ 0.6mo" }
+    inflectionPoint: { date: "Feb 2025", event: "First enterprise contract ($180K ARR)", causal: "Hiring surge → Payroll ↑ 12% → Burn ↑ 0.3x → Runway ↓ 0.6mo" }
   },
   {
-    chapter: "Q2 2024 — Efficiency Mode",
+    chapter: "Q2 2025 — Efficiency Mode",
     narrative: "Gross margin improved 4.6% through operational efficiency. Customer retention stabilized at 94%.",
     metrics: { margin: "+4.6%", retention: "94%", runway: "8.5mo" },
     sentiment: "positive",
-    inflectionPoint: { date: "Apr 2024", event: "Churn reduction initiative launched", causal: "Marketing optimization → CAC ↓ 15% → Efficiency ↑ → Runway ↑ 0.3mo" }
+    inflectionPoint: { date: "Apr 2025", event: "Churn reduction initiative launched", causal: "Marketing optimization → CAC ↓ 15% → Efficiency ↑ → Runway ↑ 0.3mo" }
   },
   {
-    chapter: "Q3 2024 — Optimization",
+    chapter: "Q3 2025 — Optimization",
     narrative: "Cost optimization initiatives extended runway by 1.2 months without impacting growth velocity.",
     metrics: { runway: "+1.2mo", efficiency: "+8%", churn: "-2.1%" },
     sentiment: "positive",
-    inflectionPoint: { date: "Aug 2024", event: "Marketing channel reallocation", causal: "Paid ads ↓ 20% → Content ↑ → ROAS ↑ 2.4% → Cash preserved" }
+    inflectionPoint: { date: "Aug 2025", event: "Marketing channel reallocation", causal: "Paid ads ↓ 20% → Content ↑ → ROAS ↑ 2.4% → Cash preserved" }
   },
   {
-    chapter: "Q4 2024 — Strategic Investment",
+    chapter: "Q4 2025 — Strategic Investment",
     narrative: "Increased R&D and sales capacity to capture market opportunity. Burn rose 6% but pipeline grew 23%.",
     metrics: { burn: "+6%", pipeline: "+23%", runway: "7.4mo" },
     sentiment: "strategic",
-    inflectionPoint: { date: "Nov 2024", event: "Headcount scaling initiated", causal: "2 engineers hired → Payroll ↑ $18.5K → Tax ↑ $2.8K → Runway ↓ 0.3mo" }
+    inflectionPoint: { date: "Nov 2025", event: "Headcount scaling initiated", causal: "2 engineers hired → Payroll ↑ $18.5K → Tax ↑ $2.8K → Runway ↓ 0.3mo" }
   }];
 
 
   const crossModuleInsights = [
-  { module: "Cash Flow", alert: "Cash deficit predicted Mar 15 due to tax filing + payroll overlap", severity: "high", impact: "-$42K" },
-  { module: "Payroll", alert: "3 bonus payouts scheduled Feb 28 — $18.5K impact", severity: "medium", impact: "-$18.5K" },
-  { module: "Taxes", alert: "Sales tax remittance moved to Jan 31 from Feb 1", severity: "low", impact: "-$20.1K" }];
+  { module: "Cash Flow", alert: "Cash deficit predicted May 15 due to tax filing + payroll overlap", severity: "high", impact: "-$42K" },
+  { module: "Payroll", alert: "3 bonus payouts scheduled Apr 28 — $18.5K impact", severity: "medium", impact: "-$18.5K" },
+  { module: "Taxes", alert: "Sales tax remittance moved to Mar 31 from Apr 1", severity: "low", impact: "-$20.1K" }];
 
 
   const causalChain = [
@@ -292,16 +292,16 @@ export default function FPA() {
   const agentActivity = [
   { time: "2 mins ago", agent: "CashFlowAgent", message: "Revenue forecast adjusted -2.1% based on delayed Stripe payout", status: "processed", severity: "medium" },
   { time: "15 mins ago", agent: "PayrollAgent", message: "Variance detected: overtime +$3.2K vs projection", status: "flagged", severity: "high" },
-  { time: "1 hr ago", agent: "RiskAgent", message: "68% likelihood of cash crunch on Feb 28 — AR acceleration recommended", status: "action_needed", severity: "high" },
-  { time: "2 hrs ago", agent: "TaxAgent", message: "Tax obligation recalculated: $32K due Jan 15", status: "processed", severity: "medium" },
+  { time: "1 hr ago", agent: "RiskAgent", message: "68% likelihood of cash crunch on Apr 28 — AR acceleration recommended", status: "action_needed", severity: "high" },
+  { time: "2 hrs ago", agent: "TaxAgent", message: "Tax obligation recalculated: $32K due Mar 15", status: "processed", severity: "medium" },
   { time: "5 hrs ago", agent: "ValuationAgent", message: "ARR multiple dropped to 8.2x from 8.4x — market correction", status: "processed", severity: "low" },
   { time: "Yesterday", agent: "ComplianceAgent", message: "All tax filings on track — no compliance risks detected", status: "processed", severity: "low" }];
 
 
   const riskHeatmap = [
-  { date: "Feb 28", event: "Potential cash crunch", probability: 68, mitigation: "Accelerate AR by 7 days", severity: "high", daysOut: 28 },
-  { date: "Mar 15", event: "Tax + Payroll overlap", probability: 95, mitigation: "Delay vendor payouts", severity: "critical", daysOut: 43 },
-  { date: "Apr 1", event: "Runway below 6 months", probability: 42, mitigation: "Initiate fundraise or cut burn", severity: "medium", daysOut: 60 }];
+  { date: "Apr 28", event: "Potential cash crunch", probability: 68, mitigation: "Accelerate AR by 7 days", severity: "high", daysOut: 75 },
+  { date: "May 15", event: "Tax + Payroll overlap", probability: 95, mitigation: "Delay vendor payouts", severity: "critical", daysOut: 92 },
+  { date: "Jun 1", event: "Runway below 6 months", probability: 42, mitigation: "Initiate fundraise or cut burn", severity: "medium", daysOut: 109 }];
 
 
   const getSyncStatusColor = (status) => {
