@@ -43,6 +43,7 @@ function LayoutContent({ children, currentPageName }) {
     { name: "FP&A", path: createPageUrl("FPA"), icon: BarChart },
     { name: "Management", path: createPageUrl("Management"), icon: Package },
     { name: "SilkRouteAI", path: createPageUrl("SilkRouteAI"), icon: Radar },
+    { name: "Workflows", path: createPageUrl("WorkflowHub"), icon: Wifi },
     { name: "Integrations", path: createPageUrl("Integrations"), icon: CheckCircle },
     { name: "Settings", path: createPageUrl("Settings"), icon: Settings }
   ];
