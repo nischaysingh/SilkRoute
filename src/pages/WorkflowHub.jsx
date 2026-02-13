@@ -278,14 +278,14 @@ export default function WorkflowHub() {
       {/* Workflow Detail Modal */}
       {selectedWorkflow && (
         <div 
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-6"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-6"
           onClick={() => setSelectedWorkflow(null)}
         >
           <Card 
-            className="bg-gray-900/95 backdrop-blur-xl border-white/10 rounded-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto"
+            className="bg-gray-900/95 backdrop-blur-xl border-white/10 rounded-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto relative z-[101]"
             onClick={(e) => e.stopPropagation()}
           >
-            <CardHeader>
+            <CardHeader className="pb-4">
               <div className="flex items-start justify-between">
                 <div>
                   <CardTitle className="text-white text-xl mb-2">
@@ -299,9 +299,9 @@ export default function WorkflowHub() {
                   variant="ghost"
                   size="icon"
                   onClick={() => setSelectedWorkflow(null)}
-                  className="text-gray-400 hover:text-white"
+                  className="text-gray-400 hover:text-white hover:bg-white/10"
                 >
-                  ×
+                  <span className="text-xl">×</span>
                 </Button>
               </div>
             </CardHeader>
@@ -315,34 +315,40 @@ export default function WorkflowHub() {
               {/* Steps */}
               <div>
                 <h4 className="text-sm font-semibold text-white mb-3">Workflow Steps</h4>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   {selectedWorkflow.steps?.map((step, idx) => (
-                    <div key={idx} className="flex items-start gap-3 p-3 rounded-lg bg-white/5 border border-white/10">
-                      <div className={cn(
-                        "w-8 h-8 rounded-lg flex items-center justify-center text-lg flex-shrink-0",
-                        step.config?.color === "blue" && "bg-blue-100 border-blue-300 text-blue-800",
-                        step.config?.color === "purple" && "bg-purple-100 border-purple-300 text-purple-800",
-                        step.config?.color === "emerald" && "bg-emerald-100 border-emerald-300 text-emerald-800",
-                        step.config?.color === "amber" && "bg-amber-100 border-amber-300 text-amber-800",
-                        step.config?.color === "red" && "bg-red-100 border-red-300 text-red-800",
-                        !step.config?.color && "bg-gray-100 border-gray-300 text-gray-800"
-                      )}>
-                        {step.config?.icon || "⚙️"}
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="text-xs font-semibold text-white">{step.name}</span>
-                          <Badge className="bg-blue-100 text-blue-700 text-[10px]">
-                            {step.type}
-                          </Badge>
-                          {step.config?.branch && (
-                            <Badge className="bg-purple-100 text-purple-700 text-[10px]">
-                              {step.config.branch}
-                            </Badge>
-                          )}
+                    <div key={idx} className="relative">
+                      <div className="flex items-start gap-3 p-3 rounded-lg bg-white/5 border border-white/10">
+                        <div className={cn(
+                          "w-10 h-10 rounded-lg flex items-center justify-center text-xl flex-shrink-0 border-2",
+                          step.config?.color === "blue" && "bg-blue-100 border-blue-300",
+                          step.config?.color === "purple" && "bg-purple-100 border-purple-300",
+                          step.config?.color === "emerald" && "bg-emerald-100 border-emerald-300",
+                          step.config?.color === "amber" && "bg-amber-100 border-amber-300",
+                          step.config?.color === "red" && "bg-red-100 border-red-300",
+                          step.config?.color === "cyan" && "bg-cyan-100 border-cyan-300",
+                          !step.config?.color && "bg-gray-100 border-gray-300"
+                        )}>
+                          {step.config?.icon || "⚙️"}
                         </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1 flex-wrap">
+                            <span className="text-sm font-semibold text-white">{step.name}</span>
+                            <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30 text-[10px]">
+                              {step.type}
+                            </Badge>
+                            {step.config?.branch && (
+                              <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30 text-[10px]">
+                                {step.config.branch}
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+                        <CheckCircle className="w-5 h-5 text-emerald-400 flex-shrink-0" />
                       </div>
-                      <CheckCircle className="w-4 h-4 text-emerald-400" />
+                      {idx < selectedWorkflow.steps.length - 1 && (
+                        <div className="ml-5 w-px h-3 bg-white/20" />
+                      )}
                     </div>
                   ))}
                 </div>
@@ -354,16 +360,22 @@ export default function WorkflowHub() {
                   <h4 className="text-sm font-semibold text-white mb-3">Metadata</h4>
                   <div className="grid grid-cols-2 gap-3">
                     {selectedWorkflow.metadata.estimatedTime && (
-                      <div className="p-3 rounded-lg bg-white/5 border border-white/10">
-                        <div className="text-xs text-gray-400 mb-1">Estimated Time</div>
+                      <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/30">
+                        <div className="flex items-center gap-2 mb-1">
+                          <Clock className="w-3 h-3 text-blue-400" />
+                          <div className="text-xs text-gray-400">Estimated Time</div>
+                        </div>
                         <div className="text-sm font-semibold text-white">
                           {selectedWorkflow.metadata.estimatedTime}
                         </div>
                       </div>
                     )}
                     {selectedWorkflow.metadata.estimatedCost && (
-                      <div className="p-3 rounded-lg bg-white/5 border border-white/10">
-                        <div className="text-xs text-gray-400 mb-1">Estimated Cost</div>
+                      <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/30">
+                        <div className="flex items-center gap-2 mb-1">
+                          <TrendingUp className="w-3 h-3 text-emerald-400" />
+                          <div className="text-xs text-gray-400">Estimated Cost</div>
+                        </div>
                         <div className="text-sm font-semibold text-white">
                           {selectedWorkflow.metadata.estimatedCost}
                         </div>
@@ -375,8 +387,8 @@ export default function WorkflowHub() {
                       <div className="text-xs text-gray-400 mb-2">Integrations</div>
                       <div className="flex flex-wrap gap-2">
                         {selectedWorkflow.metadata.integrations.map((integration, idx) => (
-                          <Badge key={idx} className="bg-cyan-100 text-cyan-700 border-cyan-300">
-                            {integration}
+                          <Badge key={idx} className="bg-cyan-500/20 text-cyan-400 border-cyan-500/30">
+                            📊 {integration}
                           </Badge>
                         ))}
                       </div>
@@ -388,7 +400,11 @@ export default function WorkflowHub() {
               {/* Actions */}
               <div className="flex gap-2 pt-4 border-t border-white/10">
                 <Button
-                  onClick={() => handleToggleStatus(selectedWorkflow)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleToggleStatus(selectedWorkflow);
+                    setSelectedWorkflow(null);
+                  }}
                   className={selectedWorkflow.status === 'active' ? 
                     "flex-1 bg-amber-600 hover:bg-amber-700" : 
                     "flex-1 bg-emerald-600 hover:bg-emerald-700"
@@ -408,7 +424,11 @@ export default function WorkflowHub() {
                 </Button>
                 <Button
                   variant="outline"
-                  onClick={() => handleDelete(selectedWorkflow.id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDelete(selectedWorkflow.id);
+                    setSelectedWorkflow(null);
+                  }}
                   className="bg-white/5 border-white/10 text-red-400 hover:bg-red-500/10"
                 >
                   <Trash2 className="w-4 h-4 mr-2" />
