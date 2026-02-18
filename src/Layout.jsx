@@ -54,21 +54,7 @@ function LayoutContent({ children, currentPageName }) {
   const periods = ["This Month", "Last 3 Months", "YTD"];
 
   return (
-    <div className="min-h-screen bg-black relative overflow-hidden">
-      {/* Cyberpunk Grid Background */}
-      <div className="fixed inset-0 opacity-20 pointer-events-none">
-        <div className="absolute inset-0" style={{
-          backgroundImage: `
-            linear-gradient(rgba(0, 255, 255, 0.1) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px)
-          `,
-          backgroundSize: '50px 50px'
-        }} />
-      </div>
-      {/* Neon Glow Orbs */}
-      <div className="fixed top-0 left-0 w-96 h-96 bg-cyan-500/20 rounded-full blur-[120px] pointer-events-none" />
-      <div className="fixed bottom-0 right-0 w-96 h-96 bg-magenta-500/20 rounded-full blur-[120px] pointer-events-none" />
-      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-purple-500/10 rounded-full blur-[120px] pointer-events-none" />
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-slate-900 to-gray-900">
       {/* Explain Mode Global Styles */}
       <style>{`
         /* Explain Mode Highlight Glow for ANY element clicked */
@@ -111,7 +97,7 @@ function LayoutContent({ children, currentPageName }) {
       `}</style>
 
       {/* Top Navigation Bar */}
-      <div className="bg-black/90 backdrop-blur-xl border-b border-cyan-500/30 sticky top-0 z-50 shadow-[0_0_15px_rgba(0,255,255,0.3)]">
+      <div className="bg-black/40 backdrop-blur-xl border-b border-white/10 sticky top-0 z-50">
         <div className="flex items-center justify-between h-16 px-4 md:px-6">
           <div className="flex items-center gap-4">
             <Button
@@ -125,7 +111,7 @@ function LayoutContent({ children, currentPageName }) {
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="flex items-center gap-2 rounded bg-black border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/10 hover:border-cyan-400 shadow-[0_0_10px_rgba(0,255,255,0.3)] transition-all">
+                <Button variant="outline" className="flex items-center gap-2 rounded-lg bg-white/5 border-white/20 text-white hover:bg-white/10 backdrop-blur-sm">
                   <span className="font-semibold">{activeCompany}</span>
                   <ChevronDown className="w-4 h-4" />
                 </Button>
@@ -147,8 +133,8 @@ function LayoutContent({ children, currentPageName }) {
           </div>
 
           <div className="absolute left-1/2 transform -translate-x-1/2">
-            <h1 className="text-4xl font-bold text-center bg-gradient-to-r from-cyan-400 via-magenta-400 to-cyan-400 bg-clip-text text-transparent animate-pulse" style={{ fontFamily: 'monospace', letterSpacing: '0.1em' }}>
-              [SILKROUTE]
+            <h1 className="text-4xl font-medium text-center text-white">
+              Silkroute
             </h1>
           </div>
 
@@ -175,21 +161,21 @@ function LayoutContent({ children, currentPageName }) {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            <Button variant="ghost" size="icon" className="relative text-cyan-400 hover:bg-cyan-500/20 hover:shadow-[0_0_10px_rgba(0,255,255,0.5)]">
+            <Button variant="ghost" size="icon" className="relative text-gray-300 hover:bg-white/10">
               <Bell className="w-5 h-5" />
-              <span className="absolute top-1 right-1 w-2 h-2 bg-magenta-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(255,0,255,0.8)]"></span>
+              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
             </Button>
 
             {user && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="flex items-center gap-2 hover:bg-cyan-500/20 hover:shadow-[0_0_10px_rgba(0,255,255,0.3)]">
-                    <div className="w-8 h-8 bg-gradient-to-br from-cyan-500 to-magenta-500 rounded-sm flex items-center justify-center border border-cyan-400/50 shadow-[0_0_10px_rgba(0,255,255,0.5)]">
-                      <span className="text-black font-bold text-sm">
+                  <Button variant="ghost" className="flex items-center gap-2 hover:bg-white/10">
+                    <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+                      <span className="text-white font-medium text-sm">
                         {user.full_name?.[0]?.toUpperCase() || user.email[0].toUpperCase()}
                       </span>
                     </div>
-                    <span className="hidden sm:block text-sm font-bold text-cyan-400" style={{ fontFamily: 'monospace' }}>
+                    <span className="hidden sm:block text-sm font-medium text-white">
                       {user.full_name || user.email}
                     </span>
                   </Button>
@@ -209,36 +195,32 @@ function LayoutContent({ children, currentPageName }) {
           </div>
         </div>
 
-        <div className="bg-black/80 backdrop-blur-sm mx-6 px-6 rounded-none hidden lg:flex items-center border border-cyan-500/30 shadow-[0_0_15px_rgba(0,255,255,0.2)]">
+        <div className="bg-slate-50 text-slate-950 mx-6 px-6 rounded-[10px] hidden lg:flex items-center border-t border-white/10">
           {navItems.map((item) => (
             <Link
               key={item.name}
               to={item.path}
               className={cn(
-                "flex items-center gap-2 px-4 py-3 border-b-2 transition-all text-sm font-bold relative group",
+                "flex items-center gap-2 px-4 py-3 border-b-2 transition-all text-sm font-medium",
                 isActive(item.path)
-                  ? "border-cyan-500 text-cyan-400 bg-cyan-500/10 shadow-[0_0_10px_rgba(0,255,255,0.4)]"
-                  : "border-transparent text-gray-400 hover:text-cyan-400 hover:bg-cyan-500/5"
+                  ? "border-blue-500 text-blue-400 bg-blue-500/10"
+                  : "border-transparent text-gray-400 hover:text-white hover:bg-white/5"
               )}
-              style={{ fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.05em' }}
             >
               <item.icon className="w-4 h-4" />
-              <span>{item.name}</span>
-              {isActive(item.path) && (
-                <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-cyan-500 to-transparent animate-pulse" />
-              )}
+              <span className="text-slate-950">{item.name}</span>
             </Link>
           ))}
           
           <div className="ml-auto flex items-center gap-3">
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-black border border-emerald-500/50 shadow-[0_0_10px_rgba(16,185,129,0.3)]">
-              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.8)]"></div>
-              <span className="text-xs font-bold text-emerald-400" style={{ fontFamily: 'monospace' }}>SYSTEMS.ONLINE</span>
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-50 border border-emerald-200">
+              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+              <span className="text-xs font-medium text-slate-700">All systems online</span>
             </div>
 
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-black border border-cyan-500/50 shadow-[0_0_10px_rgba(0,255,255,0.3)]">
-              <Wifi className="w-3.5 h-3.5 text-cyan-400" />
-              <span className="text-xs font-bold text-cyan-400" style={{ fontFamily: 'monospace' }}>M.POS::ACTIVE</span>
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-50 border border-blue-200">
+              <Wifi className="w-3.5 h-3.5 text-blue-600" />
+              <span className="text-xs font-medium text-slate-700">M.POS connected</span>
             </div>
           </div>
         </div>
@@ -279,7 +261,7 @@ function LayoutContent({ children, currentPageName }) {
 
       <main 
         className={cn(
-          "p-4 md:p-6 lg:p-8 max-w-[1600px] mx-auto relative z-10",
+          "p-4 md:p-6 lg:p-8 max-w-[1600px] mx-auto relative",
           isExplainModeActive && "explain-mode-active-bg"
         )}
       >
@@ -292,17 +274,17 @@ function LayoutContent({ children, currentPageName }) {
             <Button
               onClick={toggleExplainMode}
               className={cn(
-                "fixed bottom-6 right-6 z-[90] rounded-sm w-16 h-16 transition-all duration-200 flex items-center justify-center border-2",
+                "fixed bottom-6 right-6 z-[90] rounded-full w-16 h-16 shadow-2xl transition-all duration-200 flex items-center justify-center",
                 isExplainModeActive
-                  ? "bg-black border-magenta-500 shadow-[0_0_20px_rgba(255,0,255,0.8)] hover:shadow-[0_0_30px_rgba(255,0,255,1)] scale-110"
-                  : "bg-black border-cyan-500/50 shadow-[0_0_15px_rgba(0,255,255,0.5)] hover:shadow-[0_0_25px_rgba(0,255,255,0.8)]"
+                  ? "bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 scale-110"
+                  : "bg-gradient-to-r from-slate-700 to-slate-800 hover:from-slate-600 hover:to-slate-700"
               )}
               aria-label={isExplainModeActive ? "Exit Explain Mode (Press E)" : "Enter Explain Mode (Press E)"}
             >
               <div className="flex flex-col items-center">
-                <Eye className={cn("w-6 h-6", isExplainModeActive ? "text-magenta-400" : "text-cyan-400")} />
-                <span className={cn("text-[9px] mt-0.5 font-bold", isExplainModeActive ? "text-magenta-400" : "text-cyan-400")} style={{ fontFamily: 'monospace' }}>
-                  {isExplainModeActive ? "EXIT" : "SCAN"}
+                <Eye className="w-6 h-6 text-white" />
+                <span className="text-[9px] text-white mt-0.5 font-semibold">
+                  {isExplainModeActive ? "EXIT" : "EXPLAIN"}
                 </span>
               </div>
             </Button>
@@ -323,12 +305,11 @@ function LayoutContent({ children, currentPageName }) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
-            className="fixed bottom-24 right-6 z-[90] px-4 py-2 bg-black border-2 border-magenta-500 text-magenta-400 text-xs font-bold shadow-[0_0_20px_rgba(255,0,255,0.6)]"
-            style={{ fontFamily: 'monospace' }}
+            className="fixed bottom-24 right-6 z-[90] px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 text-white text-xs font-semibold shadow-lg border border-white/20"
           >
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-magenta-500 animate-pulse shadow-[0_0_8px_rgba(255,0,255,0.8)]"></div>
-              <span>[SCAN MODE::ACTIVE] - CLICK TO ANALYZE</span>
+              <div className="w-2 h-2 rounded-full bg-white animate-pulse"></div>
+              <span>Explain Mode Active - Click any widget to understand it</span>
             </div>
           </motion.div>
         )}
