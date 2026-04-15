@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import {
   LayoutDashboard, DollarSign, CreditCard, Users, PiggyBank,
-  BarChart, CheckCircle, Settings, Bell, ChevronDown, Menu, X, Package, Radar, Wifi, Eye
+  BarChart, CheckCircle, Settings, Bell, ChevronDown, Menu, X, Package, Radar, Wifi, Eye, Sparkles
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { base44 } from "@/api/base44Client";
@@ -44,6 +44,7 @@ function LayoutContent({ children, currentPageName }) {
     { name: "Management", path: createPageUrl("Management"), icon: Package },
     { name: "SilkRouteAI", path: createPageUrl("SilkRouteAI"), icon: Radar },
     { name: "Workflows", path: createPageUrl("WorkflowHub"), icon: Wifi },
+    { name: "Automations", path: createPageUrl("WorkflowsAgents"), icon: Sparkles },
     { name: "Integrations", path: createPageUrl("Integrations"), icon: CheckCircle },
     { name: "Settings", path: createPageUrl("Settings"), icon: Settings }
   ];

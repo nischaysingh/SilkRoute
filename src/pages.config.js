@@ -59,6 +59,7 @@ import Settings from './pages/Settings';
 import SilkRouteAI from './pages/SilkRouteAI';
 import Taxes from './pages/Taxes';
 import WorkflowHub from './pages/WorkflowHub';
+import WorkflowsAgents from './pages/WorkflowsAgents';
 import __Layout from './Layout.jsx';
 
 
@@ -75,6 +76,7 @@ export const PAGES = {
     "SilkRouteAI": SilkRouteAI,
     "Taxes": Taxes,
     "WorkflowHub": WorkflowHub,
+    "WorkflowsAgents": WorkflowsAgents,
 }
 
 export const pagesConfig = {
