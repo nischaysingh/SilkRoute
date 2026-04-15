@@ -49,7 +49,7 @@ export default function Overview() {
       positive: true,
       icon: DollarSign,
       tooltip: "Total liquid cash across all bank accounts",
-      color: "from-[#788c5d] to-[#5d7048]"
+      color: "from-emerald-500 to-teal-500"
     },
     {
       label: "Avg Monthly Burn",
@@ -58,7 +58,7 @@ export default function Overview() {
       positive: true,
       icon: TrendingDown,
       tooltip: "Average net cash outflow per month over last 3 months",
-      color: "from-[#6a9bcc] to-[#4a7bac]"
+      color: "from-blue-500 to-cyan-500"
     },
     {
       label: "Runway",
@@ -67,7 +67,7 @@ export default function Overview() {
       positive: true,
       icon: Clock,
       tooltip: "Cash on hand ÷ Average monthly burn rate",
-      color: runway < 3 ? "from-red-500 to-red-700" : runway < 6 ? "from-[#d97757] to-[#CC785C]" : "from-[#CC785C] to-[#d97757]",
+      color: runway < 3 ? "from-red-500 to-pink-500" : runway < 6 ? "from-orange-500 to-yellow-500" : "from-purple-500 to-pink-500",
       warning: runway < 6
     },
     {
@@ -77,7 +77,7 @@ export default function Overview() {
       positive: false,
       icon: CreditCard,
       tooltip: "Current credit used ÷ Total credit available",
-      color: "from-[#6a9bcc] to-[#CC785C]"
+      color: "from-indigo-500 to-purple-500"
     }
   ];
 
@@ -115,7 +115,7 @@ export default function Overview() {
     { name: "App Store", value: 20, amount: 50000, change: 12 },
     { name: "AWS", value: 10, amount: 25000, change: -3 },
   ];
-  const COLORS = ["#6a9bcc", "#d97757", "#788c5d", "#CC785C"];
+  const COLORS = ["#3b82f6", "#8b5cf6", "#ec4899", "#f59e0b"];
 
   // Top Vendors Data
   const topVendors = [
@@ -435,23 +435,18 @@ export default function Overview() {
   };
 
   return (
-    <div className="min-h-screen p-6 relative" style={{background:'#141413'}}>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;1,400&display=swap');
-        .ov-heading{font-family:'Poppins',sans-serif!important}
-        .ov-body{font-family:'Lora',serif!important}
-      `}</style>
+    <div className="min-h-screen p-6 relative">
       {/* AI Assistant Toggle Button */}
       <Button
         onClick={() => setAiPanelOpen(!aiPanelOpen)}
-        className="fixed top-20 right-6 z-50 shadow-lg rounded-full w-12 h-12 p-0"
-        style={{background:'linear-gradient(135deg,#d97757,#CC785C)'}}
+        className="fixed top-20 right-6 z-50 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 shadow-lg rounded-full w-12 h-12 p-0"
       >
         <MessageCircle className="w-5 h-5 text-white" />
       </Button>
 
       <div className="mb-6">
-        <h2 className="ov-heading text-2xl font-bold text-[#faf9f5]">Overview</h2>
-        <p className="ov-body text-sm mt-1" style={{color:'#b0aea5'}}>Financial snapshot and key metrics</p>
+        <h2 className="text-2xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">Overview</h2>
+        <p className="text-gray-400 text-sm mt-1">Financial snapshot and key metrics</p>
       </div>
 
       {/* Bento Grid Layout */}
@@ -472,8 +467,7 @@ export default function Overview() {
             <Card 
               key={idx} 
               {...explainableProps}
-              className="col-span-3 backdrop-blur-xl rounded-xl overflow-hidden group transition-all"
-              style={{background:'#1e1d1b',border:'1px solid #2a2927'}}
+              className="col-span-3 bg-white/5 backdrop-blur-xl border-white/10 rounded-xl overflow-hidden group hover:bg-white/10 transition-all"
             >
               <CardContent className="p-5">
                 <div className="flex items-center justify-between mb-3">
@@ -481,11 +475,11 @@ export default function Overview() {
                     <UITooltip>
                       <UITooltipTrigger asChild>
                         <div className="flex items-center gap-1.5 cursor-help">
-                          <span className="ov-heading text-xs font-medium" style={{color:'#b0aea5'}}>{kpi.label}</span>
-                          <Info className="w-3 h-3" style={{color:'#b0aea5'}} />
+                          <span className="text-xs font-medium text-gray-400">{kpi.label}</span>
+                          <Info className="w-3 h-3 text-gray-500" />
                         </div>
                       </UITooltipTrigger>
-                      <UITooltipContent style={{background:'#1e1d1b',border:'1px solid #2a2927',color:'#faf9f5'}} className="max-w-xs">
+                      <UITooltipContent className="bg-gray-900 border-white/20 text-white max-w-xs">
                         <p className="text-xs">{kpi.tooltip}</p>
                       </UITooltipContent>
                     </UITooltip>
@@ -495,16 +489,15 @@ export default function Overview() {
                   </div>
                 </div>
                 <div>
-                  <div className="ov-heading text-2xl font-bold mb-2" style={{color:'#faf9f5'}}>{kpi.value}</div>
+                  <div className="text-2xl font-bold text-white mb-2">{kpi.value}</div>
                   <Badge 
                     className={cn(
-                      "text-xs border",
+                      "text-xs",
                       kpi.warning && runway < 3 ? "bg-red-500/20 text-red-400 border-red-500/30" :
-                      kpi.warning && runway < 6 ? "border-[#d97757]/40 text-[#d97757]" :
-                      kpi.positive ? "border-[#788c5d]/40 text-[#788c5d]" : 
+                      kpi.warning && runway < 6 ? "bg-orange-500/20 text-orange-400 border-orange-500/30" :
+                      kpi.positive ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30" : 
                       "bg-red-500/20 text-red-400 border-red-500/30"
                     )}
-                    style={kpi.positive && !kpi.warning ? {background:'rgba(120,140,93,0.15)'} : {}}
                   >
                     {kpi.positive ? <TrendingUp className="w-3 h-3 mr-1 inline" /> : <TrendingDown className="w-3 h-3 mr-1 inline" />}
                     {kpi.delta}
@@ -516,15 +509,18 @@ export default function Overview() {
         })}
 
         {/* MIDDLE LEFT: Cash Balance Chart - 5 columns */}
-        <Card className="col-span-5 backdrop-blur-xl rounded-xl" style={{background:'#1e1d1b',border:'1px solid #2a2927'}}>
+        <Card className="col-span-5 bg-white/5 backdrop-blur-xl border-white/10 rounded-xl">
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
-              <CardTitle className="ov-heading text-sm font-semibold" style={{color:'#faf9f5'}}>Cash Balance (Last 6 Months)</CardTitle>
+              <CardTitle className="text-white text-sm">Cash Balance (Last 6 Months)</CardTitle>
               <Button
+                variant={includeCreditLine ? "default" : "outline"}
                 size="sm"
                 onClick={() => setIncludeCreditLine(!includeCreditLine)}
-                className="rounded-lg text-xs h-7 border"
-                style={includeCreditLine ? {background:'#d97757',color:'#faf9f5',border:'none'} : {background:'transparent',color:'#b0aea5',borderColor:'#2a2927'}}
+                className={includeCreditLine ? 
+                  "bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 border-0 rounded-lg text-xs h-7" : 
+                  "bg-white/5 border-white/10 text-white hover:bg-white/10 rounded-lg text-xs h-7"
+                }
               >
                 Credit Line
               </Button>
@@ -534,25 +530,31 @@ export default function Overview() {
             <ResponsiveContainer width="100%" height={180}>
               <LineChart data={cashBalanceData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                <XAxis dataKey="month" stroke="#b0aea5" tick={{ fontSize: 11, fill:'#b0aea5' }} axisLine={false} tickLine={false}/>
-                <YAxis stroke="#b0aea5" tick={{ fontSize: 11, fill:'#b0aea5' }} axisLine={false} tickLine={false}/>
+                <XAxis dataKey="month" stroke="#9ca3af" tick={{ fontSize: 11 }} />
+                <YAxis stroke="#9ca3af" tick={{ fontSize: 11 }} />
                 <Tooltip 
                   formatter={(value) => `$${value.toLocaleString()}`}
-                  contentStyle={{ backgroundColor:'#1e1d1b', border:'1px solid #2a2927', borderRadius:'8px', color:'#faf9f5', fontSize:'11px' }}
+                  contentStyle={{ 
+                    backgroundColor: 'rgba(17, 24, 39, 0.95)', 
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    borderRadius: '8px',
+                    backdropFilter: 'blur(12px)',
+                    color: '#fff',
+                    fontSize: '11px'
+                  }}
                 />
-                <CartesianGrid strokeDasharray="3 3" stroke="#2a2927" vertical={false} />
                 <Line 
                   type="monotone" 
                   dataKey="balance" 
-                  stroke="#6a9bcc" 
-                  strokeWidth={2.5}
-                  dot={{ r: 3, fill: '#6a9bcc', strokeWidth: 2, stroke: '#4a7bac' }}
+                  stroke="#3b82f6" 
+                  strokeWidth={2}
+                  dot={{ r: 3, fill: '#3b82f6', strokeWidth: 2, stroke: '#1e40af' }}
                 />
                 {includeCreditLine && (
                   <Line 
                     type="monotone" 
                     dataKey="creditLine" 
-                    stroke="#CC785C" 
+                    stroke="#8b5cf6" 
                     strokeWidth={2}
                     strokeDasharray="5 5"
                     dot={false}
@@ -564,15 +566,33 @@ export default function Overview() {
         </Card>
 
         {/* MIDDLE CENTER: Revenue vs Expenses - 4 columns */}
-        <Card className="col-span-4 backdrop-blur-xl rounded-xl" style={{background:'#1e1d1b',border:'1px solid #2a2927'}}>
+        <Card className="col-span-4 bg-white/5 backdrop-blur-xl border-white/10 rounded-xl">
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
-              <CardTitle className="ov-heading text-sm font-semibold" style={{color:'#faf9f5'}}>Revenue vs Expenses</CardTitle>
+              <CardTitle className="text-white text-sm">Revenue vs Expenses</CardTitle>
               <div className="flex gap-1">
-                <Button size="sm" onClick={() => setRevenueExpenseView("MTD")} className="rounded-lg text-xs h-7 px-3 border"
-                  style={revenueExpenseView==="MTD"?{background:'#d97757',color:'#faf9f5',border:'none'}:{background:'transparent',color:'#b0aea5',borderColor:'#2a2927'}}>MTD</Button>
-                <Button size="sm" onClick={() => setRevenueExpenseView("YTD")} className="rounded-lg text-xs h-7 px-3 border"
-                  style={revenueExpenseView==="YTD"?{background:'#d97757',color:'#faf9f5',border:'none'}:{background:'transparent',color:'#b0aea5',borderColor:'#2a2927'}}>YTD</Button>
+                <Button
+                  variant={revenueExpenseView === "MTD" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setRevenueExpenseView("MTD")}
+                  className={revenueExpenseView === "MTD" ? 
+                    "bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 border-0 rounded-lg text-xs h-7 px-3" : 
+                    "bg-white/5 border-white/10 text-white hover:bg-white/10 rounded-lg text-xs h-7 px-3"
+                  }
+                >
+                  MTD
+                </Button>
+                <Button
+                  variant={revenueExpenseView === "YTD" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setRevenueExpenseView("YTD")}
+                  className={revenueExpenseView === "YTD" ? 
+                    "bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 border-0 rounded-lg text-xs h-7 px-3" : 
+                    "bg-white/5 border-white/10 text-white hover:bg-white/10 rounded-lg text-xs h-7 px-3"
+                  }
+                >
+                  YTD
+                </Button>
               </div>
             </div>
           </CardHeader>
@@ -582,25 +602,32 @@ export default function Overview() {
                 data={revenueExpenseView === "MTD" ? revenueExpenseDataMTD : revenueExpenseDataYTD}
                 onClick={(data) => data?.activePayload && handleBarClick(data.activePayload[0].payload)}
               >
-                <CartesianGrid strokeDasharray="3 3" stroke="#2a2927" vertical={false} />
-                <XAxis dataKey="month" stroke="#b0aea5" tick={{ fontSize: 11, fill:'#b0aea5' }} axisLine={false} tickLine={false}/>
-                <YAxis stroke="#b0aea5" tick={{ fontSize: 11, fill:'#b0aea5' }} axisLine={false} tickLine={false}/>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+                <XAxis dataKey="month" stroke="#9ca3af" tick={{ fontSize: 11 }} />
+                <YAxis stroke="#9ca3af" tick={{ fontSize: 11 }} />
                 <Tooltip 
                   formatter={(value) => `$${value.toLocaleString()}`}
-                  contentStyle={{ backgroundColor:'#1e1d1b', border:'1px solid #2a2927', borderRadius:'8px', color:'#faf9f5', fontSize:'11px' }}
+                  contentStyle={{ 
+                    backgroundColor: 'rgba(17, 24, 39, 0.95)', 
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    borderRadius: '8px',
+                    backdropFilter: 'blur(12px)',
+                    color: '#fff',
+                    fontSize: '11px'
+                  }}
                 />
-                <Legend wrapperStyle={{ color: '#b0aea5', fontSize: '11px' }} />
-                <Bar dataKey="revenue" fill="#788c5d" radius={[6, 6, 0, 0]} cursor="pointer" />
-                <Bar dataKey="expenses" fill="#d97757" radius={[6, 6, 0, 0]} cursor="pointer" />
+                <Legend wrapperStyle={{ color: '#fff', fontSize: '11px' }} />
+                <Bar dataKey="revenue" fill="#10b981" radius={[6, 6, 0, 0]} cursor="pointer" />
+                <Bar dataKey="expenses" fill="#f59e0b" radius={[6, 6, 0, 0]} cursor="pointer" />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
 
         {/* MIDDLE RIGHT: Revenue Mix - 3 columns */}
-        <Card className="col-span-3 backdrop-blur-xl rounded-xl" style={{background:'#1e1d1b',border:'1px solid #2a2927'}}>
+        <Card className="col-span-3 bg-white/5 backdrop-blur-xl border-white/10 rounded-xl">
           <CardHeader className="pb-2">
-            <CardTitle className="ov-heading text-sm font-semibold" style={{color:'#faf9f5'}}>Revenue Mix</CardTitle>
+            <CardTitle className="text-white text-sm">Revenue Mix</CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
             <ResponsiveContainer width="100%" height={120}>
@@ -620,7 +647,13 @@ export default function Overview() {
                 </Pie>
                 <Tooltip 
                   formatter={(value, name, props) => [`${value}% ($${props.payload.amount.toLocaleString()})`, name]}
-                  contentStyle={{ backgroundColor:'#1e1d1b', border:'1px solid #2a2927', borderRadius:'8px', color:'#faf9f5', fontSize:'11px' }}
+                  contentStyle={{ 
+                    backgroundColor: 'rgba(17, 24, 39, 0.95)', 
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    borderRadius: '8px',
+                    color: '#fff',
+                    fontSize: '11px'
+                  }}
                 />
               </PieChart>
             </ResponsiveContainer>
@@ -629,8 +662,7 @@ export default function Overview() {
                 <button
                   key={source.name}
                   onClick={() => handleSourceClick(source.name)}
-                  className="flex items-center gap-1.5 px-2 py-1 rounded-md transition-all text-xs ov-body"
-                  style={{background:'rgba(255,255,255,0.04)',border:'1px solid #2a2927',color:'#e8e6dc'}}
+                  className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-white/5 border border-white/10 hover:bg-white/10 transition-all text-xs text-white"
                 >
                   <div className="w-2 h-2 rounded-full" style={{ backgroundColor: COLORS[idx] }}></div>
                   <span>{source.name}</span>
@@ -645,19 +677,19 @@ export default function Overview() {
         </Card>
 
         {/* BOTTOM LEFT: Top Vendors - 4 columns */}
-        <Card className="col-span-4 backdrop-blur-xl rounded-xl" style={{background:'#1e1d1b',border:'1px solid #2a2927'}}>
+        <Card className="col-span-4 bg-white/5 backdrop-blur-xl border-white/10 rounded-xl">
           <CardHeader className="pb-2">
-            <CardTitle className="ov-heading text-sm font-semibold" style={{color:'#faf9f5'}}>Top Vendors by Spend Variance</CardTitle>
+            <CardTitle className="text-white text-sm">Top Vendors by Spend Variance</CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
-                  <TableRow style={{borderColor:'#2a2927'}} className="hover:bg-transparent">
-                    <TableHead className="ov-heading text-xs h-8" style={{color:'#b0aea5'}}>Vendor</TableHead>
-                    <TableHead className="ov-heading text-xs h-8" style={{color:'#b0aea5'}}>This Month</TableHead>
-                    <TableHead className="ov-heading text-xs h-8" style={{color:'#b0aea5'}}>Last Month</TableHead>
-                    <TableHead className="ov-heading text-xs h-8" style={{color:'#b0aea5'}}>Variance</TableHead>
+                  <TableRow className="border-white/10 hover:bg-transparent">
+                    <TableHead className="text-gray-400 text-xs h-8">Vendor</TableHead>
+                    <TableHead className="text-gray-400 text-xs h-8">This Month</TableHead>
+                    <TableHead className="text-gray-400 text-xs h-8">Last Month</TableHead>
+                    <TableHead className="text-gray-400 text-xs h-8">Variance</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -667,13 +699,12 @@ export default function Overview() {
                     return (
                       <TableRow 
                         key={idx} 
-                        className="cursor-pointer transition-all h-10"
-                        style={{borderColor:'#2a2927'}}
+                        className="cursor-pointer hover:bg-white/5 border-white/10 transition-all h-10"
                         onClick={() => handleVendorClick(vendor.vendor)}
                       >
-                        <TableCell className="ov-body font-medium text-xs" style={{color:'#faf9f5'}}>{vendor.vendor}</TableCell>
-                        <TableCell className="ov-body text-xs" style={{color:'#e8e6dc'}}>${vendor.thisMonth.toLocaleString()}</TableCell>
-                        <TableCell className="ov-body text-xs" style={{color:'#b0aea5'}}>${vendor.lastMonth.toLocaleString()}</TableCell>
+                        <TableCell className="font-medium text-white text-xs">{vendor.vendor}</TableCell>
+                        <TableCell className="text-white text-xs">${vendor.thisMonth.toLocaleString()}</TableCell>
+                        <TableCell className="text-gray-400 text-xs">${vendor.lastMonth.toLocaleString()}</TableCell>
                         <TableCell>
                           <Badge className={cn(
                             "text-xs",
@@ -694,9 +725,9 @@ export default function Overview() {
         </Card>
 
         {/* BOTTOM CENTER: Risk & Alerts - 3 columns */}
-        <Card className="col-span-3 backdrop-blur-xl rounded-xl" style={{background:'#1e1d1b',border:'1px solid #2a2927'}}>
+        <Card className="col-span-3 bg-white/5 backdrop-blur-xl border-white/10 rounded-xl">
           <CardHeader className="pb-2">
-            <CardTitle className="ov-heading text-sm font-semibold" style={{color:'#faf9f5'}}>Risk & Alerts</CardTitle>
+            <CardTitle className="text-white text-sm">Risk & Alerts</CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
             <div className="space-y-2">
@@ -709,8 +740,10 @@ export default function Overview() {
                 activeAlerts.map((alert) => (
                   <div 
                     key={alert.id}
-                    className="flex items-center justify-between p-2.5 rounded-lg border cursor-pointer transition-all"
-                    style={alert.severity==="critical"?{background:'rgba(217,119,87,0.1)',borderColor:'rgba(217,119,87,0.35)'}:{background:'rgba(204,120,92,0.1)',borderColor:'rgba(204,120,92,0.35)'}}
+                    className={cn(
+                      "flex items-center justify-between p-2.5 rounded-lg border cursor-pointer hover:bg-white/5 transition-all",
+                      alert.severity === "critical" ? "bg-red-500/10 border-red-500/30" : "bg-amber-500/10 border-amber-500/30"
+                    )}
                     onClick={() => navigate(createPageUrl(alert.page))}
                   >
                     <div className="flex items-center gap-2">
@@ -723,7 +756,7 @@ export default function Overview() {
                           alert.severity === "critical" ? "text-red-400" : "text-amber-400"
                         )} />
                       </div>
-                      <p className="ov-body font-medium text-xs" style={{color:'#faf9f5'}}>{alert.title}</p>
+                      <p className="text-white font-medium text-xs">{alert.title}</p>
                     </div>
                     <Button
                       variant="ghost"
@@ -744,28 +777,33 @@ export default function Overview() {
         </Card>
 
         {/* BOTTOM CENTER-RIGHT: Payroll Coverage - 3 columns */}
-        <Card className="col-span-3 backdrop-blur-xl rounded-xl"
-          style={shortfall<0?{background:'rgba(217,119,87,0.1)',border:'1px solid rgba(217,119,87,0.35)'}:{background:'#1e1d1b',border:'1px solid #2a2927'}}>
+        <Card className={cn(
+          "col-span-3 backdrop-blur-xl border rounded-xl",
+          shortfall < 0 ? "bg-red-500/10 border-red-500/30" : "bg-white/5 border-white/10"
+        )}>
           <CardHeader className="pb-2">
-            <CardTitle className="ov-heading text-sm font-semibold" style={{color:'#faf9f5'}}>Payroll Coverage</CardTitle>
+            <CardTitle className="text-white text-sm">Payroll Coverage</CardTitle>
           </CardHeader>
           <CardContent className="pt-0 space-y-3">
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <div className="ov-body text-xs" style={{color:'#b0aea5'}}>Next Pay Run</div>
-                <div className="ov-heading text-sm font-semibold" style={{color:'#faf9f5'}}>{payrollCoverage.nextPayDate}</div>
+                <div className="text-xs text-gray-400">Next Pay Run</div>
+                <div className="text-sm font-semibold text-white">{payrollCoverage.nextPayDate}</div>
               </div>
               <div>
-                <div className="ov-body text-xs" style={{color:'#b0aea5'}}>Gross Due</div>
-                <div className="ov-heading text-sm font-semibold" style={{color:'#faf9f5'}}>${payrollCoverage.grossDue.toLocaleString()}</div>
+                <div className="text-xs text-gray-400">Gross Due</div>
+                <div className="text-sm font-semibold text-white">${payrollCoverage.grossDue.toLocaleString()}</div>
               </div>
               <div>
-                <div className="ov-body text-xs" style={{color:'#b0aea5'}}>Projected Cash</div>
-                <div className="ov-heading text-sm font-semibold" style={{color:'#faf9f5'}}>${payrollCoverage.projectedCash.toLocaleString()}</div>
+                <div className="text-xs text-gray-400">Projected Cash</div>
+                <div className="text-sm font-semibold text-white">${payrollCoverage.projectedCash.toLocaleString()}</div>
               </div>
               <div>
-                <div className="ov-body text-xs" style={{color:'#b0aea5'}}>Shortfall</div>
-                <div className="ov-heading text-sm font-bold" style={{color: shortfall<0?'#d97757':'#788c5d'}}>
+                <div className="text-xs text-gray-400">Shortfall</div>
+                <div className={cn(
+                  "text-sm font-bold",
+                  shortfall < 0 ? "text-red-400" : "text-emerald-400"
+                )}>
                   {shortfall < 0 ? '-' : ''}${Math.abs(shortfall).toLocaleString()}
                 </div>
               </div>
@@ -785,11 +823,16 @@ export default function Overview() {
         </Card>
 
         {/* BOTTOM RIGHT: Collections - 2 columns */}
-        <Card className="col-span-2 backdrop-blur-xl rounded-xl" style={{background:'#1e1d1b',border:'1px solid #2a2927'}}>
+        <Card className="col-span-2 bg-white/5 backdrop-blur-xl border-white/10 rounded-xl">
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
-              <CardTitle className="ov-heading text-sm font-semibold" style={{color:'#faf9f5'}}>Collections</CardTitle>
-              <Badge className="text-xs border" style={totalOverdue>10000?{background:'rgba(217,119,87,0.15)',color:'#d97757',borderColor:'rgba(217,119,87,0.4)'}:{background:'rgba(120,140,93,0.15)',color:'#788c5d',borderColor:'rgba(120,140,93,0.4)'}}>
+              <CardTitle className="text-white text-sm">Collections</CardTitle>
+              <Badge className={cn(
+                "text-xs",
+                totalOverdue > 50000 ? "bg-red-500/20 text-red-400 border-red-500/30" :
+                totalOverdue > 10000 ? "bg-amber-500/20 text-amber-400 border-amber-500/30" :
+                "bg-emerald-500/20 text-emerald-400 border-emerald-500/30"
+              )}>
                 ${totalOverdue.toLocaleString()}
               </Badge>
             </div>
@@ -797,12 +840,17 @@ export default function Overview() {
           <CardContent className="pt-0">
             <div className="space-y-2">
               {collections.map((item, idx) => (
-                <div key={idx} className="flex items-center justify-between p-2 rounded-lg" style={{background:'rgba(255,255,255,0.03)',border:'1px solid #2a2927'}}>
+                <div key={idx} className="flex items-center justify-between p-2 rounded-lg bg-white/5 border border-white/10">
                   <div className="flex-1">
-                    <div className="ov-body text-xs font-medium" style={{color:'#faf9f5'}}>{item.customer}</div>
-                    <div className="ov-body text-xs" style={{color:'#b0aea5'}}>${item.amount.toLocaleString()}</div>
+                    <div className="text-xs font-medium text-white">{item.customer}</div>
+                    <div className="text-xs text-gray-400">${item.amount.toLocaleString()}</div>
                   </div>
-                  <Badge className="text-xs border" style={item.daysPastDue>30?{background:'rgba(217,119,87,0.15)',color:'#d97757',borderColor:'rgba(217,119,87,0.4)'}:item.daysPastDue>15?{background:'rgba(204,120,92,0.15)',color:'#CC785C',borderColor:'rgba(204,120,92,0.4)'}:{background:'rgba(176,174,165,0.1)',color:'#b0aea5',borderColor:'#2a2927'}}>
+                  <Badge className={cn(
+                    "text-xs",
+                    item.daysPastDue > 30 ? "bg-red-500/20 text-red-400 border-red-500/30" :
+                    item.daysPastDue > 15 ? "bg-amber-500/20 text-amber-400 border-amber-500/30" :
+                    "bg-gray-500/20 text-gray-400 border-gray-500/30"
+                  )}>
                     {item.daysPastDue}d
                   </Badge>
                 </div>
@@ -814,26 +862,38 @@ export default function Overview() {
         {/* NEW WIDGETS ROW */}
 
         {/* Financial Feed - 3 columns */}
-        <Card className="col-span-3 backdrop-blur-xl rounded-xl overflow-hidden" style={{background:'#1e1d1b',border:'1px solid #2a2927'}}>
+        <Card className="col-span-3 bg-white/5 backdrop-blur-xl border-white/10 rounded-xl overflow-hidden">
           <CardHeader className="pb-2">
-            <CardTitle className="ov-heading text-sm font-semibold flex items-center gap-2" style={{color:'#faf9f5'}}>
-              <Clock className="w-4 h-4" style={{color:'#CC785C'}} />
+            <CardTitle className="text-white text-sm flex items-center gap-2">
+              <Clock className="w-4 h-4" />
               Financial Feed
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
             <div className="space-y-2 max-h-[300px] overflow-y-auto">
               {financialFeed.map((item, idx) => (
-                <div key={idx} className="flex items-start gap-3 p-2 rounded-lg transition-all cursor-pointer" style={{background:'rgba(255,255,255,0.03)',border:'1px solid #2a2927'}}>
-                  <div className="p-2 rounded-lg" style={{background: item.color==="emerald"?'rgba(120,140,93,0.2)':item.color==="blue"?'rgba(106,155,204,0.2)':'rgba(217,119,87,0.2)'}}>
-                    <item.icon className="w-3 h-3" style={{color: item.color==="emerald"?'#788c5d':item.color==="blue"?'#6a9bcc':'#d97757'}} />
+                <div key={idx} className="flex items-start gap-3 p-2 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-all cursor-pointer">
+                  <div className={cn(
+                    "p-2 rounded-lg",
+                    item.color === "emerald" && "bg-emerald-500/20",
+                    item.color === "orange" && "bg-orange-500/20",
+                    item.color === "blue" && "bg-blue-500/20",
+                    item.color === "red" && "bg-red-500/20"
+                  )}>
+                    <item.icon className={cn(
+                      "w-3 h-3",
+                      item.color === "emerald" && "text-emerald-400",
+                      item.color === "orange" && "text-orange-400",
+                      item.color === "blue" && "text-blue-400",
+                      item.color === "red" && "text-red-400"
+                    )} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="ov-body text-xs font-medium truncate" style={{color:'#faf9f5'}}>{item.title}</div>
+                    <div className="text-xs font-medium text-white truncate">{item.title}</div>
                     <div className="flex items-center justify-between mt-1">
-                      <span className="ov-body text-xs" style={{color:'#b0aea5'}}>{item.time}</span>
+                      <span className="text-xs text-gray-500">{item.time}</span>
                       {item.amount > 0 && (
-                        <span className="ov-heading text-xs font-semibold" style={{color:'#e8e6dc'}}>${item.amount.toLocaleString()}</span>
+                        <span className="text-xs font-semibold text-white">${item.amount.toLocaleString()}</span>
                       )}
                     </div>
                   </div>
@@ -844,34 +904,42 @@ export default function Overview() {
         </Card>
 
         {/* Anomaly Widget - 3 columns */}
-        <Card className="col-span-3 backdrop-blur-xl rounded-xl" style={{background:'#1e1d1b',border:'1px solid #2a2927'}}>
+        <Card className="col-span-3 bg-white/5 backdrop-blur-xl border-white/10 rounded-xl">
           <CardHeader className="pb-2">
-            <CardTitle className="ov-heading text-sm font-semibold flex items-center gap-2" style={{color:'#faf9f5'}}>
-              <AlertTriangle className="w-4 h-4" style={{color:'#d97757'}} />
+            <CardTitle className="text-white text-sm flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-amber-400" />
               Unusual Activity
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
             <div className="space-y-3">
               {anomalies.map((anomaly, idx) => (
-                <div key={idx} className="p-3 rounded-lg transition-all cursor-pointer" style={{background:'rgba(255,255,255,0.03)',border:'1px solid #2a2927'}}>
+                <div key={idx} className="p-3 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-all cursor-pointer">
                   <div className="flex items-start justify-between mb-2">
-                    <p className="ov-body text-xs font-medium flex-1" style={{color:'#faf9f5'}}>{anomaly.title}</p>
+                    <p className="text-xs text-white font-medium flex-1">{anomaly.title}</p>
                     {anomaly.trend === "up" ? (
-                      <TrendingUp className="w-3 h-3 flex-shrink-0 ml-2" style={{color:'#d97757'}} />
+                      <TrendingUp className="w-3 h-3 text-orange-400 flex-shrink-0 ml-2" />
                     ) : (
-                      <TrendingDown className="w-3 h-3 flex-shrink-0 ml-2" style={{color:'#6a9bcc'}} />
+                      <TrendingDown className="w-3 h-3 text-blue-400 flex-shrink-0 ml-2" />
                     )}
                   </div>
                   <div className="flex items-center justify-between">
-                    <Badge className="text-xs border" style={anomaly.severity==="warning"?{background:'rgba(217,119,87,0.15)',color:'#d97757',borderColor:'rgba(217,119,87,0.4)'}:{background:'rgba(106,155,204,0.15)',color:'#6a9bcc',borderColor:'rgba(106,155,204,0.4)'}}>
+                    <Badge className={cn(
+                      "text-xs",
+                      anomaly.severity === "warning" ? "bg-amber-500/20 text-amber-400 border-amber-500/30" : "bg-blue-500/20 text-blue-400 border-blue-500/30"
+                    )}>
                       {anomaly.severity === "warning" ? "Warning" : "Info"}
                     </Badge>
-                    <span className="ov-heading text-xs font-bold" style={{color: anomaly.trend==="up"?'#d97757':'#6a9bcc'}}>{anomaly.value}</span>
+                    <span className={cn(
+                      "text-xs font-bold",
+                      anomaly.trend === "up" ? "text-orange-400" : "text-blue-400"
+                    )}>
+                      {anomaly.value}
+                    </span>
                   </div>
                 </div>
               ))}
-              <Button size="sm" className="w-full text-xs h-8 border" style={{background:'transparent',color:'#b0aea5',borderColor:'#2a2927'}}>
+              <Button variant="outline" size="sm" className="w-full bg-white/5 border-white/10 text-white hover:bg-white/10 text-xs h-8">
                 View All Anomalies
                 <ArrowRight className="w-3 h-3 ml-1" />
               </Button>
@@ -880,11 +948,16 @@ export default function Overview() {
         </Card>
 
         {/* Mini P&L Snapshot - 3 columns */}
-        <Card className="col-span-3 backdrop-blur-xl rounded-xl" style={{background:'#1e1d1b',border:'1px solid #2a2927'}}>
+        <Card className="col-span-3 bg-white/5 backdrop-blur-xl border-white/10 rounded-xl">
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
-              <CardTitle className="ov-heading text-sm font-semibold" style={{color:'#faf9f5'}}>P&L Snapshot (MTD)</CardTitle>
-              <Button size="sm" variant="ghost" onClick={() => setPlExpanded(!plExpanded)} className="h-6 px-2" style={{color:'#b0aea5'}}>
+              <CardTitle className="text-white text-sm">P&L Snapshot (MTD)</CardTitle>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setPlExpanded(!plExpanded)}
+                className="text-gray-400 hover:text-white hover:bg-white/10 h-6 px-2"
+              >
                 {plExpanded ? "Collapse" : "Expand"}
               </Button>
             </div>
@@ -892,70 +965,95 @@ export default function Overview() {
           <CardContent className="pt-0">
             <div className="space-y-3">
               <div className="flex justify-between items-center">
-                <span className="ov-body text-xs" style={{color:'#b0aea5'}}>Revenue</span>
-                <span className="ov-heading text-sm font-bold" style={{color:'#788c5d'}}>${plData.revenue.toLocaleString()}</span>
+                <span className="text-xs text-gray-400">Revenue</span>
+                <span className="text-sm font-bold text-emerald-400">${plData.revenue.toLocaleString()}</span>
               </div>
+              
               {plExpanded && (
                 <>
-                  <div className="flex justify-between items-center pl-3" style={{borderLeft:'2px solid #2a2927'}}>
-                    <span className="ov-body text-xs" style={{color:'#b0aea5'}}>COGS</span>
-                    <span className="ov-heading text-sm font-semibold" style={{color:'#d97757'}}>-${plData.cogs.toLocaleString()}</span>
+                  <div className="flex justify-between items-center pl-3 border-l-2 border-white/10">
+                    <span className="text-xs text-gray-400">COGS</span>
+                    <span className="text-sm font-semibold text-red-400">-${plData.cogs.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between items-center font-semibold">
-                    <span className="ov-body text-xs" style={{color:'#e8e6dc'}}>Gross Profit</span>
-                    <span className="ov-heading text-sm" style={{color:'#faf9f5'}}>${plData.grossProfit.toLocaleString()}</span>
+                    <span className="text-xs text-white">Gross Profit</span>
+                    <span className="text-sm text-white">${plData.grossProfit.toLocaleString()}</span>
                   </div>
-                  <div className="h-px" style={{background:'#2a2927'}}></div>
+                  <div className="h-px bg-white/10"></div>
                 </>
               )}
+
               <div className="flex justify-between items-center">
-                <span className="ov-body text-xs" style={{color:'#b0aea5'}}>Operating Expenses</span>
-                <span className="ov-heading text-sm font-semibold" style={{color:'#d97757'}}>-${plData.opex.toLocaleString()}</span>
+                <span className="text-xs text-gray-400">Operating Expenses</span>
+                <span className="text-sm font-semibold text-orange-400">-${plData.opex.toLocaleString()}</span>
               </div>
-              <div className="h-px" style={{background:'#2a2927'}}></div>
+
+              <div className="h-px bg-white/10"></div>
+
               <div className="flex justify-between items-center pt-2">
-                <span className="ov-heading text-sm font-bold" style={{color:'#faf9f5'}}>Net Income</span>
-                <span className="ov-heading text-lg font-bold" style={{color: plData.net>0?'#788c5d':'#d97757'}}>${plData.net.toLocaleString()}</span>
+                <span className="text-sm font-bold text-white">Net Income</span>
+                <span className={cn(
+                  "text-lg font-bold",
+                  plData.net > 0 ? "text-emerald-400" : "text-red-400"
+                )}>
+                  ${plData.net.toLocaleString()}
+                </span>
               </div>
+
               <div className="pt-2">
-                <div className="ov-body text-xs mb-1" style={{color:'#b0aea5'}}>Net Margin</div>
-                <div className="w-full rounded-full h-2 overflow-hidden" style={{background:'#2a2927'}}>
-                  <div className="h-full rounded-full" style={{width:`${((plData.net/plData.revenue)*100).toFixed(0)}%`,background:'linear-gradient(to right,#788c5d,#5d7048)'}}></div>
+                <div className="text-xs text-gray-500 mb-1">Net Margin</div>
+                <div className="w-full bg-white/10 rounded-full h-2 overflow-hidden">
+                  <div 
+                    className="h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full"
+                    style={{ width: `${((plData.net / plData.revenue) * 100).toFixed(0)}%` }}
+                  ></div>
                 </div>
-                <div className="ov-body text-xs mt-1" style={{color:'#b0aea5'}}>{((plData.net/plData.revenue)*100).toFixed(1)}%</div>
+                <div className="text-xs text-gray-400 mt-1">
+                  {((plData.net / plData.revenue) * 100).toFixed(1)}%
+                </div>
               </div>
             </div>
           </CardContent>
         </Card>
 
         {/* Next Best Action - 3 columns */}
-        <Card className="col-span-3 backdrop-blur-xl rounded-xl" style={{background:'#1e1d1b',border:'1px solid #2a2927'}}>
+        <Card className="col-span-3 bg-white/5 backdrop-blur-xl border-white/10 rounded-xl">
           <CardHeader className="pb-2">
-            <CardTitle className="ov-heading text-sm font-semibold flex items-center gap-2" style={{color:'#faf9f5'}}>
-              <Sparkles className="w-4 h-4" style={{color:'#CC785C'}} />
+            <CardTitle className="text-white text-sm flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-purple-400" />
               Next Best Action
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
             <div className="space-y-4">
               <div>
-                <Badge className="text-xs mb-3 border" style={nextBestAction.priority==="high"?{background:'rgba(217,119,87,0.15)',color:'#d97757',borderColor:'rgba(217,119,87,0.4)'}:{background:'rgba(204,120,92,0.15)',color:'#CC785C',borderColor:'rgba(204,120,92,0.4)'}}>
+                <Badge className={cn(
+                  "text-xs mb-3",
+                  nextBestAction.priority === "high" ? "bg-red-500/20 text-red-400 border-red-500/30" : "bg-amber-500/20 text-amber-400 border-amber-500/30"
+                )}>
                   {nextBestAction.priority === "high" ? "High Priority" : "Medium Priority"}
                 </Badge>
-                <h4 className="ov-heading text-base font-bold mb-2" style={{color:'#faf9f5'}}>{nextBestAction.title}</h4>
-                <p className="ov-body text-xs leading-relaxed" style={{color:'#b0aea5'}}>{nextBestAction.description}</p>
+                <h4 className="text-base font-bold text-white mb-2">{nextBestAction.title}</h4>
+                <p className="text-xs text-gray-300 leading-relaxed">{nextBestAction.description}</p>
               </div>
+
               <div className="flex flex-col gap-2">
                 {nextBestAction.actions.map((action, idx) => (
-                  <Button key={idx} size="sm" onClick={() => navigate(createPageUrl(action.link))}
-                    className="w-full text-xs h-8 justify-between border" style={{background:'transparent',color:'#e8e6dc',borderColor:'#3a3835'}}>
+                  <Button
+                    key={idx}
+                    variant="outline"
+                    size="sm"
+                    onClick={() => navigate(createPageUrl(action.link))}
+                    className="w-full bg-white/5 border-white/10 text-white hover:bg-white/10 text-xs h-8 justify-between"
+                  >
                     {action.label}
                     <ArrowRight className="w-3 h-3" />
                   </Button>
                 ))}
               </div>
-              <div className="pt-2" style={{borderTop:'1px solid #2a2927'}}>
-                <p className="ov-body text-xs" style={{color:'#b0aea5'}}>
+
+              <div className="pt-2 border-t border-white/10">
+                <p className="text-xs text-gray-400">
                   💡 AI-powered recommendation based on your current financial position
                 </p>
               </div>
@@ -984,30 +1082,41 @@ export default function Overview() {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="fixed top-0 right-0 h-full w-[30%] min-w-[400px] backdrop-blur-xl z-50 flex flex-col shadow-2xl"
-              style={{background:'#1a1917',borderLeft:'1px solid #2a2927'}}
+              className="fixed top-0 right-0 h-full w-[30%] min-w-[400px] bg-gray-900/95 backdrop-blur-xl border-l border-white/10 z-50 flex flex-col shadow-2xl"
             >
               {/* Header */}
-              <div className="p-6" style={{borderBottom:'1px solid #2a2927'}}>
+              <div className="p-6 border-b border-white/10">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{background:'linear-gradient(135deg,#d97757,#CC785C)'}}>
+                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center">
                       <Sparkles className="w-4 h-4 text-white" />
                     </div>
-                    <h3 className="ov-heading text-lg font-bold" style={{color:'#faf9f5'}}>Silkroute Copilot</h3>
+                    <h3 className="text-lg font-bold text-white">Silkroute Copilot</h3>
                   </div>
-                  <Button variant="ghost" size="icon" onClick={() => setAiPanelOpen(false)} style={{color:'#b0aea5'}}>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setAiPanelOpen(false)}
+                    className="text-gray-400 hover:text-white hover:bg-white/10"
+                  >
                     <X className="w-5 h-5" />
                   </Button>
                 </div>
+
+                {/* Insights Strip */}
                 <div className="space-y-2">
                   {insights.map((insight, idx) => (
-                    <div key={idx} className="flex items-center justify-between p-2 rounded-lg" style={{background:'rgba(255,255,255,0.03)',border:'1px solid #2a2927'}}>
+                    <div key={idx} className="flex items-center justify-between p-2 rounded-lg bg-white/5 border border-white/10">
                       <div className="flex items-center gap-2 flex-1">
-                        <insight.icon className="w-3 h-3" style={{color: insight.severity==="critical"?'#d97757':'#CC785C'}} />
-                        <span className="ov-body text-xs" style={{color:'#e8e6dc'}}>{insight.text}</span>
+                        <insight.icon className={cn(
+                          "w-3 h-3",
+                          insight.severity === "critical" ? "text-red-400" : "text-amber-400"
+                        )} />
+                        <span className="text-xs text-gray-300">{insight.text}</span>
                       </div>
-                      <Button size="sm" variant="ghost" className="h-6 text-xs px-2" style={{color:'#6a9bcc'}}>View</Button>
+                      <Button size="sm" variant="ghost" className="text-blue-400 hover:text-blue-300 h-6 text-xs px-2">
+                        View
+                      </Button>
                     </div>
                   ))}
                 </div>
@@ -1017,11 +1126,11 @@ export default function Overview() {
               <div className="flex-1 overflow-y-auto p-6 space-y-3">
                 {chatMessages.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-full text-center">
-                    <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4" style={{background:'rgba(204,120,92,0.15)'}}>
-                      <Sparkles className="w-8 h-8" style={{color:'#CC785C'}} />
+                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500/20 to-blue-500/20 flex items-center justify-center mb-4">
+                      <Sparkles className="w-8 h-8 text-purple-400" />
                     </div>
-                    <h4 className="ov-heading font-semibold mb-2" style={{color:'#faf9f5'}}>Ask Silkroute anything</h4>
-                    <p className="ov-body text-sm mb-4 max-w-xs" style={{color:'#b0aea5'}}>
+                    <h4 className="text-white font-semibold mb-2">Ask Silkroute anything</h4>
+                    <p className="text-gray-400 text-sm mb-4 max-w-xs">
                       Get insights about your finances, cash flow, expenses, and more.
                     </p>
                   </div>
@@ -1032,24 +1141,36 @@ export default function Overview() {
 
               {/* Quick Prompts */}
               <div className="px-6 pb-3 space-y-2">
-                <div className="ov-body text-xs mb-2" style={{color:'#b0aea5'}}>Quick prompts:</div>
+                <div className="text-xs text-gray-400 mb-2">Quick prompts:</div>
                 <div className="flex flex-wrap gap-2">
                   {quickPrompts.map((prompt, idx) => (
-                    <Button key={idx} size="sm" onClick={() => handleQuickPrompt(prompt)} className="text-xs h-7 border"
-                      style={{background:'rgba(255,255,255,0.04)',borderColor:'#2a2927',color:'#e8e6dc'}}>
+                    <Button
+                      key={idx}
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleQuickPrompt(prompt)}
+                      className="bg-white/5 border-white/10 text-gray-300 hover:bg-white/10 hover:text-white text-xs h-7"
+                    >
                       {prompt}
                     </Button>
                   ))}
                 </div>
               </div>
-              <div className="p-6" style={{borderTop:'1px solid #2a2927'}}>
+
+              {/* Input Area */}
+              <div className="p-6 border-t border-white/10">
                 <div className="flex gap-2">
-                  <Input value={inputMessage} onChange={(e) => setInputMessage(e.target.value)}
+                  <Input
+                    value={inputMessage}
+                    onChange={(e) => setInputMessage(e.target.value)}
                     onKeyPress={(e) => e.key === "Enter" && handleSendMessage(inputMessage)}
                     placeholder="Ask Silkroute anything..."
-                    className="flex-1" style={{background:'rgba(255,255,255,0.05)',border:'1px solid #3a3835',color:'#faf9f5'}}
+                    className="flex-1 bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-blue-500"
                   />
-                  <Button onClick={() => handleSendMessage(inputMessage)} style={{background:'linear-gradient(135deg,#d97757,#CC785C)'}}>
+                  <Button
+                    onClick={() => handleSendMessage(inputMessage)}
+                    className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+                  >
                     <Send className="w-4 h-4" />
                   </Button>
                 </div>
