@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -346,10 +347,6 @@ Return JSON:
         description: error.message || "Please try again"
       });
     }
-  };
-
-  const updateStep = (stepId, updates) => {
-    setSteps(steps.map(s => s.id === stepId ? { ...s, ...updates } : s));
   };
 
   const getStepConfig = (type) => {
