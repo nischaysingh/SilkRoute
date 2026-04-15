@@ -452,21 +452,10 @@ export default function Overview() {
       {/* Bento Grid Layout */}
       <div className="grid grid-cols-12 gap-4">
         
-        {/* TOP ROW: KPI Cards - 3 columns each with Explain Mode support */}
-        {kpis.map((kpi, idx) => {
-          const { explainableProps } = useExplainableWidget({
-            title: kpi.label,
-            metric: kpi.value,
-            delta: kpi.delta,
-            trend: kpi.positive ? 'up' : 'down',
-            period: "This Month",
-            actions: ['simulate', 'alert', 'create_policy']
-          });
-
-          return (
+        {/* TOP ROW: KPI Cards - 3 columns each */}
+        {kpis.map((kpi, idx) => (
             <Card 
               key={idx} 
-              {...explainableProps}
               className="col-span-3 bg-white/5 backdrop-blur-xl border-white/10 rounded-xl overflow-hidden group hover:bg-white/10 transition-all"
             >
               <CardContent className="p-5">
@@ -505,8 +494,7 @@ export default function Overview() {
                 </div>
               </CardContent>
             </Card>
-          );
-        })}
+        ))}
 
         {/* MIDDLE LEFT: Cash Balance Chart - 5 columns */}
         <Card className="col-span-5 bg-white/5 backdrop-blur-xl border-white/10 rounded-xl">

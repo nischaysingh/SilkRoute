@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,7 +9,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
-import { Sparkles, Plus, Database, Zap, Shield, Play, Save, Copy, Loader2, CheckCircle, Target, Settings } from "lucide-react";
+import { Sparkles, Plus, Database, Zap, Shield, Play, Save, Copy, Loader2, CheckCircle, Target, Settings, AlertTriangle } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { base44 } from "@/api/base44Client";
@@ -277,7 +279,7 @@ Return ONLY valid JSON:`,
     });
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (generateBlueprintMutation.isSuccess || generateBlueprintMutation.isError) {
       setBuilding(false);
     }
